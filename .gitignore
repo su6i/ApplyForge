@@ -1,0 +1,96 @@
+# ══════════════════════════════════════════════════════════════
+#  CV Project — .gitignore
+#  Strategy: ignore everything by default, whitelist safe types
+# ══════════════════════════════════════════════════════════════
+
+# Ignore everything by default
+*
+
+# ── Un-ignore safe tracked types ──────────────────────────────
+!*/
+!*.tex
+!*.md
+!*.sh
+!*.zsh
+!*.py
+!*.js
+!*.mjs
+!.env.example
+!.gitignore
+!master_cv.example.json
+
+# ── Secrets and credentials — NEVER commit ────────────────────
+.env
+.linkedin_token.json
+*.token.json
+*.credentials.json
+
+# ── Personal CV data — keep private ───────────────────────────
+master_cv.json
+master_cv*.json
+!master_cv.example.json
+
+# ── Actual personal data files (real name/email/phone inside) ─
+templates/shared/personal_data.tex
+templates/shared/personal_data.json
+
+# ── Old/legacy template folders — have hardcoded personal data ─
+templates/classic/
+templates/experimental/
+templates/altacv/
+
+# ── Private reference documents ───────────────────────────────
+.agents/references/
+
+# ── Job applications — private (names, letters, rejections) ───
+Applied/
+
+# ── Specific applications with personal name / company info ───
+cover_letters/CoverLetter_*.tex
+cover_letters/lettre_*.tex
+
+# ── LinkedIn content — post ideas and strategies are private ──
+linkedin/idees_posts.md
+
+# ── Data folder — personal cache and profile data ─────────────
+data/
+
+# ── Generated output files ────────────────────────────────────
+output/
+templates/lato/output/
+templates/*/output/
+*.pdf
+*.txt
+
+# ── LaTeX build artifacts ─────────────────────────────────────
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.blg
+
+# ── Python environment ────────────────────────────────────────
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# ── Runtime and temp ──────────────────────────────────────────
+log/
+*.tmp
+scratch*.py
+
+# ── Binaries and media ────────────────────────────────────────
+*.jpg
+*.jpeg
+*.png
+*.docx
+*.xlsx
+*.gz
+*.zip
+
+# ── macOS ─────────────────────────────────────────────────────
+.DS_Store
