@@ -1,0 +1,124 @@
+% =============================================================================
+% TEMPLATE — English Cover Letter (Generalist)
+% =============================================================================
+% AI AGENT INSTRUCTIONS (READ CAREFULLY BEFORE MODIFYING):
+% =============================================================================
+%
+% This is a REUSABLE template. For each job application:
+%   1. COPY this file → rename to: cover_letter_COMPANY_POSITION.tex
+%   2. You MUST fill in ALL 4 variables below. None are optional.
+%   3. Compile with: xelatex cover_letter_COMPANY_POSITION.tex
+%
+% ⚠️  DO NOT modify anything below the variables section.
+% ⚠️  The letter body is auto-generated from the \Variant choice.
+%
+% =============================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fontspec}
+\usepackage{geometry}
+\usepackage{ragged2e}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{ifthen}
+\geometry{margin=2cm}
+
+% Font
+\setmainfont{Times New Roman}
+
+% === Owner identity — load from personal_data.tex or define here ===
+% These are loaded automatically when the pipeline copies personal_data.tex.
+% For standalone use, define them manually:
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvmobility}{Mobile}
+
+% =============================================================================
+% >>>  MANDATORY: FILL IN ALL 4 VARIABLES BELOW FOR EACH APPLICATION  <<<
+% =============================================================================
+%
+% --- VARIABLE 1 [MANDATORY] ---
+% Company name exactly as it appears in the job posting.
+\newcommand{\CompanyName}{[COMPANY NAME]}
+%
+% --- VARIABLE 2 [MANDATORY] ---
+% Job title exactly as it appears in the job posting.
+\newcommand{\PositionTitle}{[JOB TITLE]}
+%
+% --- VARIABLE 3 [MANDATORY] ---
+% Choose EXACTLY ONE of these two values:
+%   "python" → for Senior Python Developer, Backend, or Automation roles
+%   "ai"     → for AI Engineer, Data Scientist, or ML roles
+\newcommand{\Variant}{python}
+%
+% --- VARIABLE 4 [MANDATORY] ---
+% Write 2-3 sentences about why THIS SPECIFIC company interests you.
+\newcommand{\WhyThisCompany}{[PERSONALIZED PARAGRAPH]}
+%
+% =============================================================================
+
+\begin{document}
+
+% === Header ===
+\noindent
+\begin{minipage}[t]{\textwidth}
+\RaggedRight
+\textbf{\large \cvname} \\
+\cvlocation\ (\cvmobility\ | Available for Remote) \\
+\cvphone \\
+\cvemail \\
+linkedin.com/in/su6i \\
+\end{minipage}
+
+\vspace{1cm}
+
+\begin{flushright}
+  \today
+\end{flushright}
+
+\vspace{0.5cm}
+
+% === Subject ===
+\noindent
+\textbf{Subject: Application for the Position of \PositionTitle{} at \CompanyName}
+
+\vspace{0.5cm}
+\setlength{\parskip}{0.5em}
+
+Dear Hiring Team,
+
+\vspace{0.3cm}
+
+% === Paragraph 1: Hook + Motivation ===
+\ifthenelse{\equal{\Variant}{python}}{%
+% ---- PYTHON VARIANT ----
+I am writing to express my strong interest in the \PositionTitle{} position at \CompanyName. As a holder of a \textbf{Master's Degree in Computer Science} and having \textbf{completed a DU in Big Data \& Data Science} at the University of Montpellier, combined with over 7 years of professional experience in Python development and automation, I offer a unique blend of academic excellence and proven technical expertise.
+
+% === Paragraph 2: Key Achievement ===
+Throughout my career, particularly during my 3-year tenure at NIOC, I specialized in designing and refining algorithmic solutions. I developed SNMP-based automation scripts for over 200 Cisco switches, reducing manual intervention by 70\% and maintaining 99.9\% system uptime. Recently at toHero, I implemented Multi-Agent systems that processed 18,000+ data records in just 2 hours—a task that previously took 88 hours, delivering a 99\% cost reduction. My mastery of \textbf{Python}, \textbf{SQL}, and \textbf{API integration} allows me to contribute immediately to your development team.
+}{%
+% ---- AI/DATA VARIANT ----
+As a holder of a \textbf{Master's Degree in Computer Science} and having \textbf{completed a DU in Big Data \& Data Science} at the University of Montpellier, I am eager to apply for the \PositionTitle{} position at \CompanyName. My expertise in \textbf{LLMs, NLP, and Multi-Agent Systems} (LangChain, CrewAI), coupled with concrete results in AI automation, aligns perfectly with the requirements of this role.
+
+% === Paragraph 2: Key Achievement ===
+During my time at toHero, I designed and deployed an AI-driven document analysis system that increased processing speed by 500\% and reduced costs by 99\% using OpenAI API and vector embeddings. I also developed a Multi-Agent testing pipeline that autonomously generated 476 functional test scenarios. My background in \textbf{Deep Learning} and \textbf{Time Series Analysis} (e.g., stock market prediction models) further strengthens my ability to deliver data-driven insights and innovative AI solutions.
+}
+
+% === Paragraph 3: Why This Company ===
+\WhyThisCompany
+
+% === Paragraph 4: Closing ===
+Disciplined, autonomous, and possessing a strong analytical background, I am confident that my technical skills and versatility will make me a valuable asset to \CompanyName. I would appreciate the opportunity to discuss my qualifications further in an interview.
+
+\vspace{0.5cm}
+
+Sincerely,
+
+\vspace{1cm}
+
+\cvname
+
+\end{document}

@@ -1,0 +1,128 @@
+% =============================================================================
+% TEMPLATE — Lettre de Motivation Généraliste
+% =============================================================================
+% AI AGENT INSTRUCTIONS (READ CAREFULLY BEFORE MODIFYING):
+% =============================================================================
+%
+% This is a REUSABLE template. For each job application:
+%   1. COPY this file → rename to: lettre_COMPANY_POSITION.tex
+%   2. You MUST fill in ALL 4 variables below. None are optional.
+%   3. Compile with: xelatex lettre_COMPANY_POSITION.tex
+%
+% ⚠️  DO NOT modify anything below the variables section.
+% ⚠️  DO NOT leave any placeholder brackets [...] in the final version.
+% ⚠️  The letter body is auto-generated from the \Variant choice.
+%
+% =============================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{fontspec}
+\usepackage{geometry}
+\usepackage{ragged2e}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{ifthen}
+\geometry{margin=2cm}
+
+% Font
+\setmainfont{Times New Roman}
+
+% === Owner identity — load from personal_data.tex or define here ===
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvmobilityFR}{Mobile}
+
+% =============================================================================
+% >>>  MANDATORY: FILL IN ALL 4 VARIABLES BELOW FOR EACH APPLICATION  <<<
+% =============================================================================
+%
+% --- VARIABLE 1 [MANDATORY] ---
+% Company name exactly as it appears in the job posting.
+% Example: {Capgemini} or {Orange Business Services}
+\newcommand{\CompanyName}{[NOM DE L'ENTREPRISE]}
+%
+% --- VARIABLE 2 [MANDATORY] ---
+% Job title exactly as it appears in the job posting.
+% Example: {Ingénieur Data / IA} or {Technicien Support Réseau N2}
+\newcommand{\PositionTitle}{[INTITULÉ DU POSTE]}
+%
+% --- VARIABLE 3 [MANDATORY] ---
+% Choose EXACTLY ONE of these two values (no other value is valid):
+%   "ai"  → for AI, Data Science, Python Developer, Machine Learning positions
+%   "it"  → for IT Support, Network Technician, Infrastructure, SysAdmin positions
+% This controls the entire letter body — choosing the wrong variant will produce
+% an irrelevant letter. Match this to the CV you are sending:
+%   "ai" → send with CV_AI_Data.pdf
+%   "it" → send with CV_IT_Infra.pdf
+\newcommand{\Variant}{ai}
+%
+% --- VARIABLE 4 [MANDATORY] ---
+% Write 2-3 sentences IN FRENCH about why THIS SPECIFIC company interests you.
+% This paragraph must be unique per application — never copy-paste between companies.
+% Mention: their projects, values, tech stack, industry, or recent news.
+% Example: ``Votre engagement dans l'IA appliquée au secteur de l'assurance
+%            correspond parfaitement à mon expérience chez toHero.''
+\newcommand{\WhyThisCompany}{[PARAGRAPHE PERSONNALISÉ]}
+%
+% =============================================================================
+
+\begin{document}
+
+% === Header ===
+\noindent
+\begin{minipage}[t]{\textwidth}
+\RaggedRight
+\textbf{\large \cvname} \\
+\cvlocation, \cvmobilityFR \\
+\cvphone \\
+\cvemail \\
+linkedin.com/in/su6i \\
+github.com/su6i \\
+\end{minipage}
+
+\vspace{1cm}
+
+% === Subject ===
+\noindent
+\textbf{Objet : Candidature au poste de \PositionTitle{} — \CompanyName}
+
+\vspace{0.5cm}
+\setlength{\parskip}{0.5em}
+
+Madame, Monsieur,
+
+\vspace{0.3cm}
+
+% === Paragraph 1: Hook + Motivation ===
+\ifthenelse{\equal{\Variant}{ai}}{%
+% ---- AI/DATA VARIANT ----
+Titulaire d'un \textbf{Master en Informatique} et d'un \textbf{DU Big Data \& Data Science obtenu} à l'Université de Montpellier, je me permets de vous soumettre ma candidature pour le poste de \PositionTitle{} au sein de \CompanyName. Mon expertise en \textbf{LLMs, NLP et systèmes multi-agents} (OpenAI API, LangChain, CrewAI), couplée à des résultats concrets en automatisation IA, correspond directement aux enjeux de ce poste.
+
+% === Paragraph 2: Key Achievement ===
+Lors de mon stage chez toHero, j'ai conçu et déployé un système d'IA pour l'analyse automatisée de documents d'assurance. Ce projet a permis \textbf{d'augmenter la vitesse de traitement de 500\%} et \textbf{de réduire les coûts de 99\%} grâce à une architecture combinant OpenAI API, LangChain et des embeddings vectoriels. J'ai également généré 476 scénarios de tests multi-agents via CrewAI, validant la couverture fonctionnelle complète d'une plateforme e-commerce. Ma maîtrise de \textbf{Python}, \textbf{SQL}, et des outils de visualisation (\textbf{Power BI}, Streamlit) me permettra de contribuer rapidement à vos projets data.
+}{%
+% ---- IT/INFRA VARIANT ----
+Titulaire d'un \textbf{Master en Informatique} et d'un \textbf{DU Big Data \& Data Science obtenu} à l'Université de Montpellier, fort de \textbf{plus de 7 ans d'expérience} en support technique, infrastructure réseau et automatisation, je me permets de vous soumettre ma candidature pour le poste de \PositionTitle{} au sein de \CompanyName. Mon expertise en \textbf{équipements Cisco, systèmes VOIP et monitoring SolarWinds} correspond directement aux exigences de ce poste.
+
+% === Paragraph 2: Key Achievement ===
+Au sein de NIOC, j'ai assuré le support technique de niveau 2 pour \textbf{1 500+ utilisateurs}, tout en développant des scripts Python pour la gestion SNMP des switches Cisco 2960, réduisant les interventions manuelles de \textbf{70\%}. J'ai également mis en place une surveillance proactive via SolarWinds, permettant la détection de 30\% des incidents avant impact utilisateur et maintenant une disponibilité de \textbf{99,9\%}. Mon parcours récent chez toHero m'a permis de renforcer mes compétences en \textbf{Docker}, \textbf{CI/CD} et automatisation de pipelines de données.
+}
+
+% === Paragraph 3: Why This Company (CUSTOMIZABLE) ===
+\WhyThisCompany
+
+% === Paragraph 4: Closing ===
+Rigoureux, autonome et doté d'un fort esprit d'analyse, je suis convaincu que mon profil technique et ma polyvalence feront de moi un atout pour \CompanyName. Je serais ravi de vous exposer mes motivations lors d'un entretien.
+
+\vspace{0.5cm}
+
+Dans l'attente de votre retour, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+
+\vspace{1cm}
+
+\cvname
+
+\end{document}
