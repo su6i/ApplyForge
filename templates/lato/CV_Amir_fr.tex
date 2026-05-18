@@ -1,0 +1,123 @@
+\documentclass[11pt,a4paper]{article}
+\input{lato_macros}
+\input{personal_data}
+% French template overrides:
+\renewcommand{\cvmobility}{\cvmobilityFR}
+\renewcommand{\itemspace}{\vspace{0.2em}}
+
+\begin{document}
+
+\cvheader{\textcolor{black}{\LARGE Ingénieur IA \& Data Scientist — Support IT \& Réseaux}}
+
+% ─── PROFIL ──────────────────────────────────────────────────────────────────
+\cvsection{Profil}
+\noindent
+Ingénieur polyvalent alliant \textbf{7+ ans d'expérience} en infrastructure télécoms et support réseaux à une expertise récente en \textbf{IA générative, Data Science et automatisation intelligente}. Titulaire d'un \textbf{Master en Informatique} et d'un \textbf{DU Big Data \& Data Science} (Université de Montpellier). Capable de concevoir des solutions IA de bout en bout — de l'analyse des besoins terrain jusqu'au déploiement en production — et d'en faire des outils concrets pour les équipes métier.
+
+\noindent\vspace{0.4em}
+\textbf{Savoir-faire :} LLMs / NLP, Automatisation réseau, MLOps, Support technique N2/N3, Infrastructure Cisco\\
+\textbf{Savoir-être :} Autonome, orienté résultats, communicant entre équipes techniques et métier\\
+\textbf{Permis :} Aucun \quad \textbf{Mobile :} Mobile en France \quad \textbf{Disponibilité :} Immédiate
+
+% ─── COMPÉTENCES ─────────────────────────────────────────────────────────────
+\cvsection{Compétences}
+\noindent
+\begin{tabularx}{\linewidth}{@{} p{3.5cm} X @{}}
+\textbf{IA \& Data} & Python, LLMs (OpenAI, LangChain, CrewAI), NLP (spaCy, NLTK), Deep Learning, TensorFlow/Keras, Scikit-Learn, RAG (ChromaDB), AutoML \\
+\textbf{Data Engineering} & Pandas, NumPy, SQL (PostgreSQL, MySQL), MongoDB, ETL, Power BI, Streamlit, Plotly \\
+\textbf{Réseaux \& Support} & Troubleshooting L1/L2/L3, Cisco (CCNA R\&S/Security), TCP/IP, OSPF, VLAN, QoS, VoIP/Avaya, SolarWinds, SNMP \\
+\textbf{Automatisation} & Python (scripts réseau/IA), Bash (avancé), Ansible (bases), Netmiko \\
+\textbf{MLOps \& Infra} & Docker, FastAPI, Hetzner VPS, AWS, CI/CD, Linux, Git \\
+\end{tabularx}
+
+% ─── EXPÉRIENCES ─────────────────────────────────────────────────────────────
+\cvsection{Expériences Professionnelles}
+\begin{itemize}[leftmargin=1em, label={}]
+    \item
+    \headerrow{\textbf{toHero, Montpellier} \quad \emph{Ingénieur R\&D IA \& Automatisation (Stage)}}{Jan 2025 -- Juin 2025}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item \textbf{Automatisation documentaire :} Système IA pour analyser automatiquement les dossiers d'une compagnie d'assurance — ce qui prenait des journées d'analyse manuelle est désormais traité en quelques minutes (18 000+ lignes Excel, 1 772 pages PDF via OpenAI, NLP et embeddings vectoriels)
+        \item \textbf{Génération de tests IA :} Création automatique de 476 scénarios de tests fonctionnels pour une plateforme e-commerce (multi-agents CrewAI), libérant l'équipe QA des tâches répétitives
+        \item \textbf{Infrastructure :} Déploiement Docker \& pipelines CI/CD en production (Hetzner VPS)
+    \end{itemize}
+
+    \itemspace
+    \item
+    \headerrow{\textbf{NIOC, Iran} \quad \emph{Ingénieur Support Réseaux \& Data Analyst}}{2021 -- 2024}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item \textbf{Support technique N2 :} Résolution d'incidents réseau et VoIP pour \textbf{1 500+ utilisateurs}, SLA 98\%, astreinte 24/7
+        \item \textbf{Automatisation réseau :} Développement de scripts Python/SNMP pour la gestion des switches Cisco 2960 — les techniciens n'ont plus à se déplacer sur site pour les interventions courantes (\textbf{-70\% de déplacements})
+        \item \textbf{Monitoring \& Reporting :} Dashboards Power BI et SolarWinds pour détecter proactivement 30\% des incidents avant signalement utilisateur; scripts Bash réduisant le temps de diagnostic de 40\%
+        \item \textbf{Data Analysis :} Pipelines Python d'analyse et reporting automatisé sur données réseau
+    \end{itemize}
+
+    \itemspace
+    \item
+    \headerrow{\textbf{NIOC, Iran} \quad \emph{Technicien Support Réseaux (VoIP)}}{2017 -- 2019}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Support VoIP Cisco/Avaya pour 1 500+ utilisateurs; installation équipements et rédaction de procédures techniques
+    \end{itemize}
+
+    \itemspace
+    \item
+    \headerrow{\textbf{NIOC, Iran} \quad \emph{Inspecteur QA Projets Télécom}}{2010 -- 2013}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Déploiement et contrôle qualité d'un réseau TETRA sur \textbf{78 sites} (stations de base, antennes, micro-ondes)
+    \end{itemize}
+\end{itemize}
+
+% ─── PROJETS ─────────────────────────────────────────────────────────────────
+\cvsection{Projets Personnels}
+\begin{itemize}[leftmargin=1em, label={}]
+    \item
+    \headerrow{\textbf{Cisco Switch \& IP Phone Manager} \quad \emph{NIOC $\rightarrow$ Projet Personnel}}{2021 -- 2025}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Outil de monitoring réseau qui détecte les pannes avant que les utilisateurs ne les signalent — déployé sur 70 switches Cisco 2960; évolué en application full-stack avec dashboard web, alertes Telegram automatiques et monitoring temps réel
+        \item \emph{Python, PySNMP, FastAPI, PostgreSQL, Next.js, Docker, Bash}
+    \end{itemize}
+
+    \itemspace
+    \item
+    \headerrow{\textbf{Analyseur Multi-Agents de Marchés Financiers} \quad \emph{Projet Personnel}}{2025 -- En cours}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Pipeline IA autonome d'analyse et d'optimisation de portefeuille (actions, or, forex, immobilier) avec mémoire contextuelle — permet de prendre des décisions d'investissement assistées par IA en continu
+        \item \emph{Python, CrewAI, LangChain, AutoML, Deep Learning, Reinforcement Learning, ChromaDB}
+    \end{itemize}
+\end{itemize}
+
+% ─── FORMATIONS ──────────────────────────────────────────────────────────────
+\cvsection{Formations \& Certifications}
+\begin{itemize}[leftmargin=1em, label={}]
+    \item
+    \headerrow{\textbf{Diplôme d'Université (DU) Big Data, Data Science \& Analyse de Risque}}{2025 -- 2026}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Faculté d'Économie, Université de Montpellier, France
+    \end{itemize}
+
+    \itemspace
+    \item
+    \headerrow{\textbf{Master en Informatique (Bac+5)}}{2025}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Faculté des Sciences, Université de Montpellier, France
+        \item Réseaux Avancés : 16,33/20 (1\textsuperscript{er}/13) \quad Système : 16,5/20 (4\textsuperscript{ème}/64) \quad Web Avancé : 17,15/20 (2\textsuperscript{ème}/17)
+    \end{itemize}
+
+    \itemspace
+    \item
+    \headerrow{\textbf{Formation Technique — SIAE Microelettronica (Italie)}}{2012}
+    \begin{itemize}[leftmargin=1.5em, label={$\circ$}, nosep]
+        \item Transmission Faisceaux Hertziens, Multiplexage (Mux/DeMux) et Systèmes NMS
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Certifications :} MCP: Build Rich-Context AI Apps with Anthropic (2025) \quad|\quad Multi-Agent Systems — CrewAI (2025) \quad|\quad Prompt Engineering (2025)
+
+% ─── LANGUES & DIVERS ────────────────────────────────────────────────────────
+\cvsection{Langues \& Centres d'intérêt}
+\noindent
+\begin{tabularx}{\linewidth}{@{} p{3.5cm} X @{}}
+\textbf{Langues} & \textbf{Français} (Avancé — technique fluide) \quad \textbf{Anglais} (Avancé) \quad \textbf{Persan} (Langue maternelle) \\
+\textbf{Intérêts} & Échecs \& jeux de stratégie \quad|\quad Projets open source (GitHub : su6i) \quad|\quad Cyclisme \& randonnée \\
+\end{tabularx}
+
+\end{document}

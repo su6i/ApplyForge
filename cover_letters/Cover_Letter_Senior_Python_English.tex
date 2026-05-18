@@ -1,0 +1,72 @@
+% =============================================================================
+% English Cover Letter — Senior Python Developer
+% =============================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fontspec}
+\usepackage{geometry}
+\usepackage{ragged2e}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage{ifthen}
+\geometry{margin=2cm}
+
+% Font
+\setmainfont{Times New Roman}
+
+% === Owner identity ===
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvmobility}{Mobile}
+
+% =============================================================================
+% >>>  VARIABLES  <<<
+% =============================================================================
+\newcommand{\PositionTitle}{Senior Python Developer}
+\newcommand{\RecipientEmail}{recipient@example.com}
+
+\begin{document}
+
+% Header
+\begin{minipage}[t]{\textwidth}
+\RaggedRight
+\textbf{\large \cvname} \\
+\cvlocation\ (\cvmobility\ | Available for Remote) \\
+\cvphone \\
+\cvemail \\
+linkedin.com/in/su6i \\
+\end{minipage}
+
+\vspace{1cm}
+
+\begin{flushright}
+  \today
+\end{flushright}
+
+\vspace{0.5cm}
+
+\textbf{Subject: Application for the Position of \PositionTitle}
+
+\vspace{0.5cm}
+
+Dear Hiring Team,
+
+I am writing to express my strong interest in the \PositionTitle{} position. With over 7 years of professional experience in Python development, network automation, and system architecture, I have built a solid foundation in algorithm development and complex problem-solving. My background is uniquely positioned at the intersection of high-level software engineering and robust infrastructure management.
+
+Throughout my career, particularly during my 3-year tenure as a Python Developer at NIOC, I specialized in designing and refining algorithmic solutions for large-scale network telemetry. I developed SNMP-based automation scripts for over 200 Cisco switches, successfully reducing manual intervention by 70\% and maintaining a 99.9\% system uptime. This role required deep analytical research to debug and optimize code across complex, multi-layered infrastructures.
+
+More recently, at toHero, I pushed the boundaries of Python automation by implementing Multi-Agent systems and RAG architectures. I built a system that processed 18,000+ data records and 1,772 PDF pages in just 2 hours—a task that previously took 88 hours. This achievement highlights my ability to not only write efficient Python code but to architect innovative solutions that deliver massive speed and cost advantages (99\% cost reduction).
+
+I am highly proficient in the modern Python ecosystem (LangChain, CrewAI, PyTorch, Keras) and I have a disciplined approach to testing, debugging, and code refinement. My experience working in mission-critical environments has taught me to be flexible and resilient when faced with technical challenges, always seeking alternative solutions to ensure project success.
+
+Based in \cvlocation\ and available for remote work immediately, I am eager to bring my analytical mindset and technical expertise to your team. Thank you for your time and consideration. I look forward to the possibility of discussing how my background can contribute to your projects.
+
+Sincerely,
+
+\vspace{0.5cm}
+\cvname
+
+\end{document}

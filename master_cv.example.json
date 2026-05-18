@@ -1,0 +1,309 @@
+{
+  "_comment": "Copy this file to master_cv.json and fill in your real data. Never commit master_cv.json.",
+  "_updated": "2026-03-27",
+  "identity": {
+    "name": "Firstname LASTNAME",
+    "title": "Your Job Title",
+    "email": "your.email@example.com",
+    "phone": "+33 6 XX XX XX XX",
+    "location": "City, Country",
+    "github": "github.com/yourusername",
+    "linkedin": "linkedin.com/in/yourusername"
+  },
+  "profile_summary": "CS Engineer (Master's, Montpellier) with a strong background in network infrastructure and AI automation. I build end-to-end pipelines combining LLMs, data engineering, and system-level deployment.",
+  "skills": {
+    "ai_ml": [
+      "Python",
+      "LLMs (OpenAI, Anthropic, Gemini, Grok)",
+      "LangChain",
+      "CrewAI",
+      "NLP (spaCy, NLTK)",
+      "Deep Learning",
+      "TensorFlow/Keras",
+      "Scikit-Learn",
+      "RAG",
+      "ChromaDB",
+      "Reinforcement Learning",
+      "AutoML",
+      "Fish-Speech",
+      "Faster-Whisper",
+      "GPT-SoVITS",
+      "Pyrogram",
+      "Deepgram",
+      "Azure Speech",
+      "ElevenLabs (POC)"
+    ],
+    "mlops_devops": [
+      "Docker",
+      "FastAPI",
+      "Hetzner VPS (production)",
+      "AWS",
+      "CI/CD",
+      "Linux/Bash",
+      "Git",
+      "GitHub Actions"
+    ],
+    "data_engineering": [
+      "Pandas",
+      "NumPy",
+      "SQL (PostgreSQL, MySQL, PostGIS)",
+      "MongoDB",
+      "ETL",
+      "Web Scraping (Selenium, BS4)",
+      "Power BI",
+      "Streamlit"
+    ],
+    "networks_support": [
+      "Cisco IOS",
+      "SNMP",
+      "TCP/IP",
+      "VLAN",
+      "VoIP",
+      "SolarWinds",
+      "Network Monitoring",
+      "Troubleshooting"
+    ]
+  },
+  "experience": [
+    {
+      "company": "toHero",
+      "location": "Montpellier, France",
+      "roles": [
+        {
+          "title": "AI R&D & Automation Engineer (Internship)",
+          "period": "Jan 2025 – Jun 2025",
+          "highlights": [
+            "Automated an AI-driven analysis system for insurance processing — what took days of manual work now runs in minutes (18,000+ Excel rows & 1,700+ PDF pages via OpenAI API and vector embeddings)",
+            "Generated 476 functional test scenarios via Multi-Agent CrewAI framework, freeing the QA team from repetitive work",
+            "Built AI-powered data extraction pipelines (PDF, Excel) using LLMs and vector embeddings"
+          ],
+          "tech": [
+            "Python",
+            "OpenAI API",
+            "CrewAI",
+            "LangChain",
+            "FastAPI",
+            "Docker",
+            "CI/CD"
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Semahal",
+      "location": "Iran",
+      "roles": [
+        {
+          "title": "Network Support Engineer & Automation Developer",
+          "period": "2021 – 2024",
+          "highlights": [
+            "Managed network and VoIP infrastructure for 1,500+ users — incident resolution, SLA compliance, 24/7 on-call",
+            "Built Python/SNMP automation scripts to manage 70 Cisco 2960 switches remotely, eliminating 70% of on-site interventions",
+            "Deployed SolarWinds dashboards for proactive monitoring — detected 30% of incidents before user reports",
+            "Wrote Bash scripts reducing diagnostic time by 40%; automated reporting pipelines via Python",
+            "Developed Python-based network analysis pipelines and automated reporting to reduce manual work by 70%",
+            "Created interactive Power BI dashboards for 1,500+ users to monitor real-time network health"
+          ],
+          "tech": [
+            "Python",
+            "Cisco IOS",
+            "SNMP",
+            "SolarWinds",
+            "Bash",
+            "VoIP",
+            "SQL",
+            "Power BI",
+            "Pandas"
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "title": "Multimodal AI Telegram Bot - Su6i-Yar",
+      "type": "Personal Project",
+      "period": "2025",
+      "highlights": [
+        "Personal AI assistant deployed on VPS — handles voice, image, finance and multilingual queries for daily use",
+        "8-layer LLM fallback system (Gemini/DeepSeek/Grok) for resilient responses",
+        "Built and benchmarked a full STT/TTS voice pipeline across cloud and open-source engines; shifted toward open-source stack for cost control",
+        "Async data pipelines for live finance tracking; multimodal engine with TTS & image generation"
+      ],
+      "tech": [
+        "LangChain",
+        "Gemini/Grok APIs",
+        "Pyrogram",
+        "Faster-Whisper",
+        "Fish Speech",
+        "GPT-SoVITS",
+        "Deepgram",
+        "Azure Speech",
+        "ElevenLabs (POC)",
+        "Docker"
+      ]
+    },
+    {
+      "title": "Arix - Multi-Agent RAG for Technical Documentation",
+      "type": "Personal Project",
+      "period": "2025",
+      "highlights": [
+        "Built a multilingual multi-agent RAG assistant for technical maintenance documentation with context-aware retrieval",
+        "Implemented secure admin-gated ingestion workflow and FastAPI infrastructure mirroring CLI capabilities",
+        "Added hash-based incremental ingestion and Telegram admin notifications for operational reliability"
+      ],
+      "tech": [
+        "Python",
+        "LangChain",
+        "ChromaDB",
+        "FastAPI",
+        "RAG",
+        "Vector Embeddings",
+        "Telegram Bot"
+      ]
+    },
+    {
+      "title": "Farsi GPT-SoVITS Voice Cloning Lab",
+      "type": "Personal Project",
+      "period": "2025",
+      "highlights": [
+        "Fine-tuned and tested Persian TTS workflows around GPT-SoVITS and Fish-Speech for high-fidelity voice generation",
+        "Built end-to-end audio processing pipelines for segmentation, transcription, and dataset preparation"
+      ],
+      "tech": [
+        "Python",
+        "GPT-SoVITS",
+        "Fish-Speech",
+        "WhisperX",
+        "TTS",
+        "Voice Cloning"
+      ]
+    },
+    {
+      "title": "Multi-Language Video Subtitle Generator",
+      "type": "Personal Project",
+      "period": "2025",
+      "highlights": [
+        "Implemented automated multilingual subtitle generation pipeline with Faster-Whisper STT and AI translation",
+        "Generated SRT/ASS outputs with typography corrections and optional FFmpeg subtitle rendering"
+      ],
+      "tech": [
+        "Python",
+        "Faster-Whisper",
+        "DeepSeek API",
+        "FFmpeg",
+        "Subtitle Automation"
+      ]
+    },
+    {
+      "title": "Telegram Video Automation",
+      "type": "Personal Project",
+      "period": "2025",
+      "highlights": [
+        "Architected a two-phase video scraper with structural discovery and content extraction",
+        "Implemented robust session management with self-healing Selenium drivers to bypass Cloudflare",
+        "Optimized startup performance via lazy loading and enhanced reporting with ASCII statistics tables"
+      ],
+      "tech": [
+        "Python",
+        "Selenium",
+        "Web Scraping",
+        "Automation"
+      ]
+    },
+    {
+      "title": "Multi-Agent Job Applier",
+      "type": "Personal Project",
+      "period": "2025",
+      "highlights": [
+        "Developed an autonomous multi-agent system to discover, parse, and apply to relevant job postings"
+      ],
+      "tech": [
+        "Python",
+        "CrewAI",
+        "LLMs",
+        "Automation"
+      ]
+    },
+    {
+      "title": "Cisco Switch & IP Phone Manager",
+      "type": "Professional / Personal Project",
+      "period": "2021 – 2025",
+      "highlights": [
+        "Network monitoring tool that detects failures before users report them — deployed on 70 Cisco switches",
+        "Evolved into full-stack app: real-time web dashboard, automated Telegram alerts, PostGIS geolocation"
+      ],
+      "tech": [
+        "Python",
+        "PySNMP",
+        "FastAPI",
+        "PostgreSQL/PostGIS",
+        "Next.js",
+        "Docker",
+        "Bash"
+      ]
+    },
+    {
+      "title": "Crous Bot",
+      "type": "Personal Project",
+      "period": "2024",
+      "highlights": [
+        "Automated bot for parsing and interacting with CROUS university housing services"
+      ],
+      "tech": [
+        "Python",
+        "Web Scraping",
+        "Requests"
+      ]
+    },
+    {
+      "title": "Moltbook",
+      "type": "Personal Project",
+      "period": "2024",
+      "highlights": [
+        "Exploratory framework aiming to simplify deployment and architectural design"
+      ],
+      "tech": [
+        "Architecture",
+        "System Design"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "University Diploma (DU) in Big Data, Data Science and Risk Analysis with Python",
+      "institution": "Faculty of Economics, University of Montpellier, France",
+      "period": "2025 – 2026",
+      "honors": ""
+    },
+    {
+      "degree": "Master's Degree in Computer Science (Bac+5)",
+      "institution": "Faculty of Sciences, University of Montpellier, France",
+      "period": "2024 – 2025",
+      "honors": "Advanced Networks: 16.33/20 (1st/13), Advanced Web: 17.15/20 (2nd/17), Systems: 16.5/20"
+    }
+  ],
+  "languages": {
+    "French": "Advanced",
+    "English": "Advanced",
+    "Persian": "Native"
+  },
+  "hobbies": [
+    "Cycling",
+    "Group Mountain Hiking",
+    "Chess",
+    "Open Source Contributions"
+  ],
+  "certifications": [
+    "MCP: Build Rich-Context AI Apps with Anthropic (2025)",
+    "Multi-Agent Systems — CrewAI (2025)",
+    "Prompt Engineering (2025)",
+    "Technical Training: Microwave & NMS - SIAE Microelettronica (Milan, Italy - Dec 2012). Equipment: AL, ALplus2, FAMxc, ADM1, NMS5LX.",
+    "Automates Programmables (PLC) - Siemens Step 7",
+    "Servomoteurs et Contrôle de Mouvement (SM)",
+    "Machine Learning Specialist Bootcamp (125h) - onAcademy & University of Tehran (Summer 2023). Modules: Python for ML, Basic & Advanced ML, Artificial Neural Networks, Deep Learning, Computer Vision.",
+    "Startup Weekend",
+    "ISO 9001:2000 Quality Management Training Course",
+    "HSE (Health, Safety, Environment) & Industrial Hygiene Training - Energy Sector"
+  ]
+}
