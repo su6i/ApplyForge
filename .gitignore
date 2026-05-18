@@ -48,6 +48,7 @@ Applied/
 # ── Specific applications with personal name / company info ───
 cover_letters/CoverLetter_*.tex
 cover_letters/lettre_*.tex
+cover_letters/review/
 
 # ── LinkedIn content — post ideas and strategies are private ──
 linkedin/idees_posts.md

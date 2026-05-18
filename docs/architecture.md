@@ -31,16 +31,16 @@ LLM extracts four cover-letter variables:
   ▼  src/pipeline/latex_builder.py
 • Select CV template (role → file mapping below)
 • Select cover letter template (language → FR or EN template)
-• Copy files into Applied/YYYY-MM_CompanyName_Role/ workspace
+• Copy files into Applied/YYYY-MM-DD_CompanySlug_Role_lang/ workspace
 • Fill cover letter: regex-replace the 4 \newcommand placeholders
-• Generate standardized filenames: Firstname_LASTNAME-{DocumentType}_{Role}_{Language}.tex
+• Generate standardized filenames: {CV_OWNER_SLUG}-{DocumentType}_{Role}_{Language}.tex
 • pdflatex ×2  →  CV.pdf
 • xelatex  ×1  →  CoverLetter.pdf
   │
   ▼
-Applied/2026-02_CompanyName_Role/
-    Firstname_LASTNAME-CV_AI_fr.pdf
-    Firstname_LASTNAME-LettreMotivation_AI_fr.pdf
+Applied/2026-05-19_Capgemini_AI_fr/
+    {CV_OWNER_SLUG}-CV_AI_fr.pdf
+    {CV_OWNER_SLUG}-LettreMotivation_AI_fr.pdf
     (shared/ folder with personal_data.tex)
 ```
 
@@ -129,14 +129,14 @@ Input texts are truncated to 6 000 / 8 000 chars to stay within context limits.
 ## Output Folder Structure
 
 ```
-Applied/2026-02_Capgemini_DataScientistSenior/
-├── lato_macros.tex            ← copied from templates/lato/
-├── CV_AI_Data_Lato.tex        ← copied from templates/lato/
-├── CV_AI_Data_Lato.pdf        ← compiled with pdflatex
-├── CoverLetter_Capgemini.tex  ← instantiated from cover_letters/ template
-├── CoverLetter_Capgemini.pdf  ← compiled with xelatex
+Applied/2026-05-19_Capgemini_AI_fr/
+├── lato_macros.tex                              ← copied from templates/lato/
+├── {CV_OWNER_SLUG}-CV_AI_fr.tex                 ← rendered by pipeline
+├── {CV_OWNER_SLUG}-CV_AI_fr.pdf                 ← compiled with pdflatex
+├── {CV_OWNER_SLUG}-LettreMotivation_AI_fr.tex   ← instantiated from cover_letters/
+├── {CV_OWNER_SLUG}-LettreMotivation_AI_fr.pdf   ← compiled with xelatex
 └── shared/
-    └── personal_data.tex      ← copied from templates/shared/
+    └── personal_data.tex                        ← copied from templates/shared/
 ```
 
 The `shared/` sibling dir is required so that `\input{../shared/personal_data}`
