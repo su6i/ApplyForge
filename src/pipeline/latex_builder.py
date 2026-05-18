@@ -41,10 +41,11 @@ from src.pipeline.role_classifier import RoleType
 
 # ─── Template mapping ─────────────────────────────────────────────────────────
 
+# Canonical source filenames in templates/lato/ (used by _find_template_file as hint)
 _CV_TEMPLATES: dict[RoleType, str] = {
-    "ai": "CV_AI_Data.tex",
-    "it": "CV_IT_Infra.tex",
-    "phd": "CV_PhD.tex",
+    "ai":  "CV_AI_Data_Lato.tex",
+    "it":  "CV_IT_Infra_Lato.tex",
+    "phd": "CV_PhD_Lato.tex",
 }
 
 _CL_TEMPLATES: dict[str, str] = {
@@ -265,9 +266,11 @@ def _fill_cover_letter(template: str, content: TailoredContent) -> str:
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def _create_output_dir(content: TailoredContent, role: str = "") -> Path:
-    del role
-    company_slug = slugify(content.company_name)
-    folder_name = company_slug
+    date_str     = datetime.now().strftime("%Y-%m-%d")
+    company_slug = slugify(content.company_name, max_words=3)
+    role_label   = _canonical_role_label(role) if role else "Gen"
+    lang_tag     = (content.language or "en").lower()
+    folder_name  = f"{date_str}_{company_slug}_{role_label}_{lang_tag}"
 
     output_dir = APPLIED_DIR / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
