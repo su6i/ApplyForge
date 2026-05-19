@@ -1,0 +1,114 @@
+% CV 1: Pour poste CDI en Intelligence Artificielle et Data Science
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{classic}
+\moderncvcolor{blue}
+\usepackage[utf8]{inputenc}
+% \usepackage[scale=0.8, top=2cm, bottom=2cm, left=1.8cm, right=1.8cm]{geometry} % حاشیه‌های کاهش یافته
+\usepackage[scale=0.8, top=1.1cm, bottom=1.1cm, left=1.1cm, right=1.1cm]{geometry}
+% تنظیم عرض ستون Hints (عنوان‌ها) به صورت دستی
+\setlength{\hintscolumnwidth}{3.8cm} % افزایش عرض به 4.5cm (می‌توانید این مقدار را تنظیم کنید)
+
+\name{\cvfirstname}{{\cvlastname}}}
+\setlength{\makecvtitlenamewidth}{10cm}
+\title{\bfseries Data Scientist \& Ingénieur IA}
+% \title{\bfseries Data Scientist / Data Analyst}
+% \title{\bfseries Data Scientist}
+% \address{\cvlocation}{}
+% \address{\cvlocation}{}
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+% 
+
+
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+\vspace{-1.2cm}
+
+\section{Profil}
+\cvitem{}{
+Data Scientist expérimenté, diplômé d'un Master en Informatique de l'Université de Montpellier. 
+Expert en Machine Learning, NLP et analyse de données avec LLMs. \textbf{Connaissances sectorielles : marchés financiers, télécommunications, énergie, assurance et e-commerce.} 
+Résultats concrets : optimisation de processus (+500\% vitesse, -99\% réduction de coûts, -97.7\% temps d'analyse) via l'automatisation IA. 
+Recherche un poste en data science / machine learning / analyse de données. 
+Disponible immédiatement.
+}
+
+\vspace{-0.3cm}
+% [بخش Compétences بدون تغییر]
+\section{Compétences}
+
+\cvitem{Data Science Python}{\textbf{Python}, Pandas, NumPy, Scikit-Learn, TensorFlow, NLP}
+\cvitem{Machine Learning \& IA}{Deep Learning, LLMs, OpenAI API, LangChain, CrewAI, Computer Vision}
+\cvitem{Data \& Visualisation}{SQL, MongoDB, Power BI, Matplotlib, Analyse exploratoire}
+\cvitem{Outils \& DevOps}{Docker, Git, AWS, Streamlit, Agile SCRUM}
+
+\vspace{-0.3cm}
+\section{Expériences Professionnelles}
+
+\cventry{Jan 2025 -- Juin 2025}{Data Scientist  - Spécialiste LLMs}{Stage -- toHero}{Montpellier}{}{
+\begin{itemize}
+\item \textbf{Automatisation IA:} Développement d'un système d'analyse automatisé avec validation par un expert métier : +500\% vitesse, -99\% coûts
+\item \textbf{Extraction \& Analyse de Données:} Traitement automatisé de 18 000+ lignes Excel et 1 772 pages PDF via API OpenAI, NLP et vector embeddings : réduction du temps d'analyse de 97,7\% (88h → 2h) avec amélioration de la précision
+\item \textbf{Tests multi-agents (CrewAI):} Génération de 476 scénarios de test fonctionnels pour une plateforme e-commerce, simulant des parcours utilisateurs variés
+\item \textbf{Compétences:} OpenAI API, NLP, Vector Embeddings, CrewAI, Automatisation
+\end{itemize}
+}
+
+\cventry{2021 -- 2024}{Data Analyst \& Python Developer}{National Iranian Oil Company (NIOC)}{Iran}{}{
+\begin{itemize}
+\item \textbf{Analyse de Données:} Développement de scripts Python pour l'analyse des données de performance réseau et la génération de rapports automatisés
+\item \textbf{Data Visualization:} Tableaux de bord interactifs avec Power BI pour 1500+ utilisateurs
+\end{itemize}
+}
+
+\vspace{-0.3cm}
+% [بخش Projets و Formations و Certifications و Langues بدون تغییر]
+\section{Projets}
+\cventry{2025 -- 2026}{Analyse de Données d'Assurance \& Modélisation ML}{\textit{Projet Universitaire}}{}{}{
+    \begin{itemize}
+        \item \textbf{Analyse \& Modélisation:} Gestion et modélisation de données d'assurance complexes (\textbf{plus de 922 000 enregistrements historiques}) pour l'optimisation des processus internes.
+        \item \textbf{Méthodologie:} Application rigoureuse de l'économétrie et du Machine Learning pour l'inférence de relations et l'identification d'anomalies opérationnelles.
+        \item \textbf{Développement \& Déploiement:} Conception du pipeline en utilisant la \textbf{Programmation Orientée Objet (POO)} et déploiement d'une application DataViz interactive (Streamlit).
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, POO, Machine Learning, Streamlit, Économétrie, Pandas}}
+}
+
+
+\cventry{2023}{Prédiction Boursière par Deep Learning}{Projet Freelance}{}{}{
+    \begin{itemize}
+        \item Comparaison de 3 modèles (LSTM, BiLSTM, CNN-BiLSTM) - optimisation précision
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, Keras, TensorFlow, Pandas, NumPy}}
+}
+
+\cventry{2022}{Web Scraping \& Analyse Financière}{Projet Personnel}{}{}{
+    \begin{itemize}
+        \item Collecte données financières + modèles ML pour prédictions
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, Beautiful Soup, Pandas, Scikit-Learn}}
+}
+
+\vspace{-0.3cm}
+\section{Formations}
+\cventry{2025 -- 2026}{Diplôme d'Université Big Data, Data Science et Analyse des Risques sous Python (DU, obtenu)}{\textbf{Faculté d'Économie}, Université de Montpellier, France}{}{}{}
+\cventry{2024 -- 2025}{Master en Informatique (Bac+5)}{\textbf{Faculté des sciences}, Université de Montpellier, France}{}{}{}
+
+\vspace{-0.3cm}
+\section{Langues \& Certifications}
+\cvitem{Langues}{Français (Avancé), Anglais (Opérationnel Professionnel), Persan (Natif)}
+\cvitem{Certifications}{Multi-Agent Systems (CrewAI), Prompt Engineering, Machine Learning Bootcamp}
+
+\end{document}

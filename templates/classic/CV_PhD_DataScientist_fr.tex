@@ -1,0 +1,174 @@
+% CV 3: Pour Candidature en Doctorat (PhD) - VERSION FINALE (Banking Style)
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}  
+\moderncvcolor{blue}
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8, top=1.1cm, bottom=1.1cm, left=1.1cm, right=1.1cm]{geometry}
+\setlength{\hintscolumnwidth}{3.8cm}
+
+\name{\cvfirstname}{{\cvlastname}}}
+\title{\bfseries \\Candidat au doctorat en Data Science \& IA (Finance / RL)}
+\setlength{\separatorcolumnwidth}{10pt}
+
+
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+% PHOTO REMOVED FOR ACADEMIC CV STANDARDS
+
+
+
+\makeatletter
+% ذخیره کد اصلی
+\let\originalmakecvhead\makecvhead
+
+% بازتعریف makecvhead با اندازه عنوان بزرگتر
+\renewcommand*{\makecvhead}{%
+  \recomputecvlengths%
+  
+  % فقط بخش نام و عنوان را با فرمت دلخواه نمایش می‌دهیم
+  \begin{center}
+    % نام با سایز مناسب
+    {\namefont\fontsize{28}{34}\selectfont\textcolor{color0}{\@firstname\ \@lastname}}\\[4pt]
+    \vspace{-0.3cm}
+    % عنوان با سایز بزرگتر (LARGE به جای large)
+     {\fontsize{18}{22}\selectfont\textcolor{color2}{\@title}}\\[12pt]
+  \end{center}
+  
+  % حالا کد اصلی را بدون بخش نام و عنوان اجرا می‌کنیم
+  \begingroup
+  % به طور موقت نام و عنوان را خالی می‌کنیم
+  \let\oldfirstname\@firstname
+  \let\oldlastname\@lastname
+  \let\oldtitle\@title
+  
+  \def\@firstname{}
+  \def\@lastname{}
+  \def\@title{}
+  
+  % اجرای کد اصلی
+  \originalmakecvhead
+  
+  % بازگرداندن مقادیر اصلی
+  \def\@firstname{\oldfirstname}
+  \def\@lastname{\oldlastname}
+  \def\@title{\oldtitle}
+  \endgroup
+  
+  \vspace{0.5\baselineskip}
+}
+\makeatother
+
+
+
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+
+\vspace{-1.1cm}
+\section{Profil de Chercheur}
+\cvitem{}{
+Chercheur en Data Science et Intelligence Artificielle, spécialisé en finance quantitative et en analyse des risques. 
+Solide expérience en Deep Learning, LLMs et systèmes multi-agents appliqués à l’optimisation de portefeuilles et à la modélisation financière. 
+Actuellement à la recherche d’un sujet de doctorat impliquant l’Apprentissage par Renforcement pour les marchés financiers ou les systèmes multi-agents complexes.
+}
+
+\vspace{-0.2cm}
+\section{Compétences Techniques}
+\begin{itemize}
+\item \textbf{Programmation :} Python (Pandas, NumPy, TensorFlow, Keras), Scikit-Learn, PyTorch (bases)
+\item \textbf{IA \& ML :} Deep Learning, LLMs, Reinforcement Learning, LangChain, CrewAI, NLP
+\item \textbf{Finance Quantitative :} Statistiques, séries temporelles, Markowitz, VaR, modèles de portefeuille
+\item \textbf{Outils :} Git, Docker, Streamlit, Linux, AWS, Power BI, Tableau
+\end{itemize}
+
+\vspace{-0.2cm}
+\section{Formation}
+\cventry{2025 -- 2026}{Faculté d’Économie, Université de Montpellier}{Diplôme Universitaire (DU) Big Data, Data Science et Analyse des Risques avec Python}{}{}{}
+\cventry{2024 -- 2025}{Faculté des Sciences, Université de Montpellier}{Master 2 Informatique, spécialité ICo (équivalent M.Sc.)}{}{}{}
+\cventry{2019 -- 2021}{Faculté des Sciences, Université de Montpellier}{Master Informatique, spécialité IPS (équivalent M.Sc.)}{}{}{}
+\cventry{2015 -- 2017}{CUEF, Université Grenoble Alpes}{Études de langue française (niveau B2)}{}{}{}
+\cventry{2013 -- 2015}{Université Jahad-e-Daneshgahi Khouzestan, Iran}{Licence en Génie Électronique}{}{}{}
+
+\vspace{-0.2cm}
+\section{Expériences en Recherche \& Projets}
+
+\cventry{}{Projet Universitaire}{Analyse de Données d'Assurance \& Modélisation Économétrique}{2025 -- 2026}{}{
+    \begin{itemize}
+        \item \textbf{Gestion des Données:} Traitement et intégration de données d'assurance complexes, incluant l'analyse de \textbf{plus de 922 000 enregistrements historiques} sur plusieurs tables.
+        \item \textbf{Méthodologie Avancée:} Application d'une analyse exploratoire rigoureuse, de l'économétrie et de modèles de Machine Learning pour l'inférence de relations causales et la détection d'anomalies.
+        \item \textbf{Ingénierie Logicielle:} Conception et déploiement d'un pipeline d'analyse en utilisant la \textbf{Programmation Orientée Objet (POO)} et une interface DataViz interactive (Streamlit) pour la validation des résultats.
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, POO, Machine Learning, Streamlit, Économétrie, Pandas}}
+}
+
+\cventry{}{Projet Freelance}{Prédiction Boursière par Deep Learning}{2023}{}{
+    \begin{itemize}
+        \item \textbf{Méthodologie :} Comparaison et optimisation de 4 architectures Deep Learning (\textbf{LSTM, BiLSTM, CNN-BiLSTM}) pour la prédiction de séries temporelles.
+    \end{itemize}
+\scriptsize{\textit{Technologies : Python, Keras, TensorFlow}}
+}
+
+\cventry{}{Projet Personnel}{Web Scraping \& Analyse Financière}{2022}{}{
+    \begin{itemize}
+        \item \textbf{Analyse Quantitative :} Collecte et modélisation de données financières pour des prédictions basées sur le ML.
+    \end{itemize}
+\scriptsize{\textit{Technologies : Python, BeautifulSoup, Pandas, Scikit-Learn}}
+}
+
+\clearpage
+\vspace{-0.2cm}
+\section{Publications \& Communications}
+\cvitem{}{
+\textbf{Manuscrit en préparation (2025)}
+\begin{itemize}
+\item « Optimisation d’un portefeuille boursier via un modèle hybride ML et Markowitz » (Co-auteur)
+\item Sujet de thèse proposé : Optimisation robuste de portefeuilles multi-actifs par Deep RL et systèmes multi-agents (minimisation du tail-risk)
+\end{itemize}
+}
+
+\vspace{-0.2cm}
+\section{Expériences en Data Science \& IA}
+
+\cventry{Montpellier}{Stage de Master -- toHero}{Système RAG Multi-Agents pour Génération de Scénarios}{Janv. 2025 -- Juin 2025}{}{
+\begin{itemize}
+\item \textbf{Sujet :} Conception d’un Proof of Concept (PoC) pour automatiser l’analyse de données non structurées (1772 pages PDF) via RAG et LLMs.
+\item \textbf{Recherche appliquée :} Utilisation de CrewAI pour générer 476 scénarios fonctionnels en simulant des interactions complexes entre agents IA.
+\item \textbf{Résultats clés :} Amélioration de la fiabilité analytique et réduction du temps de traitement de \textbf{97,7\%}.
+\end{itemize}
+}
+
+\cventry{Iran}{National Iranian Oil Company (NIOC)}{Data Analyst \& Développeur Python}{2021 -- 2024}{}{
+\begin{itemize}
+\item \textbf{Analyse de données :} Développement de scripts Python pour analyser les performances réseau et automatiser les rapports.
+\item \textbf{Automatisation :} Création de pipelines réduisant les tâches manuelles de 20\%.
+\end{itemize}
+}
+
+\vspace{-0.2cm}
+\section{Expériences Professionnelles Antérieures}
+
+\cventry{}{Secteur Informatique / Télécommunications}{Chef de Projet Logiciel – Développement Python}{2017 -- 2019}{}{
+\begin{itemize}
+    \item Développement de microservices Python et de workflows d’automatisation des données.
+    \item Pilotage du cycle de développement logiciel (SDLC) et coordination d’une petite équipe de développeurs.
+\end{itemize}
+}
+
+\vspace{-0.2cm}
+\section{Langues \& Centres d’Intérêt}
+\cvitem{Langues}{Français (Avancé), Anglais (Compétence Professionnelle), Persan (Langue Maternelle)}
+\cvitem{Intérêts}{Investissement personnel en bourse (10+ ans), Profil multidisciplinaire (Ingénierie, Informatique, Finance)}
+
+\end{document}

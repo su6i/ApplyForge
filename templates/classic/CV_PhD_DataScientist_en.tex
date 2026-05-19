@@ -1,0 +1,173 @@
+% CV 3: Pour Candidature en Doctorat (PhD) - VERSION FINALE AVEC SECTIONS SÉPARÉES
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8, top=1.1cm, bottom=1.1cm, left=1.1cm, right=1.1cm]{geometry}
+\setlength{\hintscolumnwidth}{3.8cm}
+
+\name{\cvfirstname}{{\cvlastname}}}
+\setlength{\separatorcolumnwidth}{10pt}
+\title{\bfseries \\PhD Applicant – AI \& Quantitative Finance} 
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+% 
+
+
+\makeatletter
+% ذخیره کد اصلی
+\let\originalmakecvhead\makecvhead
+
+% بازتعریف makecvhead با اندازه عنوان بزرگتر
+\renewcommand*{\makecvhead}{%
+  \recomputecvlengths%
+  
+  % فقط بخش نام و عنوان را با فرمت دلخواه نمایش می‌دهیم
+  \begin{center}
+    % نام با سایز مناسب
+    {\namefont\fontsize{28}{34}\selectfont\textcolor{color0}{\@firstname\ \@lastname}}\\[4pt]
+    \vspace{-0.3cm}
+    % عنوان با سایز بزرگتر (LARGE به جای large)
+     {\fontsize{18}{22}\selectfont\textcolor{color2}{\@title}}\\[12pt]
+  \end{center}
+  
+  % حالا کد اصلی را بدون بخش نام و عنوان اجرا می‌کنیم
+  \begingroup
+  % به طور موقت نام و عنوان را خالی می‌کنیم
+  \let\oldfirstname\@firstname
+  \let\oldlastname\@lastname
+  \let\oldtitle\@title
+  
+  \def\@firstname{}
+  \def\@lastname{}
+  \def\@title{}
+  
+  % اجرای کد اصلی
+  \originalmakecvhead
+  
+  % بازگرداندن مقادیر اصلی
+  \def\@firstname{\oldfirstname}
+  \def\@lastname{\oldlastname}
+  \def\@title{\oldtitle}
+  \endgroup
+  
+  \vspace{0.5\baselineskip}
+}
+\makeatother
+
+
+
+
+
+
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+\vspace{-1cm}
+
+\section{Researcher Profile}
+\cvitem{}{
+Data Science \& AI researcher specialized in quantitative finance and risk analysis. 
+Strong experience in Deep Learning, LLMs, and Multi-Agent Systems applied to portfolio optimization and financial modeling. 
+Currently seeking a PhD topic involving Reinforcement Learning for financial markets or complex multi-agent systems.
+}
+
+
+\vspace{-0.2cm}
+\section{Technical Skills}
+\begin{itemize}
+\item \textbf{Programming:} Python (Pandas, NumPy, TensorFlow, Keras), Scikit-Learn, PyTorch (basic)
+\item \textbf{AI \& ML:} Deep Learning, LLMs, Reinforcement Learning, LangChain, CrewAI, NLP
+\item \textbf{Quantitative Finance:} Statistics, Time Series, Markowitz, VaR, Portfolio models
+\item \textbf{Tools:} Git, Docker, Streamlit, Linux, AWS, Power BI, Tableau
+\end{itemize}
+
+\vspace{-0.2cm}
+\section{Education}
+\cventry{2025 -- 2026}{Faculty of Economics, University of Montpellier, France}{University Diploma (DU) Big Data, Data Science and Risk Analysis with Python}{}{}{}
+\cventry{2024 -- 2025}{Faculty of Sciences, University of Montpellier, France}{Master 2 Computer Science, specialization ICo. (M.Sc. equivalent)}{}{}{}
+\cventry{2019 -- 2021}{Faculty of Sciences, University of Montpellier, France}{Master in Computer Science, specialization IPS (M.Sc. equivalent)}{}{}{}
+\cventry{2015 -- 2017}{CUEF, University Grenoble Alpes, France}{French Language Studies (B2 Level)}{}{}{}
+\cventry{2013 -- 2015}{Jahad-e-Daneshgahi Khouzestan University, Iran}{Bachelor's Degree in Electronic Engineering}{}{}{}
+
+
+\vspace{-0.2cm}
+\section{Research \& Projects Experience} % Combined for academic focus
+
+\cventry{2025 -- 2026}{Insurance Data Analysis \& Econometric Modeling}{\textit{University Project}}{}{}{
+    \begin{itemize}
+        \item \textbf{Data Management:} Processed, cleaned, and integrated complex insurance data consisting of \textbf{922,000+ historical records} (case files, resources, processing times) across multiple tables.
+        \item \textbf{Methodology:} Applied rigorous econometric analysis and Machine Learning (ML) techniques to infer key relationships and identify critical operational anomalies.
+        \item \textbf{Software Development:} Engineered the final analysis pipeline using Object-Oriented Programming (OOP) principles and developed an interactive DataViz interface with Streamlit for decision-support.
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, OOP, Machine Learning, Streamlit, Econometrics, Pandas}}
+}
+
+\cventry{2023}{Stock Market Prediction using Deep Learning}{\textit{Freelance Project}}{}{}{
+    \begin{itemize}
+        \item \textbf{Methodology:} Comparison and optimization of 3 Deep Learning architectures (\textbf{LSTM, BiLSTM, CNN-BiLSTM}) for time series prediction.
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, Keras, TensorFlow}}
+}
+
+\cventry{2022}{Web Scraping \& Financial Analysis}{\textit{Personal Project}}{}{}{
+    \begin{itemize}
+        \item \textbf{Quantitative Analysis:} Collection and modeling of financial data for ML-based predictions.
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, Beautiful Soup, Pandas, Scikit-Learn}}
+}
+
+\section{Publications \& Communications}
+
+\cvitem{}{
+\textbf{Manuscript in Preparation (2025)}  
+\begin{itemize}
+\item "Stock Portfolio Optimization with a Hybrid ML and Markowitz Model" (Co-author)
+\item Proposed PhD topic: Robust multi-asset portfolio optimization using Deep RL and multi-agent frameworks (tail-risk minimization)
+\end{itemize}
+}
+
+
+\section{Data Science \& AI Experience} % Focus on relevant recent experience
+
+\cventry{Montpellier}{Master Internship -- toHero}{RAG Multi-Agent System for Scenario Generation}{Jan 2025 -- June 2025}{}{
+\begin{itemize}
+\item \textbf{Topic:} Conception of a Proof of Concept (PoC) for the automation of unstructured data analysis (1772 PDF pages) via RAG and LLMs.
+\item \textbf{Applied Research:} Used CrewAI to generate functional test scenarios (476 cases) by simulating complex interactions between AI agents.
+\item \textbf{Key Results:} Improved analysis reliability and reduced processing time by \textbf{97.7\%}.
+\end{itemize}
+}
+
+\cventry{Iran}{National Iranian Oil Company (NIOC)}{Data Analyst \& Python Developer}{2021 -- 2024}{}{
+\begin{itemize}
+\item \textbf{Data Analysis:} Developed Python scripts for analyzing network performance data and automating reports.
+\item \textbf{Automation:} Created data pipelines to reduce manual interventions by 20\%.
+\end{itemize}
+}
+
+\section{Previous Professional Experience}
+
+\cventry{}{IT / Telecommunications Sector}{Software Project Manager – Python Development}{2017 -- 2019}{}{
+\begin{itemize}
+    \item Developed Python microservices and data automation workflows.
+    \item Led the Software Development Life Cycle (SDLC) and coordinated a small development team.
+\end{itemize}
+}
+
+\section{Languages \& Interests}
+\cvitem{Languages}{French (Advanced), English (Professional Working Proficiency), Persian (Native)}
+\cvitem{Interests}{Personal experience in stock market investing (10+ years), Multidisciplinary background (Engineering, Computer Science, Finance)}
+
+\end{document}

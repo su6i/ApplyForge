@@ -1,0 +1,108 @@
+% =============================================================================
+% GENERAL-PURPOSE CV — IT Support / Network / Infrastructure
+% Classic CV template — IT Infra (fr)
+% Template: moderncv classic style
+% Compile with: pdflatex CV_IT_Infra.tex
+% =============================================================================
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{classic}
+\moderncvcolor{blue}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=0.7cm, bottom=0.6cm, left=1.1cm, right=1.1cm,
+  scale=0.87
+}
+\setlength{\hintscolumnwidth}{3.5cm}
+
+% === Informations Personnelles ===
+\name{\cvfirstname}{{\cvlastname}}
+\setlength{\makecvtitlenamewidth}{11cm}
+\title{\bfseries Ingénieur Support IT \& Réseaux}
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+\vspace{-0.7cm}
+
+% === PROFIL ===
+\section{Profil}
+\cvitem{}{Récemment diplômé d'un \textbf{Master en Informatique} (Université de Montpellier) et fort de \textbf{plus de 7 ans d'expérience} en infrastructure télécoms, automatisation et support IT. Expert en équipements Cisco, VoIP et monitoring SolarWinds. Résultats : \textbf{-70\% d'interventions manuelles} via Python/Bash. Disponible immédiatement.}
+
+\vspace{-0.4cm}
+
+% === COMPÉTENCES ===
+\section{Compétences}
+\cvitem{Support \& Réseaux}{Troubleshooting (L1/L2/L3), SLA, Ticketing (GLPI, OTRS), Support VOIP, Astreinte 24/7}
+\cvitem{Infrastructure Cisco}{CCNA R\&S/Security, Routeurs/Switches (Cisco 2960), TCP/IP, OSPF, VLAN, QoS, STP}
+\cvitem{Monitoring}{SolarWinds (Avancé), SNMP, Analyse de logs, Dashboards, Alerting}
+\cvitem{Automatisation}{Python (Automatisation réseau, SNMP), Bash Scripting (Avancé), Ansible (Bases)}
+\cvitem{DevOps \& Cloud}{Docker, Git, CI/CD, AWS (Bases), Linux}
+
+% === EXPÉRIENCES ===
+\section{Expériences Professionnelles}
+
+\cventry{Jan 2025 -- Juin 2025}{Ingénieur R\&D IA \& Automatisation (Stage)}{toHero}{Montpellier}{}{
+  Pipelines Python pour extraction automatisée de données (PDF, Excel, CSV) via LLM/LangChain. Déploiement Docker \& CI/CD.
+}
+
+\cventry{2021 -- 2024}{Ingénieur Support Réseaux \& Automatisation}{NIOC}{Iran}{}{
+  \begin{itemize}[leftmargin=*,label=$\circ$]
+    \item \textbf{Support Technique (N2):} Résolution d'incidents réseau et VOIP pour \textbf{1 500+ utilisateurs}, SLA à 98\% + astreinte 24/7
+    \item \textbf{Automatisation Réseau:} Scripts Python pour gestion SNMP des Cisco 2960, \textbf{-70\% interventions manuelles}
+    \item \textbf{Scripting \& Monitoring:} Bash (-40\% temps de diagnostic) + SolarWinds (30\% incidents détectés proactivement, 99,9\% disponibilité)
+    \item \textbf{Infrastructure:} Configuration et déploiement des switches Cisco 2960
+  \end{itemize}
+}
+
+\cventry{2017 -- 2019}{Technicien Support Réseaux (VOIP)}{NIOC}{Iran}{}{
+\begin{itemize}[leftmargin=*,label=$\circ$]
+\item \textbf{Support VOIP:} Configuration et maintenance pour 1 500+ utilisateurs, \textbf{-30\% temps d'arrêt} via SolarWinds
+\item \textbf{Infrastructure:} Installation des équipements Cisco et Avaya + rédaction de procédures techniques
+\end{itemize}
+}
+
+\cventry{2010 -- 2013}{Inspecteur QA Projets Télécom}{NIOC}{Iran}{}{
+  Déploiement et contrôle qualité d'un réseau TETRA sur \textbf{78 sites} (stations de base, antennes, micro-ondes).
+}
+
+\vspace{-0.4cm}
+
+% === PROJETS ===
+\section{Projets}
+
+\cventry{2025}{\textbf{Cisco Switch Manager} | Projet Personnel}{}{}{}{
+    Monitoring SNMP/Syslog temps réel pour Cisco 2960, dashboard web, alertes Telegram.\\\scriptsize{\textit{FastAPI, PySNMP, PostgreSQL/PostGIS, Next.js, Docker}}
+}
+
+\cventry{2025}{\textbf{Amir CLI} | Projet Personnel}{}{}{}{
+    Assistant terminal : compression vidéo, intégration IA, maintenance système.\\\scriptsize{\textit{Bash, Python, FFmpeg}}
+}
+
+\vspace{-0.4cm}
+% === FORMATIONS ===
+\section{Formations}
+\cventry{2024 -- 2025}{Master en Informatique (Bac+5)}{Université de Montpellier}{France}{}{Réseaux: 15,71/20 (5\textsuperscript{ème}/16) -- Réseaux Avancés: 16,33/20 (1\textsuperscript{er}/13)}
+
+\vspace{-0.3cm}
+% === LANGUES ===
+\section{Langues}
+\cvitem{}{Français (Avancé -- technique fluide) | Anglais (Opérationnel Professionnel) | Persan (Langue maternelle)}
+
+\end{document}
