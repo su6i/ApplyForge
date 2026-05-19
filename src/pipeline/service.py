@@ -208,6 +208,37 @@ class ApplicationService:
         bundle: ApplicationBundle = build(role, content, profile=profile_dict, template=template)
         return bundle
 
+    def generate_spontaneous(
+        self,
+        role: str,
+        city: str = "",
+        language: str = "",
+    ) -> ApplicationBundle:
+        """
+        Generate a spontaneous application CV (candidature spontanée).
+
+        Uses the pre-written static template for the given role — no LLM tailoring.
+        Personal data is injected via templates/shared/personal_data.tex at compile time.
+
+        Parameters
+        ----------
+        role     : Role key (e.g., "ai", "ai-en", "phd", "devops-alternance", "polyvalent").
+                   Run with role="?" to see available keys.
+        city     : Location hint — pass "montpellier" or any Occitanie city to get
+                   "Montpellier, mobile en France"; leave empty for Grenoble (default).
+        language : Override output language ("fr" or "en"). Empty → template default.
+        """
+        from src.pipeline.latex_builder import _SPONTANEOUS_MAP, build_spontaneous
+
+        if role == "?":
+            available = sorted(_SPONTANEOUS_MAP.keys())
+            raise ValueError(f"Available spontaneous roles: {', '.join(available)}")
+
+        logger.info(f"Generating spontaneous CV: role={role!r}, city={city!r}")
+        bundle = build_spontaneous(role_key=role, city=city, language=language)
+        logger.info(f"Spontaneous CV ready: {bundle.cv_pdf}")
+        return bundle
+
     def generate_with_llm_fallback(
         self,
         job_url: str,
