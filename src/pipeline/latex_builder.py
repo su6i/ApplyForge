@@ -48,6 +48,18 @@ _CV_TEMPLATES: dict[RoleType, str] = {
     "phd": "CV_PhD_Lato.tex",
 }
 
+# Spontaneous application templates: role_key → (template_folder, filename, default_lang)
+_SPONTANEOUS_MAP: dict[str, tuple[str, str, str]] = {
+    "devops-alternance": ("altacv", "CV_DevOps_Alternance_fr.tex", "fr"),
+    "devops":            ("altacv", "CV_DevOps_Alternance_fr.tex", "fr"),
+    "ai":                ("altacv", "CV_AI_MLOps_fr.tex",          "fr"),
+    "ai-en":             ("altacv", "CV_AI_MLOps_en.tex",          "en"),
+    "mlops":             ("altacv", "CV_AI_MLOps_fr.tex",          "fr"),
+    "mlops-en":          ("altacv", "CV_AI_MLOps_en.tex",          "en"),
+    "phd":               ("lato",   "CV_PhD_Research_en.tex",      "en"),
+    "polyvalent":        ("altacv", "CV_Polyvalent_fr.tex",         "fr"),
+}
+
 _CL_TEMPLATES: dict[str, str] = {
     "fr": "Lettre_de_Motivation_Template.tex",
     "en": "Cover_Letter_Template_English.tex",
@@ -73,7 +85,7 @@ def _canonical_role_label(role: str) -> str:
 class ApplicationBundle:
     output_dir: Path
     cv_pdf: Path
-    cl_pdf: Path
+    cl_pdf: Path | None = None
 
 
 # ─── Public API ───────────────────────────────────────────────────────────────
@@ -117,6 +129,66 @@ def build(
         )
 
     return ApplicationBundle(output_dir=output_dir, cv_pdf=cv_pdf, cl_pdf=cl_pdf)
+
+
+# ─── Spontaneous application ──────────────────────────────────────────────────
+
+def build_spontaneous(
+    role_key: str,
+    city: str = "",
+    language: str = "",
+) -> ApplicationBundle:
+    """
+    Compile a spontaneous CV from a pre-written static template (no LLM).
+
+    Parameters
+    ----------
+    role_key : Key from _SPONTANEOUS_MAP (e.g., "ai", "phd", "devops-alternance").
+    city     : Job location hint for city selection (e.g., "montpellier", "grenoble").
+               Empty string → defaults to Grenoble.
+    language : Override output language. Empty → use template's default language.
+    """
+    if role_key not in _SPONTANEOUS_MAP:
+        available = ", ".join(sorted(_SPONTANEOUS_MAP.keys()))
+        raise ValueError(f"Unknown spontaneous role {role_key!r}. Available: {available}")
+
+    from src.core.settings import REPO_ROOT
+    template_folder, template_file, default_lang = _SPONTANEOUS_MAP[role_key]
+    lang = (language or default_lang).strip().lower()
+
+    src_tex = REPO_ROOT / "templates" / template_folder / template_file
+    if not src_tex.exists():
+        raise FileNotFoundError(f"Spontaneous template not found: {src_tex}")
+
+    # Create output dir
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    role_slug = role_key.replace("-", "_")
+    folder_name = f"{date_str}_Spontannee_{role_slug}_{lang}"
+    output_dir = APPLIED_DIR / folder_name
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Copy template + dependencies into output dir
+    _copy_deps(output_dir, template_folder)
+
+    # Determine output filename
+    role_label = _canonical_role_label(role_slug)
+    cv_tex_name = f"{CV_OWNER_SLUG}-CV_{role_label}_{lang}.tex"
+    cv_tex_path = output_dir / cv_tex_name
+    shutil.copy2(src_tex, cv_tex_path)
+
+    # Inject location override
+    _inject_location_override(cv_tex_path, job_location=city, language=lang)
+
+    # Compile
+    engine = "xelatex" if template_folder == "altacv" else "pdflatex"
+    _run_latex(engine=engine, tex_file=cv_tex_name, work_dir=output_dir, runs=2)
+
+    cv_pdf = cv_tex_path.with_suffix(".pdf")
+    if not cv_pdf.exists():
+        raise RuntimeError(f"LaTeX did not produce {cv_pdf}")
+
+    logger.info(f"Spontaneous CV compiled: {cv_pdf}")
+    return ApplicationBundle(output_dir=output_dir, cv_pdf=cv_pdf, cl_pdf=None)
 
 
 # ─── CV compilation ───────────────────────────────────────────────────────────
@@ -172,24 +244,28 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
     return cv_pdf
 
 
-def _inject_cv_location(tex_path: Path, content: TailoredContent) -> None:
+def _inject_location_override(tex_path: Path, job_location: str, language: str) -> None:
     """
-    Inject \\renewcommand{\\cvlocation}{...} into the compiled tex file right after
-    \\begin{document}, so it overrides whatever personal_data.tex sets.
-
-    Occitanie region (34, 31, 30, 66, …) → Montpellier
-    Anywhere else                          → Grenoble
+    Inject \\renewcommand{\\cvlocation}{...} right after \\begin{document}.
+    Occitanie region → Montpellier, everywhere else → Grenoble.
     """
     from src.core.location_utils import select_cv_city
-    city = select_cv_city(content.job_location, content.language)
-    override = f"\\renewcommand{{\\cvlocation}}{{{city}}}  % auto: {content.job_location or 'unknown'}\n"
-
+    city = select_cv_city(job_location, language)
+    override = f"\\renewcommand{{\\cvlocation}}{{{city}}}  % auto: {job_location or 'unknown'}\n"
     tex = tex_path.read_text(encoding="utf-8")
     if "\\begin{document}" not in tex:
         return
     tex = tex.replace("\\begin{document}", "\\begin{document}\n" + override, 1)
     tex_path.write_text(tex, encoding="utf-8")
-    logger.debug(f"CV location set to {city!r} (job_location={content.job_location!r})")
+    logger.debug(f"CV location set to {city!r} (job_location={job_location!r})")
+
+
+def _inject_cv_location(tex_path: Path, content: TailoredContent) -> None:
+    _inject_location_override(
+        tex_path,
+        job_location=getattr(content, "job_location", "") or "",
+        language=str(getattr(content, "language", "fr") or "fr"),
+    )
 
 
 def _copy_deps(output_dir: Path, template: str = "altacv") -> None:
