@@ -40,6 +40,7 @@ class TailoredContent:
     selected_experience: list[dict] = field(default_factory=list)  # [{company,role,period,highlights,tech}]
     selected_projects: list[dict] = field(default_factory=list)    # [{title,period,description,tech}]
     color_theme: str = ""     # Optional sidebar color highlight string
+    job_location: str = ""   # City/region extracted from posting (drives \cvlocation selection)
 
 
 _SYSTEM = """\
@@ -56,6 +57,7 @@ EXACTLY these keys (no extras, no markdown fences):
   "position_title": "<exact job title from the posting>",
   "language": "<fr or en — the language the posting is written in>",
   "variant": "<see variant rules below>",
+  "job_location": "<city or region where the job is located, e.g. 'Montpellier', 'Paris', 'Lyon'. Use 'remote' or 'télétravail' if fully remote. Use 'France' if no specific city is mentioned.>",
   "why_this_company": "<2-3 sentences in the SAME language as the posting. \
                         Reference the candidate's ACTUAL experience. \
                         Mention the company's product/tech/industry. Never generic.>",
@@ -175,11 +177,13 @@ def tailor(
         cv_summary=_strip_metrics_in_summary(data.get("cv_summary", "")),
         selected_experience=data.get("selected_experience", []),
         selected_projects=data.get("selected_projects", []),
+        job_location=data.get("job_location", ""),
     )
     logger.info(
         f"Tailored → company={content.company_name!r}, "
         f"title={content.position_title!r}, lang={content.language}, "
-        f"variant={content.variant!r}, match_score={content.match_score}"
+        f"variant={content.variant!r}, match_score={content.match_score}, "
+        f"job_location={content.job_location!r}"
     )
     if content.match_score < 40:
         logger.warning(
