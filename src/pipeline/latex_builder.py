@@ -61,8 +61,8 @@ _SPONTANEOUS_MAP: dict[str, tuple[str, str, str]] = {
 }
 
 _CL_TEMPLATES: dict[str, str] = {
-    "fr": "Lettre_de_Motivation_Template.tex",
-    "en": "Cover_Letter_Template_English.tex",
+    "fr": "Cover_Letter_Template_Fr.tex",
+    "en": "Cover_Letter_Template_En.tex",
 }
 
 _ROLE_LABEL_MAP = {
