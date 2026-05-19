@@ -1,0 +1,353 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,top=0.4in, bottom=0.4in, left=0.5in, right=0.5in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{mdwlist}
+\usepackage[default]{lato}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{hyperref}
+
+\definecolor{primary}{HTML}{00B8B8}
+\definecolor{darkgray}{HTML}{333333}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=primary,
+    linkcolor=primary
+}
+
+% --- Spacing Variables ---
+\newcommand{\itemspace}{\vspace{0.4em}}
+\newcommand{\sectionspace}{\itemspace}
+\newcommand{\subspace}{\vspace{0.5em}}
+% -------------------------
+
+\pagestyle{empty}
+\setlength{\tabcolsep}{0.8em}
+
+\newcommand{\cvsection}[1]{
+    \sectionspace
+    \noindent\textcolor{primary}{\Large \textbf{#1}} \textcolor{primary}{\hrulefill}
+    \par\vspace{0.4em}
+}
+
+\newcommand{\cvsubsection}[1]{
+    \subspace
+    \noindent\textcolor{primary}{\large \textbf{#1}}
+    \par\vspace{0.3em}
+}
+
+\newcommand{\headerrow}[2]{
+    \begin{tabular*}{\linewidth}{l@{\extracolsep{\fill}}r}
+    #1 & \textcolor{primary}{#2} \\
+    \end{tabular*}
+}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\providecommand{\cvorcid}{0000-0000-0000-0000}
+\providecommand{\cvauthorcitation}{Author A.}
+\input{../shared/personal_data}
+
+\begin{document}
+
+% ============================================================
+%  HEADER
+% ============================================================
+\begin{center}
+    {\huge \textcolor{primary}{\textbf{\cvname}}}\\
+    \vspace{0.1cm}
+    \textcolor{primary}{\textbf{PhD Applicant — LLMs, Multi-Agent Systems \& RAG}}\\
+    \vspace{0.2cm}
+    \textcolor{primary}{\faMapMarker*} \ \cvlocation \quad|\quad
+    \textcolor{primary}{\faEnvelope} \ \href{mailto:\cvemail}{\cvemail} \quad|\quad
+    \textcolor{primary}{\faPhone} \ \cvphone \\
+    \vspace{0.1cm}
+    \textcolor{primary}{\faLinkedin} \ \href{https://linkedin.com/in/\cvlinkedin}{linkedin.com/in/\cvlinkedin} \quad|\quad
+    \textcolor{primary}{\faGithub} \ \href{https://github.com/\cvgithub}{github.com/\cvgithub} \quad|\quad
+    \textcolor{primary}{\faGlobe} \ ORCID: \cvorcid
+\end{center}
+
+% ============================================================
+%  RESEARCH INTERESTS
+% ============================================================
+\cvsection{Research Interests}
+\noindent
+Large Language Models (LLMs) and their alignment, \textbf{Multi-Agent Systems} orchestration and coordination, \textbf{Multi-Step \& Multi-Source Retrieval-Augmented Generation} (RAG), Natural Language Processing for low-resource languages, \textbf{Neural Text-to-Speech \& Voice Cloning} (with focus on Persian/Farsi), Deep Learning and Reinforcement Learning for Financial Time Series Forecasting and Portfolio Optimization, Multimodal AI Systems, Spaced Repetition and AI-assisted Language Acquisition.
+
+% ============================================================
+%  EDUCATION
+% ============================================================
+\cvsection{Education}
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{University Diploma (DU) — Big Data, Data Science \& Risk Analysis with Python}}{2025 -- 2026}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Faculty of Economics, University of Montpellier, France
+        \item Econometric modeling \& ML applied to 922,000+ insurance records; risk modeling; interactive DataViz (Streamlit)
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Master's Degree (M2) in Computer Science — Bac+5, parcours ICo}}{2024 -- 2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Faculty of Sciences, University of Montpellier, France
+        \item \textbf{R\'eseaux Avanc\'es:} 16.33/20 \textbf{(1\textsuperscript{st}/13)}
+        \item \textbf{Technologies avanc\'ees du Web:} 17.15/20 \textbf{(2\textsuperscript{nd}/17)}
+        \item \textbf{Java avanc\'e:} 16/20 \textbf{(2\textsuperscript{nd}/18)}
+        \item \textbf{Syst\`eme} (Linux \& Python): 16.5/20 (3\textsuperscript{rd}/64)
+        \item \textbf{Structures de donn\'ees:} 17.95/20 (5\textsuperscript{th}/17)
+        \item Coursework: Machine Learning, Distributed Systems, Databases, Algorithms
+        \item \textit{All M1 and M2 coursework completed 2019--2021 (parcours IPS); internship deferred due to residence permit non-renewal during COVID-19; diploma obtained 2025}
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Bachelor's Degree in Electronics Engineering (Licence, Bac+2+2)}}{2013 -- 2015}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Jahade Daneshgahi Institute of Higher Education of Khuzestan, Ahvaz, Iran \quad \textbf{GPA: 17.94/20}
+        \item 6 courses scored 20/20 (Computer Programming, Differential Equations, Linear Integrated Circuits, among others)
+        \item Notable: Computer Networks (19.75), Numerical Analysis (19.50), Electronic Circuit Analysis (19.50)
+    \end{itemize}
+
+\end{itemize}
+
+% ============================================================
+%  PUBLICATIONS
+% ============================================================
+\cvsection{Publications}
+
+\begin{itemize}[leftmargin=1em, label={}]
+    \item \textbf{Ferdousizadeh N., \underline{\cvauthorcitation}, Sinaei H., Ghasemiyeh R., Akhoond M.R.} (2025). \\
+    ``A Two-Stage Portfolio Optimization Model: Integrating Deep Learning for Asset Selection with Mean-Variance Analysis in Emerging Markets.''\\
+    \emph{Manuscript completed; currently under submission to peer-reviewed journals.} \quad ORCID: \cvorcid
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Proposed a two-stage hybrid framework: LSTM, BiLSTM, and CNN--BiLSTM for return forecasting on the Tehran Stock Exchange (30 stocks, 10-year horizon), followed by Markowitz mean-variance optimization under no-short-selling constraints
+        \item BiLSTM achieved the best predictive accuracy on average; the DL-augmented portfolios yielded higher Sharpe ratios and cumulative returns than equally weighted baselines, with five-asset portfolios achieving the best risk-return trade-off
+        \item First comprehensive study comparing all three architectures within the TSE emerging-market context
+    \end{itemize}
+\end{itemize}
+
+\clearpage
+% ============================================================
+%  PROFESSIONAL & RESEARCH EXPERIENCE
+% ============================================================
+\cvsection{Professional \& Research Experience}
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{toHero, Montpellier, France} \quad \emph{AI Research Intern — LLMs, RAG \& Multi-Agent Systems}}{Jan 2025 -- Jun 2025}
+    \emph{Supervisors: I. Mougenot \& S. Da Silva (Univ. Montpellier); N. Herzog (toHero)}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item \textbf{Project 1 — Insurance Document Analysis:} Built a \textbf{custom RAG pipeline from scratch} (bypassing LangChain and LlamaIndex for data confidentiality); processed \textbf{105 PDF contracts (1,772 pages)} and \textbf{18,169 free-text insurance clauses} — reducing analysis time from $\sim$88 hours to under 2 hours (\textbf{$-$98\% processing time})
+        \item Dual-pipeline architecture: adaptive \textbf{chunking} for heterogeneous PDFs (OCR-capable via pytesseract) + \textbf{multi-threaded batch processing} (5 workers, TPM-aware) for 18K+ Excel rows; \textbf{20,604 clauses} processed with semantic correction layer (sentence-transformers + cosine similarity) auto-correcting LLM outputs against a domain knowledge base
+        \item \textbf{Project 2 — Multi-Agent QA (Orchestra e-commerce):} Developed a \textbf{CrewAI multi-agent system} to autonomously generate \textbf{500+ functional test scenarios} (Gherkin); detected \textbf{25+ critical bugs} pre-production; hybrid NotebookLM $\to$ GPT $\to$ Excel pipeline reduced manual writing time by $\sim$60\%
+        \item Applied: prompt engineering, structured output parsing, semantic embeddings, multi-threading, Agile/Redmine
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Semahal Co., Iran} \quad \emph{Network Engineer \& Python Developer}}{\textasciitilde7 years (non-continuous, 2010--2024)}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Three separate periods (2010--2013, 2017--2019, 2021--2024), interspersed with academic studies in France and Iran
+        \item Developed Python/SNMP automation for monitoring \textbf{200+ Cisco 2960 switches} — \textbf{reducing manual intervention by 70\%}
+        \item Built Power BI dashboards for \textbf{1,500+ users}, transforming raw network telemetry into actionable insights
+        \item Maintained SLA at \textbf{99.9\% uptime} for critical telecom infrastructure; Bash scripts cut diagnostic time by 40\%
+        \item Deployed SolarWinds dashboards for proactive monitoring — detected 30\% of incidents before user reports
+    \end{itemize}
+
+\end{itemize}
+
+% ============================================================
+%  RESEARCH-ORIENTED PROJECTS
+% ============================================================
+\cvsection{Research Projects}
+
+% ---- Multi-Agent & RAG ----
+\cvsubsection{Multi-Agent Systems \& Retrieval-Augmented Generation}
+
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{Arix — Multi-Step Multi-Agent RAG for Technical Documentation}}{2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Architected a \textbf{4-agent sequential pipeline} (Router $\to$ Ingestion $\to$ Retrieval $\to$ Response) for domain-specific QA over PDF corpora
+        \item Implemented RAG with ChromaDB, Google Embedding API (\texttt{text-embedding-004}), and metadata-filtered semantic search — constant-time search over \textbf{500+ documents / 50,000+ pages}
+        \item Designed an \textbf{intent classification router} dispatching across technical RAG, troubleshooting, and general pipelines; admin-gated ingestion with hash-based incremental updates
+        \item Deployed via FastAPI + Docker on production VPS; real-time Telegram alerts for admin workflows
+        \item \emph{Tech: Python, LangChain, ChromaDB, Google Gemini API, FastAPI, Docker, RAG}
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Multi-Agent Financial Markets Analyser}}{2025 -- In Progress}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item End-to-end pipeline: data preprocessing, feature engineering, AutoML, deep learning fine-tuning, and \textbf{RL-based portfolio optimization} across stocks, gold, forex \& real estate
+        \item \textbf{RAG memory layer} (BGE-M3 embeddings, ChromaDB) for context-aware, historically-grounded analysis; CrewAI sector-expert agents routing queries to Stock/Gold/Forex/Real Estate specialists
+        \item Output syndicated as weekly investment reports via voice synthesis; all insights stored in a persistent RAG knowledge base
+        \item \emph{Tech: Python, CrewAI, LangChain, AutoML, Deep Learning, RL, ChromaDB, BGE-M3}
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Housi — Multi-Agent Real Estate Assistant (Hub \& Spoke Architecture)}}{2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Designed a Hub \& Spoke system with 4 specialized agents (Support, Manager, Search, Translator) orchestrated via CrewAI; custom Python router for 100\% deterministic intent dispatch
+        \item Domain-Driven Design (DDD): deep-strategy Search Crew vs.\ fast-track Advisor; dual LLM backend (DeepSeek reasoning + Gemini generation); trilingual output (EN/FR/FA)
+        \item \emph{Tech: Python, CrewAI, DeepSeek, Google Gemini, Streamlit, DDD}
+    \end{itemize}
+
+\end{itemize}
+
+\clearpage
+
+% ---- Speech & NLP ----
+\cvsubsection{Speech Processing, NLP \& Multimodal AI}
+
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{Voice Cloning Lab — Neural TTS for Low-Resource Persian}}{2025 -- In Progress}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Comparative experiments on \textbf{3 TTS architectures}: Fish Speech 1.5, GPT-SoVITS v2, XTTS v2 — fine-tuned for \textbf{Persian (Farsi)}, a low-resource language with minimal native OSS support, using ParsiVoice \& ManaTTS (\textbf{4,000+ audio clips, $\sim$25 h})
+        \item End-to-end pipeline: dataset preparation, phoneme alignment, speaker embedding extraction, fine-tuning, scalable inference; benchmarked on naturalness, speaker similarity, zero-shot vs.\ fine-tuned performance
+        \item Architecting a \textbf{CLIL language-learning platform}: AI-directed multi-character stories, automated dubbing scalable to \textbf{70 languages}, all on open-source models
+        \item \emph{Tech: Python, Fish Speech 1.5, GPT-SoVITS v2, XTTS v2, PyTorch, ManaTTS, HuggingFace}
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Su6i-Yar — Multimodal Production AI System (Deployed on Hetzner VPS)}}{2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item \textbf{8-layer LLM fallback system} (Gemini Flash $\to$ Pro $\to$ DeepSeek $\to$ Grok) orchestrated via LangChain with self-healing error recovery
+        \item Multiple TTS engines (edge-tts, Fish Speech, GPT-SoVITS, XTTS v2 with voice cloning); ASR (Faster-Whisper) with SRT/ASS subtitle generation; real-time fact-checking via Google Search grounding
+        \item CLIL educational mode: AI-generated images (Flux/Pollinations.ai), bilingual TTS with spaced-repetition pedagogy; 4-language support (FA/EN/FR/KO)
+        \item \emph{Tech: Python, LangChain, Gemini/Grok/MiniMax APIs, Pyrogram, fal.ai, Fish Speech, GPT-SoVITS, Faster-Whisper, Docker}
+    \end{itemize}
+
+\end{itemize}
+
+% ---- Financial Deep Learning ----
+\cvsubsection{Deep Learning for Financial Markets}
+
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{Stock Market Prediction — Comparative Deep Learning Study} \emph{(see Publications)}}{2023 -- 2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Comparative study of LSTM, BiLSTM, CNN-BiLSTM on \textbf{30 TSE stocks} over a 10-year horizon; contributed to the submitted paper as second author
+        \item Key finding: hybrid CNN-BiLSTM achieved best predictive accuracy; DL-augmented Markowitz portfolios outperformed equally weighted baselines on Sharpe ratio and cumulative return
+        \item End-to-end pipeline: data collection, preprocessing, feature engineering, model training, hyperparameter tuning, portfolio construction and backtesting
+        \item \emph{Tech: Python, TensorFlow, Keras, Pandas, SciPy, Financial APIs, Time Series Analysis}
+    \end{itemize}
+
+    \subspace
+    \item
+    \headerrow{\textbf{Insurance Risk Modeling \& Econometric Analysis} \emph{(University of Montpellier, DU)}}{2025 -- 2026}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Analyzed \textbf{922,000+ insurance records} using econometric models and ML; statistical hypothesis testing, regression analysis, risk modeling
+        \item Deployed interactive DataViz application (Streamlit, OOP architecture)
+        \item \emph{Tech: Python, Scikit-Learn, Econometrics, Statsmodels, Streamlit, Pandas}
+    \end{itemize}
+
+\end{itemize}
+
+% ---- AI for Education ----
+\cvsubsection{AI for Language Acquisition}
+
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{LinguaFlash — Spaced Repetition Chrome Extension} \emph{(Published, Chrome Web Store)}}{2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Spaced Repetition system with interval-based notifications and TTS auto-pronunciation; \\\textbf{1,600+ vocabulary items} across CEFR A1--C2 in \textbf{10 languages} with native-logic grammar explanations
+        \item Migrated from flat-file to high-performance IndexedDB architecture; published to Chrome Web Store with real user base
+        \item \emph{Tech: JavaScript, Chrome Extensions API, IndexedDB, SQLite, TTS, Spaced Repetition Algorithms}
+    \end{itemize}
+
+\end{itemize}
+
+% ---- AI for Research ----
+\cvsubsection{AI for Research Automation}
+
+\begin{itemize}[leftmargin=1em, label={}]
+
+    \item
+    \headerrow{\textbf{Research Toolkit — Automated Academic Research Assistant}}{2025}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Built an AI-powered tool for automated literature review: professor profiling, paper summarization, and research topic brainstorming — reducing project initialization time from $\sim$30 minutes to $<$2 minutes
+        \item Implemented \textbf{identity verification} via cross-referencing publications across ResearchGate and Google Scholar; structured async workflows for concurrent research threads
+        \item Multi-model LLM fallback pipeline (Gemini Flash $\to$ DeepSeek $\to$ Gemma) with TTS output for audio summaries of retrieved literature
+        \item \emph{Tech: Python, Google Gemini API, asyncio, Web Scraping, edge-tts, SQLite}
+    \end{itemize}
+
+\end{itemize}
+
+
+% ============================================================
+%  TECHNICAL SKILLS
+% ============================================================
+\cvsection{Technical Skills}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{} p{3.8cm} X @{}}
+\textbf{AI \& LLMs} & Python, LangChain, CrewAI, OpenAI / Anthropic / Gemini / DeepSeek / Grok APIs, Prompt Engineering, RAG, ChromaDB, BGE-M3 embeddings, Multi-Agent Orchestration \\[0.3em]
+\textbf{Deep Learning} & TensorFlow, Keras, PyTorch, LSTM, BiLSTM, CNN-BiLSTM, Scikit-Learn, AutoML, Reinforcement Learning \\[0.3em]
+\textbf{Speech \& Audio} & TTS (Fish Speech, GPT-SoVITS v2, XTTS v2, edge-tts), STT (Faster-Whisper, WhisperX), Voice Cloning, Audio Pipeline Design \\[0.3em]
+\textbf{Data Science} & Pandas, NumPy, SciPy, SQL (PostgreSQL, MySQL), MongoDB, ETL, Econometrics, Time Series Analysis, Power BI, Streamlit, Plotly \\[0.3em]
+\textbf{Infrastructure} & Docker, FastAPI, Git, CI/CD, Linux/Bash, AWS, Hetzner VPS, Cisco IOS (CCNA), SNMP, PySNMP, SolarWinds \\[0.3em]
+\textbf{Web \& Frontend} & JavaScript, Chrome Extensions API, IndexedDB, Next.js, HTML/CSS \\[0.3em]
+\textbf{Media \& Video} & FFmpeg (HEVC, H.264, HW Acceleration), Manim, Real-ESRGAN, Selenium \\[0.3em]
+\end{tabularx}
+
+% ============================================================
+%  CERTIFICATIONS & COURSES
+% ============================================================
+\cvsection{Certifications \& Courses}
+\begin{itemize}[leftmargin=1em, label={}]
+    \item \headerrow{\textbf{MCP: Build Rich-Context AI Applications with Anthropic}}{2025}
+    \vspace{0.15em}
+    \item \headerrow{\textbf{Multi-Agent Systems with CrewAI — DeepLearning.AI}}{2025}
+    \vspace{0.15em}
+    \item \headerrow{\textbf{Prompt Engineering for Developers — DeepLearning.AI}}{2025}
+    \vspace{0.15em}
+    \item \headerrow{\textbf{Machine Learning Specialist Bootcamp (125 h) — OnAcademy \& University of Tehran}}{2023}
+    \begin{itemize}[leftmargin=1.5em, label=$\bullet$, nosep]
+        \item Modules: Python for ML, Basic \& Advanced ML, Artificial Neural Networks, Deep Learning, Computer Vision
+    \end{itemize}
+\end{itemize}
+
+% ============================================================
+%  LANGUAGES
+% ============================================================
+\cvsection{Languages}
+\noindent
+\begin{tabularx}{\linewidth}{@{} p{3.8cm} X @{}}
+\textbf{French}  & Advanced — Full professional proficiency; initial studies in Grenoble (2015--2017) \\
+\textbf{English} & Professional — Technical writing, academic publications, and documentation \\
+\textbf{Persian} & Native Speaker \\
+\end{tabularx}
+
+% ============================================================
+%  ADDITIONAL INFORMATION
+% ============================================================
+\cvsection{Additional Information}
+
+\noindent
+\begin{tabularx}{\linewidth}{@{} p{3.8cm} X @{}}
+\textbf{Interests} & Open Source, Cycling, Group Mountain Hiking, Chess \\[0.3em]
+\textbf{GitHub}    & \href{https://github.com/\cvgithub}{github.com/\cvgithub} — Active repositories: Arix (RAG), Su6i-Yar (Multimodal Bot), Voice Cloning Lab, amir-cli (multi-LLM CLI toolkit), LinguaFlash (Chrome Extension) \\[0.3em]
+\textbf{Availability} & Available for PhD start: September 2026 \\
+\end{tabularx}
+
+\end{document}

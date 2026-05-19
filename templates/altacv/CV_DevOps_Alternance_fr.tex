@@ -1,0 +1,178 @@
+\documentclass[7pt,a4paper,withhyper]{altacv}
+
+\geometry{left=0.9cm,right=0.9cm,top=0.7cm,bottom=0.7cm,columnsep=0.3cm}
+\usepackage{paracol}
+\usepackage[default]{lato}
+\usepackage{ragged2e}
+\linespread{0.95}
+
+\definecolor{VividPurple}{HTML}{1A5276}
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{555555}
+
+\colorlet{name}{black}
+\colorlet{tagline}{VividPurple}
+\colorlet{heading}{VividPurple}
+\colorlet{headingrule}{VividPurple}
+\colorlet{subheading}{VividPurple}
+\colorlet{accent}{VividPurple}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+\renewcommand{\itemmarker}{{\small\textbullet}}
+\renewcommand{\ratingmarker}{\faCircle}
+\renewcommand{\taglinefont}{\Large\bfseries}
+
+\renewcommand{\cvevent}[4]{%
+  {\large\color{emphasis}\raggedright #1\par}
+  \smallskip\normalsize
+  \ifstrequal{#2}{}{}{%
+    \textbf{\color{accent}#2}%
+  }%
+  \ifstrequal{#4}{}{}{%
+    \ifstrequal{#2}{}{}{\hspace{1.5em}}%
+    {\small\cvLocationMarker~#4}%
+  }%
+  \ifstrequal{#3}{}{}{%
+    \hfill{\small\cvDateMarker~#3}%
+  }\par
+}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+
+\begin{document}
+\enlargethispage{5cm}
+
+\name{\cvname}
+\tagline{Alternant Ingénieur DevOps / MLOps | CI/CD · Docker · Python · Automatisation}
+\personalinfo{}
+\makecvheader
+
+\cvsection{Profil}
+{\small\justifying
+Ingénieur informatique (Master 2, Université de Montpellier) avec 7 ans d'expérience en infrastructure système/réseau et une spécialisation en automatisation DevOps et MLOps. Ayant déployé des pipelines end-to-end en production (Docker, CI/CD, FastAPI, VPS), je recherche une alternance pour consolider mon expertise en orchestration cloud et intégration continue. Profil opérationnel dès le premier jour sur les environnements Linux, scripting Python/Bash et conteneurisation.\par}
+
+\columnratio{0.35}
+\vspace{0.1em}
+\backgroundcolor{c[0]}[HTML]{EBF5FB}
+\vspace{0.1em}
+\begin{paracol}{2}
+\vspace{-0.5em}
+
+% ---- LEFT COLUMN ----
+
+\cvsection{Coordonnées}
+\smallskip
+\textcolor{accent}{\faAt} \hspace{0.5em} \href{mailto:\cvemail}{\cvemail}\\\vspace{0.1em}
+\textcolor{accent}{\faPhone} \hspace{0.5em} \cvphone\\\vspace{0.1em}
+\textcolor{accent}{\cvLocationMarker} \hspace{0.5em} \cvlocation\\\vspace{0.1em}
+\textcolor{accent}{\faLinkedin} \hspace{0.5em} \href{https://linkedin.com/in/\cvlinkedin}{linkedin.com/in/\cvlinkedin}\\\vspace{0.1em}
+\textcolor{accent}{\faGithub} \hspace{0.5em} \href{https://github.com/\cvgithub}{github.com/\cvgithub}\par
+
+\vspace{0.2em}
+\cvsection{Compétences}
+
+\cvachievement{\faCloud}{DevOps \& CI/CD}{Docker, GitHub Actions/GitLab CI, Linux/Bash, Git, AWS, VPS (production), FastAPI, Nginx}\par
+\vspace{0.2em}
+\cvachievement{\faChartLine}{Monitoring \& Infra}{Grafana, Prometheus, SolarWinds, SNMP, TCP/IP, DNS, VPN, Cisco IOS}\par
+\vspace{0.2em}
+\cvachievement{\faRobot}{IA \& MLOps}{Python, LLMs, LangChain, CrewAI, RAG, NLP, pipelines ML en production}\par
+\vspace{0.2em}
+\cvachievement{\faDatabase}{Data}{Pandas, SQL (PostgreSQL), MongoDB, ETL, Power BI}\par
+
+\vspace{0.2em}
+\cvsection{Certifications}
+\smallskip
+\noindent\textbf{DeepLearning.ai / Anthropic}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~MCP: Build Rich-Context AI Apps\par
+\vspace{0.2em}
+\noindent\textbf{DeepLearning.ai / CrewAI}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~Multi-Agent Systems\par
+\vspace{0.2em}
+\noindent\textbf{DeepLearning.ai}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~Prompt Engineering\par
+\vspace{0.2em}
+\noindent\textbf{Univ. de Téhéran / OnAcademy}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~ML Specialist Bootcamp (125h) · 2023\par
+\hspace{1em}{Python ML · Neural Networks · Computer Vision}\par
+
+\vspace{0.2em}
+\cvsection{Langues}
+\textbf{Français} (Avancé)\\\vspace{0.1em}
+\textbf{Anglais} (Avancé)\\\vspace{0.1em}\par
+
+\vspace{0.2em}
+\cvsection{Centres d'intérêt}
+\cvtag{Open Source} \cvtag{Cyclisme}\\[-0.15em]
+\cvtag{Randonnée} \cvtag{Échecs}\par
+
+% ---- RIGHT COLUMN ----
+\switchcolumn
+\vspace{-0.5em}
+
+\cvsection{Expérience}
+
+\cvevent{Ingénieur R\&D IA \& DevOps (Stage)}{toHero}{Jan – Juin 2025}{Montpellier}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Déploiement conteneurisé (Docker) de pipelines IA end-to-end en production ; intégration continue (CI/CD), gestion de branches Git en équipe
+\item \justifying Automatisation du traitement de \textbf{18 000+ lignes Excel \& 1 700+ pages PDF} via APIs LLM ; \textbf{476 scénarios de tests} générés par agents CrewAI
+\end{itemize}
+\smallskip\noindent\textit{Stack: Docker, Git, CI/CD, FastAPI, Python, OpenAI API, CrewAI, LangChain}\par
+
+\vspace{0.25em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.25em}
+
+\cvevent{Ingénieur Automatisation \& Infrastructure}{Semahal}{2021 – 2024}{}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Scripts \textbf{Python/SNMP/Bash} pour gérer à distance 70 switchs Cisco et automatiser le reporting — \textbf{−70\% d'interventions sur site}, \textbf{−40\% du temps de diagnostic}
+\item \justifying Dashboards SolarWinds/SNMP : \textbf{détection proactive de 30\%} des incidents avant signalement utilisateur
+\item \justifying Administration Linux/Windows pour \textbf{1 500+ utilisateurs}, astreinte 24/7, conformité SLA
+\end{itemize}
+\smallskip\noindent\textit{Stack: Python, Bash, SNMP, SolarWinds, Cisco IOS, Linux, Power BI, SQL}\par
+
+\vspace{-0.5ex}
+\cvsection{Projets}
+
+{\large\color{emphasis}\raggedright\href{https://github.com/\cvgithub/cisco-manager}{\textbf{Cisco Manager} -- Dashboard réseau full-stack} {\small\color{LightGrey}· 2021–2025}\par}
+\vspace{0.1em}
+\begin{itemize}[leftmargin=1.25em, nosep]
+\item \justifying Surveillance temps réel de 70 switchs Cisco (pannes détectées avant signalement), alertes Telegram, géolocalisation PostGIS
+\item \justifying Stack : FastAPI + Next.js + PostgreSQL/PostGIS + Docker
+\end{itemize}\par
+\vspace{0.1em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.1em}
+
+{\large\color{emphasis}\raggedright\href{https://github.com/\cvgithub/su6i-yar}{\textbf{Su6i-Yar} -- Assistant IA multimodal (VPS)} {\small\color{LightGrey}· 2025}\par}
+\vspace{0.1em}
+\begin{itemize}[leftmargin=1.25em, nosep]
+\item \justifying Bot Telegram en production : vocal (TTS/STT), images, suivi financier temps réel, FA/EN/FR, fallback 8 couches (Gemini→DeepSeek)
+\end{itemize}
+\noindent\textit{\small Stack: LangChain, Gemini/DeepSeek APIs, Pyrogram, Faster-Whisper, Docker}\par
+\vspace{0.1em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.1em}
+
+{\large\color{emphasis}\raggedright\href{https://github.com/\cvgithub/LinguaFlash}{\textbf{LinguaFlash} -- Extension Chrome (Web Store)} {\small\color{LightGrey}· 2025}\par}
+\vspace{0.1em}
+\begin{itemize}[leftmargin=1.25em, nosep]
+\item \justifying Publiée sur Chrome Web Store : apprentissage des langues avec TTS, répétition espacée, 10 langues
+\end{itemize}\par
+
+\vspace{-0.5ex}
+\cvsection{Formation}
+
+\cvevent{DU Big Data, Data Science \& Analyse des Risques (Python)}{Université de Montpellier}{2025 – 2026}{}
+\textit{Econométrie, fraude, NLP, bases de données massives, Python pour actuaires}\par
+
+\vspace{0.1em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.1em}
+
+\cvevent{Master 2 en Informatique (Bac+5)}{Université de Montpellier}{2024 – 2025}{}
+\textit{Réseaux Avancés : \textbf{16.33/20 (1\textsuperscript{er}/13)} · Web Avancé : \textbf{17.15/20 (2\textsuperscript{e}/17)} · Systèmes : \textbf{16.5/20 (4\textsuperscript{e}/64)}}\par
+
+\end{paracol}
+\end{document}
