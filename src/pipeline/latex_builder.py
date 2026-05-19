@@ -249,22 +249,33 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
     return cv_pdf
 
 
+# Macros owned by personal_data.tex — strip these from static templates so
+# personal_data.tex can define them with \newcommand without conflict.
+# Extended macros unique to specific templates (e.g. \cvorcid) are NOT listed
+# here and must keep their \providecommand fallback.
+_PERSONAL_DATA_MACROS: frozenset[str] = frozenset({
+    "cvname", "cvemail", "cvphone", "cvlocation",
+    "cvgithub", "cvlinkedin", "cvfirstname", "cvlastname",
+})
+
+
 def _strip_providecommands(tex_path: Path) -> None:
     """
-    Remove \\providecommand{\\cvXxx}{...} lines from a static template.
+    Remove \\providecommand lines for macros owned by personal_data.tex.
 
     Static templates define macro defaults with \\providecommand so they compile
     standalone. When personal_data.tex is present it tries \\newcommand for the
-    same macros, causing "Command already defined" errors. Stripping the
-    \\providecommand lines lets personal_data.tex own the definitions.
+    same macros, causing "Command already defined" errors. Only macros in
+    _PERSONAL_DATA_MACROS are stripped; template-specific macros (\\cvorcid, etc.)
+    keep their \\providecommand fallback.
     """
-    tex = tex_path.read_text(encoding="utf-8")
-    tex = re.sub(
-        r'^\\providecommand\{\\cv[A-Za-z]+\}\{[^}]*\}[ \t]*\n?',
-        '',
-        tex,
-        flags=re.MULTILINE,
+    pattern = (
+        r'^\\providecommand\{\\('
+        + '|'.join(re.escape(m) for m in _PERSONAL_DATA_MACROS)
+        + r')\}\{[^}]*\}[ \t]*\n?'
     )
+    tex = tex_path.read_text(encoding="utf-8")
+    tex = re.sub(pattern, '', tex, flags=re.MULTILINE)
     tex_path.write_text(tex, encoding="utf-8")
 
 
