@@ -173,6 +173,8 @@ last = datetime.fromtimestamp(ts/1000, tz=timezone.utc)
 # ۱. کپی فایل‌های نمونه
 cp master_cv.example.json master_cv.json   # پروفایل خودت را پر کن
 cp .env.example .env                       # کلیدهای API را وارد کن
+# در .env حتماً تنظیم کن:
+#   CV_OWNER_SLUG=Firstname_LASTNAME   ← پیشوند نام فایل‌های خروجی PDF
 
 # ۲. نصب وابستگی‌ها
 pip install -r requirements.txt
@@ -216,3 +218,5 @@ python scripts/linkedin_post.py --auth
 - **قالب‌های جدید (May 2026):** 16 قالب classic (moderncv banking)، 4 قالب altacv (AI MLOps en/fr، DevOps Alternance، Polyvalent)، 1 قالب lato/PhD Research، 2 قالب tina
 - **candidature spontanée (May 2026):** `build_spontaneous()` در `latex_builder.py`، `generate_spontaneous()` در `service.py`، دستور CLI: `uv run main.py spontaneous <role>`
 - **`ApplicationBundle.cl_pdf`**: از `Path` به `Path | None` تغییر کرد — برای candidature spontanée که cover letter ندارد
+- **نامگذاری خروجی:** pattern ثابت `{CV_OWNER_SLUG}-{DocumentType}_{Role}_{lang}.pdf` — برای tailored و spontaneous یکسان؛ پوشه spontanée از نام شرکت خالی است (`Spontannee_{role}_{lang}`). `CV_OWNER_SLUG` باید در `.env` ست شود.
+- **`build_spontaneous` output folder:** فقط `.cls/.sty` از پوشه template کپی می‌شود (نه همه قالب‌ها) — خروجی تمیز
