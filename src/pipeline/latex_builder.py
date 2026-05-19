@@ -151,9 +151,11 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
         logger.warning(f"No profile loaded — falling back to static CV template: {template_filename}")
         src_tex = output_dir / template_filename
         if not src_tex.exists():
-             # Last resort fallback if _find_template_file returned something that doesn't exist locally
              raise FileNotFoundError(f"CV template not found: {src_tex}")
         shutil.copy2(src_tex, cv_tex_path)
+
+    # Inject \cvlocation override based on job location (Occitanie → Montpellier, else Grenoble)
+    _inject_cv_location(cv_tex_path, content)
 
     # Quality check before burning compile time
     verify_tex_files(cv_tex_path)
@@ -168,6 +170,26 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
 
     logger.info(f"CV compiled: {cv_pdf}")
     return cv_pdf
+
+
+def _inject_cv_location(tex_path: Path, content: TailoredContent) -> None:
+    """
+    Inject \\renewcommand{\\cvlocation}{...} into the compiled tex file right after
+    \\begin{document}, so it overrides whatever personal_data.tex sets.
+
+    Occitanie region (34, 31, 30, 66, …) → Montpellier
+    Anywhere else                          → Grenoble
+    """
+    from src.core.location_utils import select_cv_city
+    city = select_cv_city(content.job_location, content.language)
+    override = f"\\renewcommand{{\\cvlocation}}{{{city}}}  % auto: {content.job_location or 'unknown'}\n"
+
+    tex = tex_path.read_text(encoding="utf-8")
+    if "\\begin{document}" not in tex:
+        return
+    tex = tex.replace("\\begin{document}", "\\begin{document}\n" + override, 1)
+    tex_path.write_text(tex, encoding="utf-8")
+    logger.debug(f"CV location set to {city!r} (job_location={content.job_location!r})")
 
 
 def _copy_deps(output_dir: Path, template: str = "altacv") -> None:
