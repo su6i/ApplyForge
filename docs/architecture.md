@@ -91,9 +91,9 @@ class ApplicationBundle:
 
 | Role | CV template | CL template | LaTeX engine |
 |---|---|---|---|
-| `ai` | `CV_AI_Data_Lato.tex` | `Cover_Letter_Template_English.tex` (EN) or `Lettre_de_Motivation_Template.tex` (FR) | pdflatex / xelatex |
-| `it` | `CV_IT_Infra_Lato.tex` | `Lettre_de_Motivation_Template.tex` | pdflatex / xelatex |
-| `phd` | `CV_PhD_Lato.tex` | `Cover_Letter_Template_English.tex` | pdflatex / xelatex |
+| `ai` | `CV_AI_Data_Lato.tex` | `Cover_Letter_Template_En.tex` (EN) or `Cover_Letter_Template_Fr.tex` (FR) | pdflatex / xelatex |
+| `it` | `CV_IT_Infra_Lato.tex` | `Cover_Letter_Template_Fr.tex` | pdflatex / xelatex |
+| `phd` | `CV_PhD_Lato.tex` | `Cover_Letter_Template_En.tex` | pdflatex / xelatex |
 
 **LaTeX engine split:**
 - CV templates use `pdflatex` — they load the `lato` font via `fontenc`, not `fontspec`

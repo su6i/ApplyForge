@@ -110,8 +110,8 @@ Example: "DU Big Data & Data Science (obtenu)"
 - `templates/lato/CV_IT_Infra_Lato.tex` — profile and education sections
 - `templates/lato/CV_PhD_Lato.tex` — education section
 - `templates/classic/*.tex` (~20 files) — batch updated via regex
-- `cover_letters/Lettre_de_Motivation_Template.tex` — both AI and IT variants
-- `cover_letters/Cover_Letter_Template_English.tex` — both AI and Python variants
+- `cover_letters/Cover_Letter_Template_Fr.tex` — both AI and IT variants
+- `cover_letters/Cover_Letter_Template_En.tex` — both AI and Python variants
 
 This ensures generated applications reflect credential status accurately across all roles and languages.
 
@@ -183,8 +183,8 @@ Located in `cover_letters/`. Two templates cover all cases:
 
 | File | Language | Variants |
 |---|---|---|
-| `Lettre_de_Motivation_Template.tex` | French | `ai`, `it` |
-| `Cover_Letter_Template_English.tex` | English | `ai`, `python` |
+| `Cover_Letter_Template_Fr.tex` | French | `ai`, `it` |
+| `Cover_Letter_Template_En.tex` | English | `ai`, `python` |
 
 Each template has **4 mandatory `\newcommand` variables** at the top:
 
@@ -201,7 +201,7 @@ The letter body (stock paragraphs) lives in `\ifthenelse{\equal{\Variant}{ai}}{�
 Compile with `xelatex` (requires `fontspec` + Times New Roman):
 ```bash
 cd cover_letters
-xelatex -interaction=nonstopmode Lettre_de_Motivation_Template.tex
+xelatex -interaction=nonstopmode Cover_Letter_Template_Fr.tex
 ```
 
 ---

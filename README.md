@@ -224,8 +224,8 @@ Open the relevant template in `cover_letters/`:
 
 | File | Language |
 |---|---|
-| `Lettre_de_Motivation_Template.tex` | French |
-| `Cover_Letter_Template_English.tex` | English |
+| `Cover_Letter_Template_Fr.tex` | French |
+| `Cover_Letter_Template_En.tex` | English |
 
 Only edit the **stock paragraphs** (the text that describes your experience).
 The four personalisation variables at the top (`\CompanyName`, `\PositionTitle`, etc.)
