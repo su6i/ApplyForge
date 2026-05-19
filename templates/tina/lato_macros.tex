@@ -1,0 +1,75 @@
+% =============================================================
+% lato_macros.tex — Shared packages & macros for Lato CV templates
+%
+% Usage in each CV file (after \documentclass):
+%   \input{lato_macros}
+%   \input{../shared/personal_data}
+%   \renewcommand{\itemspace}{\vspace{0.15em}}  % optional override
+%
+% Then in \begin{document}:
+%   \cvheader{Job Title}
+% =============================================================
+
+\usepackage[a4paper,top=0.3in, bottom=0.3in, left=0.4in, right=0.4in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{mdwlist}
+\usepackage[default]{lato}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{primary}{HTML}{00B8B8}
+
+% --- Spacing defaults — override with \renewcommand in your CV file ---
+\newcommand{\sectionspace}{\vfill}
+\newcommand{\itemspace}{\vspace{0.2em}}
+% ---------------------------------------------------------------------
+
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{3em}
+
+\pagestyle{empty}
+\setlength{\tabcolsep}{0.8em}
+\setlist{topsep=0pt, partopsep=0pt}
+
+% --- No \vfill before the very first section ---
+\newif\iffirstsection
+\firstsectiontrue
+
+\newcommand{\cvsection}[1]{%
+    \iffirstsection
+        \firstsectionfalse
+        \vspace{0.25em}
+    \else
+        \sectionspace
+    \fi
+    \noindent\textcolor{primary}{\large \textbf{#1}} \textcolor{primary}{\hrulefill}
+    \par\vspace{0.3em}
+}
+
+\newcommand{\headerrow}[2]{
+    \begin{tabular*}{\linewidth}{l@{\extracolsep{\fill}}r}
+    #1 & \textcolor{primary}{#2} \\
+    \end{tabular*}
+}
+
+% \cvheader{Job Title}
+% Requires personal_data.tex to be \input before use.
+\newcommand{\cvheader}[1]{%
+    \begin{center}
+        {\LARGE \textcolor{primary}{\textbf{\cvname}}}\\
+        \vspace{0.05cm}
+        \textcolor{primary}{\textbf{#1}}\\
+        \vspace{0.1cm}
+        \textcolor{primary}{\faMapMarker*} \ \cvlocation\ (\cvmobility) \quad|\quad
+        \textcolor{primary}{\faEnvelope} \ \href{mailto:\cvemail}{\cvemail} \quad|\quad
+        \textcolor{primary}{\faPhone} \ \cvphone \\
+        \vspace{0.05cm}
+        \textcolor{primary}{\faLinkedin} \ \href{https://\cvlinkedin}{\cvlinkedin} \quad|\quad
+        \textcolor{primary}{\faGithub} \ \href{https://\cvgithub}{\cvgithub}
+    \end{center}
+}
