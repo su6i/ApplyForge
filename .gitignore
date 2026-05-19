@@ -34,10 +34,12 @@ master_cv*.json
 templates/shared/personal_data.tex
 templates/shared/personal_data.json
 
+# ── LaTeX class files — safe to track ─────────────────────────
+!*.cls
+
 # ── Old/legacy template folders — have hardcoded personal data ─
 templates/classic/
 templates/experimental/
-templates/altacv/
 
 # ── Private reference documents ───────────────────────────────
 .agents/references/
@@ -83,6 +85,8 @@ __pycache__/
 log/
 *.tmp
 scratch*.py
+test_*.tex
+test_*.py
 
 # ── Binaries and media ────────────────────────────────────────
 *.jpg
