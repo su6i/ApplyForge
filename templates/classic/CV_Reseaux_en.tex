@@ -1,0 +1,92 @@
+% Network & IT Support Engineer Resume - English Version
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{classic}
+\moderncvcolor{blue}
+
+% === Essential Packages ===
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm,
+  scale=0.8
+}
+
+% === moderncv settings ===
+\setlength{\hintscolumnwidth}{3.8cm}
+
+% === Personal Information ===
+\name{\cvfirstname}{{\cvlastname}}
+\setlength{\makecvtitlenamewidth}{11cm}
+\title{\bfseries Network \& IT Support Engineer}
+
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+
+\makecvtitle
+\vspace{-0.7cm}
+
+\section{Profile}
+\cvitem{}{Experienced Network and IT Support Engineer specialized in incident resolution, proactive monitoring (SolarWinds), and Python network automation. Expertise in SNMP management of Cisco equipment, VOIP support, and 99.9\% SLA compliance. Achieved 70\% reduction in manual interventions through SNMP automation and 30\% faster resolution times. Seeking IT support / network support / NOC position. Available immediately.}
+
+\section{Technical Skills}
+\cvitem{Network Support}{Troubleshooting (L1/L2), SLA Management, Ticketing, VOIP Support, On-call}
+\cvitem{Monitoring}{SolarWinds (Advanced), Alerting, SNMP, Dashboards, Log Analysis}
+\cvitem{Networking}{CCNA R\&S/Security, VOIP (Expert), Cisco Routers/Switches, Protocols (TCP/IP, OSPF, VLAN, QoS)}
+\cvitem{Automation}{Python (Network Automation), Bash Scripting (Advanced), Ansible (Basic)}
+\cvitem{DevOps \& Cloud}{Docker, Git, AWS (Basic)}
+
+\section{Professional Experience}
+\cventry{Jan 2025 -- Jun 2025}{Development Intern}{toHero}{Montpellier}{}{
+  Automated extraction of heterogeneous data from an insurance company using LLM models.
+}
+
+\cventry{2021 -- 2024}{Network Support \& Automation Engineer}{NIOC}{Iran}{}{
+  \begin{itemize}[leftmargin=*,label=$\circ$]
+    \item \textbf{Technical Support (Level 2):} Resolved network and VOIP incidents for 1,500+ users, maintaining 98\% SLA compliance + 24/7 on-call for critical incidents
+    \item \textbf{Network Automation:} Developed Python scripts for SNMP management of Cisco 2960 switches, reducing manual interventions by 70\% across the entire network
+    \item \textbf{Automation:} Developed Bash scripts reducing diagnostic time by 40\%
+    \item \textbf{Cisco Infrastructure:} Configuration and deployment of Cisco 2960 switches
+    \item \textbf{Monitoring:} SolarWinds surveillance (30\% of incidents detected) + Battery monitoring via Power View, preventive replacement of faulty batteries (99.9\% availability)
+  \end{itemize}
+}
+
+\cventry{2017--2019}{VOIP Support Technician}{NIOC}{Iran}{}{
+\begin{itemize}
+\item \textbf{VOIP Support:} Configuration and maintenance of VOIP systems for 1,500+ users
+\item \textbf{Troubleshooting:} Reduced downtime by 30\% through SolarWinds monitoring
+\item \textbf{Infrastructure:} Installation and maintenance of Cisco and Avaya equipment
+\item \textbf{Documentation:} Procedure writing and local team training
+\end{itemize}
+}
+
+\section{Education}
+\cventry{2025}{Master's in Computer Science}{University of Montpellier}{France}{}{
+\begin{itemize}
+\item \textbf{Networks:} 15.71/20 (5th/16) - Network architecture, protocols, configuration
+\item \textbf{Advanced Networks:} 16.33/20 (1st/13) - Switching, advanced routing, security
+\end{itemize}
+}
+\cventry{2015}{Bachelor's in Electronic Engineering}{JDKH University}{Iran}{}{}
+
+\section{Languages}
+\cvitem{French}{Advanced -- Fluent technical communication}
+\cvitem{English}{Professional Working Proficiency -- Documentation \& technical}
+
+\end{document}

@@ -1,0 +1,257 @@
+% =============================================================================
+% ACADEMIC CV — PhD Application
+% Classic CV template — PhD (en)
+% Template: moderncv banking style (multi-page)
+% Compile with: pdflatex CV_PhD.tex
+% =============================================================================
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.85, top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm]{geometry}
+\setlength{\hintscolumnwidth}{3.5cm}
+
+% === Personal Information ===
+\name{\cvfirstname}{{\cvlastname}}
+\title{PhD Candidate — Artificial Intelligence \& NLP}
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+\vspace{-0.8cm}
+
+% === RESEARCH INTERESTS ===
+\section{Research Interests}
+\cvitem{}{Large Language Models (LLMs), Multi-Agent Systems Orchestration, Retrieval-Augmented Generation (RAG), Natural Language Processing, Speech Synthesis \& Recognition (TTS/STT), Neural Voice Cloning, Deep Learning for Financial Time Series, Multimodal AI, Spaced Repetition in Language Acquisition.}
+
+% === EDUCATION ===
+\section{Education}
+\cventry{2025 -- 2026}{Completed University Diploma (DU) in Big Data, Data Science and Risk Analysis with Python}{Faculty of Economics, University of Montpellier}{France}{}{
+\begin{itemize}
+\item Econometric modeling \& Machine Learning on 922,000+ insurance records
+\item Statistical analysis, risk modeling, and interactive DataViz (Streamlit)
+\end{itemize}
+}
+
+\cventry{2024 -- 2025}{Master's Degree in Computer Science (Bac+5)}{Faculty of Sciences, University of Montpellier}{France}{}{
+\begin{itemize}
+\item \textbf{R\'{e}seaux Avanc\'{e}s:} 16.33/20 (1\textsuperscript{st}/13) — Advanced Switching, Routing, Network Security
+\item \textbf{Technologies avanc\'{e}es du Web:} 17.15/20 (2\textsuperscript{nd}/17)
+\item \textbf{Programmation avanc\'{e}e} (Java): 16/20 (2\textsuperscript{nd}/18)
+\item \textbf{Syst\`{e}me} (Linux \& Python): 16.5/20 (3\textsuperscript{rd}/64)
+\item Coursework: Machine Learning, Structures de donn\'{e}es (17.95/20), Distributed Systems, Databases
+\end{itemize}
+}
+
+\cventry{2013 -- 2015}{Bachelor's Degree in Electronics Engineering (Licence, bac+2+2)}{Jahade Daneshgahi Institute of Higher Education of Khuzestan}{Ahvaz, Iran}{GPA: 17.94/20}{
+\begin{itemize}
+\item \textbf{6 courses scored 20/20}: Computer Programming, Differential Equations, Linear Integrated Circuits, Physics of Electricity \& Magnetism, among others
+\item Notable grades: Computer Networks (19.75), Electronic Circuit Analysis (19.50), Numerical Analysis (19.50), Telecom Circuits Lab (19.50)
+\end{itemize}
+}
+
+% === PROFESSIONAL EXPERIENCE ===
+\section{Professional \& Research Experience}
+\cventry{Jan 2025 -- Jun 2025}{\textbf{AI Research Intern — LLMs \& Multi-Agent Systems}}{toHero}{Montpellier, France}{}{
+\begin{itemize}
+\item Designed and deployed an \textbf{automated document analysis system} for an insurance company using OpenAI API, LangChain, and vector embeddings
+\item Processed \textbf{18,000+ Excel rows} and \textbf{1,772 PDF pages} — achieving \textbf{+500\% processing speed} and \textbf{-99\% operational costs}
+\item Developed a \textbf{Multi-Agent testing pipeline} (CrewAI) that autonomously generated \textbf{476 functional test scenarios} for an e-commerce platform
+\item Applied NLP techniques: document chunking, semantic embeddings, prompt engineering, and structured output parsing
+\end{itemize}
+}
+
+\cventry{2021 -- 2024}{\textbf{Network Engineer \& Python Developer}}{National Iranian Oil Company (NIOC)}{Iran}{}{
+\begin{itemize}
+\item Developed Python automation scripts for SNMP-based network monitoring of 200+ Cisco switches — \textbf{reducing manual intervention by 70\%}
+\item Built interactive data dashboards (Power BI) for 1,500+ users, transforming raw network telemetry into actionable insights
+\item Maintained SLA at \textbf{99.9\% uptime} for critical telecom infrastructure
+\end{itemize}
+}
+
+% =====================================================================
+% RESEARCH PROJECTS — Organized by Theme
+% =====================================================================
+\section{Research-Oriented Projects}
+
+% --- Theme 1: Multi-Agent Systems ---
+\subsection{Multi-Agent Systems \& Orchestration}
+
+\cventry{2025}{\textbf{Arix — Multi-Agent RAG for Technical Documentation}}{Personal Project}{}{}{
+\begin{itemize}
+\item Architected a \textbf{4-agent sequential pipeline} (Router $\rightarrow$ Ingestion $\rightarrow$ Retrieval $\rightarrow$ Response) for domain-specific QA over PDF corpora
+\item Implemented \textbf{Retrieval-Augmented Generation} with ChromaDB vector store, Google Embedding API (\texttt{text-embedding-004}), and metadata-filtered semantic search
+\item Designed an \textbf{intent classification router} dispatching queries across technical RAG, interactive troubleshooting, and general-purpose pipelines
+\item Scalability: metadata filtering enables constant-time search over \textbf{500+ documents / 50,000+ pages}
+\item REST API (FastAPI) with premium web UI and drag-and-drop document ingestion
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, LangChain, ChromaDB, Google Gemini API, FastAPI, RAG, Vector Embeddings}}
+}
+
+\cventry{2025}{\textbf{Housi — Multi-Agent Real Estate Assistant}}{Personal Project}{}{}{
+\begin{itemize}
+\item Designed a \textbf{Hub \& Spoke architecture} with 4 specialized agents (Support, Manager, Search, Translator) orchestrated via CrewAI
+\item Implemented \textbf{Domain-Driven Design (DDD)} with intelligent intent routing between a deep-strategy Search Crew and a fast-track Advisor
+\item Dual LLM backend: DeepSeek (reasoning) + Google Gemini (generation), with trilingual output (EN/FR/FA)
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, CrewAI, DeepSeek, Google Gemini, Streamlit, DDD}}
+}
+
+\cventry{2025}{\textbf{Multi-Agent Financial Markets Analyser}}{Personal Project}{}{}{
+\begin{itemize}
+\item Built a \textbf{sector-specialized multi-agent system} (Stock Agent, Gold Agent, Real Estate Agent, Forex Agent) for financial market analysis
+\item Implemented \textbf{smart query routing} to automatically dispatch user queries to the correct domain-expert agent
+\item Each agent generates \textbf{structured 3-paragraph investment reports} using CrewAI and LangChain orchestration
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, CrewAI, LangChain, OpenAI GPT-4o-mini}}
+}
+
+\cventry{2025}{\textbf{Multi-Agent Job Applier — Autonomous Application Assistant}}{Personal Project}{}{}{
+\begin{itemize}
+\item Developed an \textbf{autonomous multi-agent system} for end-to-end job application: CV parsing, job analysis, skill matching, CV optimization, and cover letter generation
+\item Telegram bot interface for real-time interaction and application tracking
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, CrewAI, OpenAI API, Telegram Bot API}}
+}
+
+% --- Theme 2: Speech, NLP & Multimodal AI ---
+\subsection{Speech Processing, NLP \& Multimodal AI}
+
+\cventry{2025}{\textbf{Su6i-Yar — Multimodal AI Telegram Bot}}{Personal Project}{}{}{
+\begin{itemize}
+\item Built an \textbf{8-layer LLM fallback system} (Gemini 3 Flash $\rightarrow$ Pro $\rightarrow$ DeepSeek) orchestrated via LangChain with self-healing error recovery
+\item Integrated \textbf{multiple TTS engines}: edge-tts, Fish Speech, GPT-SoVITS, XTTS v2 — with \textbf{voice cloning} capabilities
+\item Implemented \textbf{Speech-to-Text} (Faster-Whisper) with automatic multi-language subtitle generation (SRT/ASS)
+\item Real-time \textbf{fact-checking via Search Grounding} (Google Search API with LangChain)
+\item \textbf{Educational mode}: AI-generated images (Flux/Pollinations.ai), bilingual TTS with spaced-repetition pedagogy
+\item Live \textbf{financial data analysis}: currency rates, gold parity analysis with smart async caching
+\item 4-language support (FA/EN/FR/KO) with fully localized interface
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, LangChain, Gemini API, Pyrogram, Fish Speech, GPT-SoVITS, XTTS v2, Faster-Whisper}}
+}
+
+\cventry{2025}{\textbf{Voice Cloning Lab — Neural TTS Research}}{Personal Research}{}{}{
+\begin{itemize}
+\item Conducted comparative experiments on \textbf{3 state-of-the-art voice cloning architectures}: Fish Speech 1.5, GPT-SoVITS, and XTTS v2 (Coqui TTS)
+\item Currently \textbf{fine-tuning all 3 models for Persian language} using ParsiVoice and Mana datasets — a low-resource language adaptation challenge
+\item Built end-to-end fine-tuning pipelines: dataset preparation (4,000+ audio clips), phoneme alignment, speaker embedding extraction
+\item Benchmarked models on naturalness, speaker similarity, and zero-shot vs fine-tuned performance
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Fish Speech, GPT-SoVITS, XTTS v2, PyTorch, HuggingFace}}
+}
+
+\cventry{2025}{\textbf{Multi-Language Subtitle Generator}}{Personal Project}{}{}{
+\begin{itemize}
+\item Built an automated \textbf{ASR $\rightarrow$ Translation $\rightarrow$ Rendering} pipeline using Faster-Whisper and DeepSeek API
+\item Supports \textbf{15+ languages} with language-specific fonts, RTL handling, and automatic Persian ZWNJ typography correction
+\item Resolution-adaptive subtitle rendering with real-time FFmpeg encoding progress
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Faster-Whisper, DeepSeek API, FFmpeg, ASS/SRT}}
+}
+
+% --- Theme 3: Deep Learning for Finance ---
+\subsection{Deep Learning for Financial Markets}
+
+\cventry{2023}{\textbf{Stock Market Prediction — Comparative Deep Learning Study}}{Financial AI Research}{}{}{
+\begin{itemize}
+\item Conducted a \textbf{comparative study of 4 deep learning architectures} for financial time series: LSTM, BiLSTM, CNN-BiLSTM, and R-CNN-BiLSTM
+\item Evaluated on \textbf{30 financial instruments} using MAE, MAPE, and directional accuracy metrics
+\item \textbf{Key finding}: CNN-BiLSTM achieved the best MAE/MAPE, confirming the benefit of convolutional feature extraction before recurrent modeling
+\item End-to-end pipeline: API data collection, feature engineering (technical indicators), model training, hyperparameter tuning, backtesting
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Keras, TensorFlow, Pandas, Financial APIs, Time Series Analysis}}
+}
+
+\cventry{2025 -- 2026}{\textbf{Insurance Risk Modeling \& Econometric Analysis}}{University of Montpellier — DU Big Data}{}{}{
+\begin{itemize}
+\item Analyzed \textbf{922,000+ insurance records} using econometric models and machine learning
+\item Deployed an interactive DataViz application via Streamlit with OOP architecture
+\item Applied statistical hypothesis testing, regression analysis, and risk modeling
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Scikit-Learn, Econometrics, Streamlit, Pandas}}
+}
+
+% --- Theme 4: Language Learning & Spaced Repetition ---
+\subsection{AI for Language Acquisition}
+
+\cventry{2025}{\textbf{LinguaFlash — Spaced Repetition Chrome Extension}}{Published on Chrome Web Store}{}{}{
+\begin{itemize}
+\item Developed a \textbf{Spaced Repetition} system with interval-based notifications and auto-pronunciation (TTS) for vocabulary acquisition
+\item Curated \textbf{1,600+ vocabulary items} across CEFR levels (A1--C2) in \textbf{10 languages}, with native-logic grammar explanations
+\item Migrated from flat-file to high-performance \textbf{IndexedDB} architecture for offline-first browser storage
+\item Published on Chrome Web Store with real users
+\end{itemize}
+\scriptsize{\textit{Technologies: JavaScript, Chrome Extensions API, IndexedDB, SQLite, TTS, Spaced Repetition Algorithms}}
+}
+
+% --- Theme 5: Automation & Tools ---
+\subsection{Research Tools \& Automation}
+
+\cventry{2025}{\textbf{Research Toolkit — Automated Academic Research Assistant}}{Personal Project}{}{}{
+\begin{itemize}
+\item Built an AI-powered tool for \textbf{automated literature review}: professor profiling, paper summarization, and research topic brainstorming
+\item Implemented \textbf{identity verification} via cross-referencing publications across ResearchGate and Google Scholar
+\item Multi-model LLM fallback (Gemini Flash $\rightarrow$ DeepSeek $\rightarrow$ Gemma) with TTS output for audio summaries
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Google Gemini API, Web Scraping, edge-tts, SQLite}}
+}
+
+\cventry{2025}{\textbf{Telegram Video Automation Kit}}{Personal Project}{}{}{
+\begin{itemize}
+\item Engineered a \textbf{3-phase automated pipeline} (Scan $\rightarrow$ Download $\rightarrow$ Upload) for batch video processing and Telegram delivery
+\item Implemented \textbf{HEVC hardware-accelerated encoding} (VideoToolbox/NVENC), achieving 50--70\% file size reduction
+\item Self-healing Selenium sessions for Cloudflare bypass, stateful manifest system for resume-ability across 500+ video batches
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Pyrogram, Selenium, FFmpeg, HEVC, Asyncio}}
+}
+
+\cventry{2025}{\textbf{YouTube Toolkit (ytool)}}{Personal Project}{}{}{
+\begin{itemize}
+\item Comprehensive automation suite: 3D intro generation (Manim), AI-powered script writing (Gemini), kinetic typography hooks, face-tracking auto-reframe for Shorts, and auto-ducking audio mixing
+\item Hardware-accelerated encoding with smart codec selection
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Manim, Gemini API, FFmpeg, Real-ESRGAN}}
+}
+
+\cventry{2025}{\textbf{Cisco Switch Manager}}{Personal Project}{}{}{
+\begin{itemize}
+\item Full-stack SNMP/Syslog monitoring system for Cisco 2960 switches with real-time dashboard and Telegram alerting
+\end{itemize}
+\scriptsize{\textit{Technologies: FastAPI, PySNMP, PostgreSQL/PostGIS, Next.js, Docker}}
+}
+
+% === TECHNICAL SKILLS ===
+\section{Technical Skills}
+\cvitem{AI \& ML}{Python, LLMs (OpenAI API, LangChain, CrewAI), RAG (ChromaDB, Vector Embeddings), NLP (spaCy, NLTK), Deep Learning (TensorFlow, Keras, PyTorch), Scikit-Learn, Prompt Engineering}
+\cvitem{Speech \& Audio}{TTS (edge-tts, Fish Speech, GPT-SoVITS, XTTS v2), STT (Faster-Whisper), Voice Cloning, Audio Processing}
+\cvitem{Data Science}{Pandas, NumPy, SQL (PostgreSQL, MySQL), MongoDB, ETL, Econometrics, Time Series Analysis, Power BI, Streamlit, Plotly}
+\cvitem{Infrastructure}{Docker, Git, FastAPI, CI/CD, Linux/Bash, AWS, Cisco Networking (CCNA), SNMP}
+\cvitem{Web \& Frontend}{JavaScript, Chrome Extensions, IndexedDB, Next.js, HTML/CSS}
+\cvitem{Media \& Video}{FFmpeg (HEVC, H.264, HW Accel), Manim, Real-ESRGAN, Selenium}
+
+% === CERTIFICATIONS ===
+\section{Certifications \& Courses}
+\cvitem{2025}{MCP: Build Rich-Context AI Applications with Anthropic (Model Context Protocol)}
+\cvitem{2025}{Multi-Agent Systems with CrewAI — DeepLearning.AI}
+\cvitem{2025}{Prompt Engineering for Developers — DeepLearning.AI}
+
+% === LANGUAGES ===
+\section{Languages}
+\cvitem{French}{Advanced — Full professional proficiency (studying and working in France since 2024)}
+\cvitem{English}{Professional Working Proficiency — Technical writing, publications, documentation}
+\cvitem{Persian}{Native Speaker}
+
+\end{document}

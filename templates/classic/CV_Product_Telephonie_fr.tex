@@ -1,0 +1,103 @@
+% =============================================================================
+% TAILORED CV — Chef de Produit Téléphonie | Expert VoIP & Infrastructures
+% Classic CV template — Chef de Produit Téléphonie (fr)
+% =============================================================================
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{classic}
+\moderncvcolor{blue}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=0.7cm, bottom=0.6cm, left=1.1cm, right=1.1cm,
+  scale=0.92
+}
+\setlength{\hintscolumnwidth}{3.2cm}
+
+% === Informations Personnelles ===
+\name{\cvfirstname}{{\cvlastname}}
+\setlength{\makecvtitlenamewidth}{11cm}
+\title{\bfseries Chef de Produit Téléphonie | Expert VoIP \& Infrastructures Télécoms}
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+\nopagenumbers{}
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+\vspace{-0.8cm}
+
+% === PROFIL ===
+\section{Profil}
+\cvitem{}{Expert Télécoms avec \textbf{7 ans d'expérience} au sein du département ICT de la NIOC (opérateur interne d'envergure nationale). Spécialiste du déploiement d'infrastructures critiques : \textbf{VoIP/PABX, Réseaux TETRA, Faisceaux Hertziens, et Fibre Optique}. Profil hybride alliant maîtrise technique pointue (Mux/DeMux, BTS, SNMP) et gestion de projet opérationnelle. Master en Informatique \& DU Big Data obtenu (Montpellier).}
+
+\vspace{-0.3cm}
+
+% === COMPÉTENCES ===
+\section{Compétences}
+\cvitem{Gestion de Produit}{Pilotage d'offres télécoms, documentation technique/commerciale, rédaction de mémoires techniques, suivi de planning, harmonisation d'offres multi-sites.}
+\cvitem{VoIP \& Téléphonie}{IP Centrex / PABX / PBX IP (Cisco, Avaya), SIP, QoS, Interconnexion de sites industriels.}
+\cvitem{Infrastructures}{Réseaux TETRA (BTS, Antennes 4m), Faisceaux Hertziens (Microwave), Mux/DeMux, Fibre Optique, Câblage Cuivre, Antennes WiFi.}
+\cvitem{Monitoring \& Automatisation}{SolarWinds (Expert), SNMP, Python (Scripting réseau), Dashboards temps réel.}
+\cvitem{Gestion de Projet}{Supervision de chantiers, Contrôle Qualité (QA), Gestion des prestataires, Reporting management.}
+\cvitem{Méthodologies}{Agile, Scrum, Cycle de vie produit (PLM), Rédaction de spécifications fonctionnelles.}
+
+\vspace{-0.3cm}
+
+% === EXPÉRIENCES ===
+\section{Expériences Professionnelles}
+
+\cventry{Jan 2025 -- Juin 2025}{\textbf{Ingénieur R\&D IA \& Automatisation (Stage)}}{toHero}{Montpellier}{}{
+  Conception de pipelines Python pour l'extraction automatisée de données (PDF, Excel) via LLM / LangChain. Déploiement via Docker et intégration CI/CD.
+}
+
+\cventry{2021 -- 2024}{Ingénieur Support Télécoms \& Automatisation}{NIOC (ICT)}{Iran}{}{
+  \begin{itemize}[leftmargin=*,label=$\circ$]
+    \item \textbf{Opérateur Interne :} Gestion autonome de la connectivité nationale pour \textbf{1 500+ utilisateurs} sans recours à des prestataires externes.
+    \item \textbf{VoIP \& Infrastructure :} Maintenance et optimisation du parc PABX Avaya/Cisco. Disponibilité garantie à \textbf{99,9\%}.
+    \item \textbf{Automatisation :} Développement de scripts Python/SNMP pour le monitoring proactif, réduisant les interventions manuelles de \textbf{70\%}.
+  \end{itemize}
+}
+
+\cventry{2017 -- 2019}{Ingénieur Support Réseaux (VoIP)}{NIOC (ICT)}{Iran}{}{
+\begin{itemize}[leftmargin=*,label=$\circ$]
+\item \textbf{Gestion de l'Offre VoIP :} Déploiement et configuration des solutions IP Centrex/PABX pour les sites industriels.
+\item \textbf{Transition Numérique :} Modernisation des infrastructures legacy vers des solutions IP full-stack.
+\end{itemize}
+}
+
+\cventry{2010 -- 2013}{Superviseur de Projet Télécom (TETRA) — Inspecteur QA}{NIOC}{Iran}{}{
+  \begin{itemize}[leftmargin=*,label=$\circ$]
+    \item \textbf{Déploiement National :} Supervision de l'installation du réseau TETRA sur \textbf{78 sites industriels}.
+    \item \textbf{Infrastructure Radio :} Pilotage installation BTS, FH (Microwave) et systèmes Mux/DeMux.
+    \item \textbf{Contrôle Qualité :} Validation de conformité, rapports de réception et rédaction des procédures.
+  \end{itemize}
+}
+
+\vspace{-0.3cm}
+
+% === FORMATIONS ===
+\section{Formations}
+\cventry{2025 -- 2026}{DU Big Data \& Data Science}{Université de Montpellier}{France}{}{Analyse de risques et modélisation prédictive via Python.}
+\cventry{2024 -- 2025}{Master en Informatique (Bac+5)}{Université de Montpellier}{France}{}{Spécialisation Réseaux et IA -- Classé 1\textsuperscript{er} en Réseaux Avancés (16,33/20).}
+
+\vspace{-0.2cm}
+
+\section{Langues \& Certifications}
+\cvitem{Langues}{Français (Avancé) | Anglais (Technique) | Persan (Maternel)}
+\cvitem{Certifications}{\textbf{Formation technique certifiante — SIAE Microelettronica (Milan, Italie)} : Transmission Faisceaux Hertziens, Multiplexage (Mux/DeMux) et Systèmes NMS (2012).}
+
+\end{document}

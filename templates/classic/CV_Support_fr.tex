@@ -1,0 +1,99 @@
+% CV Support Réseaux - Version corrigée et compilable avec XeLaTeX
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{classic}
+\moderncvcolor{blue}
+
+% === بسته‌های ضروری ===
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm,
+  scale=0.8
+}
+
+% === تنظیمات moderncv ===
+\setlength{\hintscolumnwidth}{3.8cm}
+
+% === دستور بولد برای آیتم‌ها (قبل از document) ===
+\newcommand{\bolditem}[1]{\textbf{#1}}
+
+% === اطلاعات شخصی ===
+\name{\cvfirstname}{{\cvlastname}}
+\setlength{\makecvtitlenamewidth}{11cm}
+\title{\bfseries Technicien Support IT}
+
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+
+\makecvtitle
+\vspace{-0.7cm}  % کاهش فضای بعد از عنوان
+
+\section{Profil}
+
+\cvitem{}{Technicien Support IT expérimenté avec solide expertise en résolution d'incidents, support utilisateur et maintenance des systèmes. Maîtrise des outils de surveillance SolarWinds, gestion des équipements Cisco et support VOIP. Réduction de 70\% des interventions manuelles via l'automatisation et respect des SLA à 99,9\%. Recherche un poste en support technique / helpdesk / assistance informatique. Disponible immédiatement.}
+
+
+\section{Compétences}
+
+% === روش ساده: بدون لیست تودرتو ===
+\cvitem{Support Réseaux}{Troubleshooting (L1/L2), SLA, Ticketing, Support VOIP, On-call}
+\cvitem{Surveillance}{SolarWinds (Avancé), Alerting, SNMP, Dashboards, Analyse de logs}
+\cvitem{Réseaux}{CCNA R\&S/Security, VOIP (Expert), Routeurs/Switches Cisco, Protocoles (TCP/IP, OSPF, VLAN, QoS)}
+\cvitem{Automatisation}{Bash Scripting (Avancé), Python (Automatisation réseau), Ansible (Bases)}
+\cvitem{DevOps \& Cloud}{Docker, Git, AWS (Bases)}
+
+\section{Expériences Professionnelles}
+\cventry{Jan 2025 -- Juin 2025}{Stagiaire en Développement}{toHero}{Montpellier}{}{
+  Automatisation de l'extraction de données hétérogènes d'une compagnie d'assurance via des modèles LLM.
+}
+
+\cventry{2021 -- 2024}{Ingénieur Support Réseaux \& Automatisation}{NIOC}{Iran}{}{
+  \begin{itemize}[leftmargin=*,label=$\circ$]
+    \item \textbf{Support Technique (Niveau 2):} Résolution d'incidents réseau et VOIP pour 1,500+ utilisateurs, respect des SLA à 98\% + astreinte 24/7 pour incidents critiques
+    \item \textbf{Automatisation Réseau:} Développement de scripts Python pour la gestion SNMP des switches Cisco 2960, réduisant les interventions manuelles de 70\% sur l'ensemble du réseau
+    \item \textbf{Automatisation:} Développement de scripts Bash réduisant le temps de diagnostic de 40\%
+    \item \textbf{Infrastructure Cisco:} Configuration et déploiement des switches Cisco 2960
+    \item \textbf{Monitoring:} Surveillance SolarWinds (30\% incidents détectés) + Surveillance des batteries via Power View, remplacement préventif des batteries défaillantes (99.9\% de disponibilité)
+  \end{itemize}
+}
+
+\cventry{2017--2019}{Technicien Support Réseaux (VOIP)}{NIOC}{Iran}{}{
+\begin{itemize}
+\item \textbf{Support VOIP:} Configuration et maintenance des systèmes VOIP pour 1,500+ utilisateurs
+\item \textbf{Dépannage:} Réduction des temps d'arrêt de 30\% via monitoring SolarWinds
+\item \textbf{Infrastructure:} Installation et maintenance des équipements Cisco et Avaya
+\item \textbf{Documentation:} Rédaction de procédures et formation des équipes locales
+\end{itemize}
+}
+
+\section{Formations}
+\cventry{2025}{Master Informatique}{Université de Montpellier}{France}{}{
+\begin{itemize}
+\item \textbf{Réseaux:} 15.71/20 (5ème/16) - Architecture réseau, protocoles, configuration
+\item \textbf{Réseaux Avancés:} 16.33/20 (1er/13) - Switching, routing avancé, sécurité
+\end{itemize}
+}
+% \cventry{2015}{Licence Génie Électronique (Bac+4)}{Université JDKH, Iran}{}{}{}
+
+\section{Langues}
+\cvitem{Français}{Avancé -- Communication technique fluide}
+\cvitem{Anglais}{Niveau Opérationnel Professionnel -- Documentation \& technique}
+
+\end{document}

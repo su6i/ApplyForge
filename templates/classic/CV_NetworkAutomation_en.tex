@@ -1,0 +1,137 @@
+\documentclass[11pt,a4paper,sans]{moderncv}
+
+% ModernCV styles
+\moderncvstyle{banking} 
+\moderncvcolor{blue}
+
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8, top=1.1cm, bottom=1.1cm, left=1.1cm, right=1.1cm]{geometry}
+\setlength{\hintscolumnwidth}{3.8cm}
+
+\usepackage{ragged2e}
+
+% --- Force Times New Roman & Full Justification ---
+\usepackage{mathptmx}
+\usepackage[T1]{fontenc}
+\renewcommand{\familydefault}{\rmdefault}
+\AtBeginDocument{\rmfamily\justifying}
+\usepackage{etoolbox}
+\patchcmd{\section}{\sffamily}{}{}{}
+\patchcmd{\subsection}{\sffamily}{}{}{}
+\patchcmd{\mainnamefont}{\sffamily}{}{}{}
+\patchcmd{\addressfont}{\sffamily}{}{}{}
+
+% --- بازنویسی بخش Header برای نمایش دوخطی، متمرکز و رنگی ---
+\makeatletter
+\let\originalmakecvhead\makecvhead
+\renewcommand*{\makecvhead}{%
+  \recomputecvlengths%
+  \begin{center}
+    % نام کوچک مشکی و نام خانوادگی آبی (رنگ تم)
+    {\namefont\fontsize{28}{34}\selectfont \textcolor{color2}{\cvfirstname} \textcolor{black}{\cvlastname}}\\[4pt]
+    \vspace{0cm}
+    % عنوان با سایز مناسب
+    {\fontsize{16}{20}\selectfont\textcolor{color2}{\@title}}\\[10pt]
+  \end{center}
+  \begingroup
+  \let\oldfirstname\@firstname
+  \let\oldlastname\@lastname
+  \let\oldtitle\@title
+  \def\@firstname{}
+  \def\@lastname{}
+  \def\@title{}
+  \originalmakecvhead
+  \def\@firstname{\oldfirstname}
+  \def\@lastname{\oldlastname}
+  \def\@title{\oldtitle}
+  \endgroup
+  \vspace{-0.5cm}
+}
+\makeatother
+% ---------------------------------------------------
+
+% Personal Information
+\name{\cvfirstname}{{\cvlastname}}
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+\title{Network Automation |  Support Engineer | Python Developer}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+
+\vspace{-0.8cm}
+
+\section{Profile}
+\justifying
+Master’s graduate in Computer Science from the University of Montpellier, with over 5 years of hands-on experience in \textbf{L2/L3 Network Support} and \textbf{Infrastructure Automation}. Expert in managing large-scale environments (1,500+ users) and leveraging \textbf{Python} for network monitoring optimization, \textbf{log analysis}, \textbf{anomaly detection}, and \textbf{incident resolution}. Highly proficient in \textbf{Cisco systems}, advanced \textbf{Linux administration}, \textbf{Virtualization}, and data-driven diagnostics, seeking to contribute to a high-performing Technical Assistance Center (TAC) team in cybersecurity.
+
+\vspace{-0.2cm}
+\section{Skills}
+\cvitem{Networking}{TCP/IP, Routing/Switching (Cisco), SNMP, VOIP Support, Troubleshooting (L1/L2), SLA Management, Network Security.}
+\cvitem{Programming}{Python (Automation, Data Science), Java, Bash Scripting, SQL, MongoDB.}
+\cvitem{Tools \& AI}{Linux (Advanced Administration), SolarWinds, Docker, Git, LLMs (LangChain), Power BI, Scikit-Learn.}
+
+\vspace{-0.2cm}
+\section{Experiences}
+
+% دوره کارآموزی در فرانسه
+\cventry{Jan 2025 -- June 2025}{\textbf{toHero} | Software Engineering Intern (End-of-studies Internship) | Montpellier}{}{}{}{
+\begin{itemize}
+    \item Developed an AI-based automated analysis system, achieving a \textbf{500\% boost} in speed and \textbf{99\% cost savings}.
+    \item Optimized workflows using \textbf{LLMs and NLP} to analyze 1,772+ PDF pages, reducing time from 88h to 2h.
+    \item Engineered multi-agent systems for functional test scenarios, ensuring robust software deployment.
+\end{itemize}}
+
+% دوره اول شرکت نفت - پشتیبانی و داشبورد
+\cventry{2021 -- 2024}{\textbf{National Iranian Oil Company (NIOC)} | Network Support \& Automation Engineer (L2/L3)}{}{}{}{
+\begin{itemize}
+    \item Resolved critical network and VOIP incidents for \textbf{1,500+ users}, ensuring \textbf{99.9\% availability} and SLA compliance.
+    \item Automated network tasks using \textbf{Python (Netmiko/PySNMP)}, reducing manual interventions by \textbf{70\%}.
+    \item Managed \textbf{Cisco infrastructure} (2960 Switches/Routers) and implemented monitoring via \textbf{SolarWinds}.
+\end{itemize}}
+
+% دوره دوم شرکت نفت - اتوماسیون و شبکه
+\cventry{2017 -- 2019}{\textbf{NIOC} | IT Support Specialist \& Python Developer}{}{}{}{
+\begin{itemize}
+    \item Designed Python-based performance dashboards using \textbf{Power BI} to visualize network traffic.
+    \item Provided L1/L2 support for \textbf{VOIP systems} and performed \textbf{complex hardware/software diagnostics}.
+\end{itemize}}
+
+% دوره نظارت پروژه‌های مخابراتی در شرکت نفت
+\cventry{2010 -- 2013}{\textbf{NIOC} | Project Coordinator \& Telecom Site Inspector}{}{}{}{
+\begin{itemize}
+    \item Coordinated between stakeholders, security departments, and factories to facilitate contractor access and site operations.
+    \item Supervised on-site technical deployments to ensure compliance with standards and prevent operational errors.
+\end{itemize}}
+
+\vspace{-0.2cm}
+\section{Projects}
+\justifying
+\cvitem{Network Log Analyzer}{Developed a \textbf{Python} tool for automated parsing of Syslog data from Cisco devices to detect security anomalies and unauthorized access attempts using Regex and data filtering.}
+\cvitem{Automated Monitoring}{Built a custom framework to automate the health-check of 50+ network nodes, reducing the diagnostic time by 40\% through \textbf{Bash} and \textbf{Python} integration.}
+\cvitem{Financial Trend AI}{Implemented Deep Learning models (LSTM/CNN) to analyze time-series data, demonstrating advanced capabilities in handling large-scale datasets.}
+
+\vspace{-0.2cm} 
+\section{Education}
+\cventry{2025 -- 2026}{University Diploma (DU) Big Data, Data Science \& Risk Analysis with Python}{University of Montpellier}{France}{}{}
+\cventry{2024 -- 2025}{Master in Computer Science, Tracks: Intégration de Compétences (ICo)}{University of Montpellier}{France}{}{}
+
+\vspace{-0.2cm}
+\section{Languages \& Interests}
+\cvitem{Languages}{\textbf{French} (Advanced/C1), \textbf{English} (Professional Working Proficiency), \textbf{Persian} (Native).}
+\cvitem{Financial Markets}{10+ years of personal experience in stock market analysis and risk management.}
+\cvitem{Multidisciplinary}{Proven track record in Telecom Supervision, Network Engineering, and Data Science.}
+\end{document}

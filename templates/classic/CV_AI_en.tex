@@ -1,0 +1,157 @@
+% CV 1: For a permanent position (CDI) in Artificial Intelligence and Data Science
+\documentclass[11pt,a4paper,sans]{moderncv}
+\moderncvstyle{banking}  % Changed from 'classic' to 'casual' - has photo on left
+\moderncvcolor{blue}
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8, top=0.7cm, bottom=1.1cm, left=1.2cm, right=1.2cm]{geometry}
+% Manually set the width of the Hints column (titles)
+\setlength{\hintscolumnwidth}{3.8cm}
+
+
+%!TeX program = pdflatex
+%!TeX encoding = UTF-8
+%!TeX spellcheck = en_US
+
+
+
+\name{\cvfirstname}{{\cvlastname}}
+\title{\bfseries Data Scientist}
+\address{\cvlocation}{}
+\phone[mobile]{\cvphone}
+\email{\cvemail}
+\social[linkedin]{\cvlinkedin}
+\social[github]{\cvgithub}
+
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvfirstname}{Firstname}
+\providecommand{\cvlastname}{LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+\begin{document}
+\makecvtitle
+
+\vspace{-1cm}
+\section{Profile}
+
+\cvitem{}{Experienced Data Scientist, graduated with a Master's degree in Computer Science from the University of Montpellier. 
+Expert in Machine Learning, NLP, and data analysis using LLMs. \textbf{Sectoral Knowledge: Financial markets, telecommunications, energy, insurance, and e-commerce.} 
+Concrete results: Process optimization (+500\% speed, -99\% cost reduction, -97.7\% analysis time) via AI automation. 
+Seeking a position in data science / machine learning / data analysis. 
+Available immediately.}
+
+\vspace{-0.3cm}
+\section{Skills}
+\cvitem{Python Data Science}{\textbf{Python}, Pandas, NumPy, Scikit-Learn, TensorFlow, NLP}
+\cvitem{Machine Learning \& AI}{Deep Learning, LLMs, OpenAI API, LangChain, CrewAI, Computer Vision}
+\cvitem{Data \& Visualization}{SQL, MongoDB, Power BI, Matplotlib, Exploratory Analysis}
+\cvitem{Tools \& DevOps}{Docker, Git, AWS, Streamlit, Agile SCRUM}
+
+\vspace{-0.3cm}
+\section{Professional Experience}
+% \cventry{Jan 2025 -- Jun 2025}{Internship -- toHero}{Data Scientist (LLMs \& AI)}{Montpellier}{}{
+%     \begin{itemize}
+%         \item \textbf{AI Automation:} Development of an automated analysis system with business expert validation: +500\% speed, -99\% costs
+%         \item \textbf{Data Extraction \& Analysis:} Automated processing of 18,000+ Excel rows and 1,772 PDF pages via OpenAI API, NLP and vector embeddings, reducing analysis time from 88 to 2 hours (97.7\% reduction) while improving accuracy
+%         \item \textbf{Multi-Agent Testing (CrewAI):} Generation of 476 functional test scenarios for an e-commerce platform, simulating varied user journeys
+%         \item \textbf{Skills:} Advanced Python, OpenAI API, NLP, Vector Embeddings, CrewAI, Data Processing, Automation, Functional Testing, Excel, PDF Data Extraction, Agile SCRUM
+%     \end{itemize}
+% }
+
+\cventry{Jan 2025 -- Jun 2025}{\textbf{Data Scientist (LLMs \& AI)} | Internship -- toHero, Montpellier}{}{}{}{    
+    \begin{itemize}
+        \item \textbf{AI Automation:} Development of an automated analysis system with business expert validation: +500\% speed, -99\% costs
+        \item \textbf{Data Extraction \& Analysis:} Automated processing of 18,000+ Excel rows and 1,772 PDF pages via OpenAI API, NLP and vector embeddings, reducing analysis time from 88 to 2 hours (97.7\% reduction) while improving accuracy
+        \item \textbf{Multi-Agent Testing (CrewAI):} Generation of 476 functional test scenarios for an e-commerce platform, simulating varied user journeys
+        \item \textbf{Skills:} Advanced Python, OpenAI API, NLP, Vector Embeddings, CrewAI, Data Processing, Automation, Functional Testing, Excel, PDF Data Extraction, Agile SCRUM
+    \end{itemize}
+}
+
+\cventry{2021 -- 2024}{\textbf{Data Analyst \& Python Developer} | National Iranian Oil Company (NIOC), Iran}{}{}{}{
+\begin{itemize}
+\item \textbf{Data Analysis:} Developed Python scripts for network performance data analysis and automated report generation
+\item \textbf{Automation:} Created data pipelines reducing manual interventions by 20\%
+\item \textbf{Data Visualization:} Designed interactive dashboards with Power BI for 1500+ users
+\item \textbf{Skills:} Python, Data Analysis, Power BI, Complex Problem Solving
+\end{itemize}
+}
+
+
+% \cventry{2017--2019}{Network Engineer (VOIP)}{National Iranian Oil Company (NIOC)}{Iran}{}{
+% \begin{itemize}
+% \item \textbf{Technical Support:} Configuration, maintenance, and performance analysis of enterprise VOIP systems serving 1,500+ users.
+% \item \textbf{Network Infrastructure:} Supervision and security of Cisco network equipment.
+% \item \textbf{Team Collaboration:} Worked within a 10-member technical team on critical telecommunications projects.
+% \item \textbf{Technical Skills:} VOIP Systems, Cisco Technologies, Network Security, Performance Monitoring, Team Coordination
+% \end{itemize}
+% }
+\vspace{-0.3cm}
+\section{Projects}
+\cventry{2025 -- 2026}{\textbf{Insurance Data Analysis \& ML Modeling }| University Project}{}{}{}{
+    \begin{itemize}
+\item \textbf{Objective:} Analyzed and modeled complex insurance data (\textbf{over 922,000 historical records}) to optimize internal processes and improve efficiency.
+        \item \textbf{Approach:} Applied exploratory analysis, econometric models, and Machine Learning techniques to deduce key relationships and identify operational anomalies.
+        \item \textbf{Deployment:} Developed (using \textbf{OOP}) and deployed an interactive DataViz application via Streamlit.    
+    \end{itemize}
+\scriptsize{\textit{Technologies: Python, Object-oriented programming (OOP), Machine Learning, Streamlit, Econometrics, Pandas}}
+}
+% \cventry{2023}{Comparison of Deep Learning Models for Stock Market Prediction}{Freelance Project}{}{}{
+% \begin{itemize}
+% \item Comparative analysis of 4 deep learning architectures (LSTM, BiLSTM, CNN-BiLSTM, R-CNN-BiLSTM) on a portfolio of 30 stocks.
+% \item Preprocessing of financial data and feature engineering in Python.
+% \item Identified the optimal model (CNN-BiLSTM) to maximize prediction accuracy.
+% \end{itemize}
+% \scriptsize{\textit{Technologies: Python, Keras, TensorFlow, Pandas, NumPy}}
+% }
+
+\cventry{2023}{\textbf{Comparison of Deep Learning Models for Stock Market Prediction} | Freelance Project}{}{}{}{
+\begin{itemize}
+\item Comparison of 4 models (LSTM, BiLSTM, CNN-BiLSTM, R-CNN-BiLSTM) - accuracy optimization
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Keras, TensorFlow, Pandas, NumPy}}
+}
+
+% \cventry{2022}{Personal Project}{Financial Data Analysis and Web Scraping}{}{}{
+% \begin{itemize}
+% \item Automated collection and cleaning of financial data using web scraping techniques (Beautiful Soup, Scrapy).
+% \item Explored and analyzed data to identify market trends.
+% \item Trained machine learning models (regression, classification) for predictive analytics.
+% \end{itemize}
+% \scriptsize{\textit{Technologies: Python, Beautiful Soup, Pandas, Scikit-Learn}}
+% }
+
+\cventry{2022}{\textbf{Financial Data Analysis \& Web Scraping} | Personal Project}{}{}{}{
+\begin{itemize}
+\item Automated collection and analysis of financial data via web scraping (Beautiful Soup, Scrapy)
+\item Trained ML models (regression, classification) for predictive analytics and trend identification
+\end{itemize}
+\scriptsize{\textit{Technologies: Python, Beautiful Soup, Pandas, Scikit-Learn}}
+}
+
+\vspace{-0.3cm}
+\section{Education}
+\cventry{}{Faculty of Economics, University of Montpellier, France}{University Diploma (DU) in Big Data, Data Science and Risk Analysis using Python}{2025 -- 2026}{}{}
+% \cventry{2024 -- 2025}{Master's Degree in Computer Science (Bac+5)}{\textbf{Faculty of Science}, University of Montpellier, France}{}{}{}
+\cventry{}{Faculty of Sciences, University of Montpellier, France}{Master's Degree in Computer Science (Bac+5)}{2024 -- 2025}{}{}
+% \cventry{2015}{Bachelor's in Electronic Engineering}{JDK University, Iran}{}{}{}
+
+% \section{Certifications}
+% \cvitem{Certifications}{Multi-Agent Systems (CrewAI), Prompt Engineering, Machine Learning Bootcamp}
+
+% \section{Certifications}
+% \cvitem{2025}{Multi-Agent Systems (CrewAI)}
+% \cvitem{2025}{ChatGPT Prompt Engineering (DeepLearning.AI)}
+% \cvitem{2023}{Machine Learning Bootcamp (OnAcademy)}
+% \cvitem{2022}{Financial Analysis Bootcamp (RoseAcademy)}
+
+
+\vspace{-0.3cm}
+\section{Languages \& Certifications}
+\cvitem{Languages}{French (Advanced), English (Professional Working Proficiency), Persian (Native)}
+\cvitem{Certifications}{Multi-Agent Systems (CrewAI), Prompt Engineering, Machine Learning Bootcamp}
+
+\end{document}
