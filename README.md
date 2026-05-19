@@ -29,6 +29,7 @@ cp .env.example .env
 ```
 
 Open `.env` and fill in:
+- `CV_OWNER_SLUG` — your name slug used in all output filenames (e.g. `Firstname_LASTNAME`)
 - `OPENAI_API_KEY` — from [platform.openai.com](https://platform.openai.com)
 - `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` — only needed for the Telegram bot
   *(see [docs/bot-setup.md](docs/bot-setup.md))*
@@ -132,8 +133,8 @@ The two PDFs are saved in the `Applied/` folder.
 
 | What | Where |
 |---|---|
-| Generated applications (CV + cover letter per job) | `Applied/YYYY-MM_Company_Role/` |
-| Final clean CVs (general, not job-specific) | `output/` |
+| Generated applications (CV + cover letter per job) | `Applied/YYYY-MM-DD_Company_Role/` |
+| Spontaneous applications (no company) | `Applied/YYYY-MM-DD_Spontannee_Role_lang/` |
 
 **Output Filenames:** All generated CVs and cover letters follow the standardized naming pattern:
 ```
@@ -163,24 +164,57 @@ All CVs pull from this file — you never need to update the same detail in mult
 
 ### Change CV content (work experience, skills, etc.)
 
-Open the relevant file in `templates/lato/`:
+Templates are organized by style family:
+
+**`templates/altacv/`** — AltaCV style (xelatex), used for spontaneous applications:
+
+| File | Use for |
+|---|---|
+| `CV_AI_MLOps_fr.tex` | AI / MLOps roles (French) |
+| `CV_AI_MLOps_en.tex` | AI / MLOps roles (English) |
+| `CV_DevOps_Alternance_fr.tex` | DevOps alternance (French) |
+| `CV_Polyvalent_fr.tex` | Polyvalent / interim agency (French) |
+
+**`templates/lato/`** — Lato/article style (pdflatex):
 
 | File | Use for |
 |---|---|
 | `CV_AI_Data_Lato.tex` | AI / Data Science / Python roles (English) |
 | `CV_IT_Infra_Lato.tex` | IT Support / Network roles (French) |
-| `CV_PhD_Lato.tex` | PhD / Research applications (English) |
+| `CV_PhD_Research_en.tex` | PhD / Research applications (English) |
 
-After editing, rebuild the PDF:
+**`templates/classic/`** — ModernCV banking style (pdflatex), 16 role variants.
+
+After editing a lato or classic template, rebuild the PDF:
 
 ```bash
-./compile.sh ai    # AI / Data Science CV
-./compile.sh it    # IT Support CV
-./compile.sh phd   # PhD CV
-./compile.sh all   # rebuild everything
+./compile.sh ai    # CV_AI_Data_Lato
+./compile.sh it    # CV_IT_Infra_Lato
+./compile.sh phd   # CV_PhD_Research_en
+./compile.sh all   # rebuild all CV_*.tex across all template folders
 ```
 
-The updated PDF appears in `output/`.
+---
+
+## Spontaneous Applications
+
+Generate a pre-written CV without LLM — no job URL needed:
+
+```bash
+uv run main.py spontaneous ai                    # AI / MLOps (French)
+uv run main.py spontaneous ai-en                 # AI / MLOps (English)
+uv run main.py spontaneous mlops                 # MLOps (French)
+uv run main.py spontaneous mlops-en              # MLOps (English)
+uv run main.py spontaneous devops                # DevOps (French)
+uv run main.py spontaneous devops-alternance     # DevOps alternance (French)
+uv run main.py spontaneous phd                   # PhD / Research (English)
+uv run main.py spontaneous polyvalent            # Polyvalent / interim (French)
+
+# Add --city to select Montpellier vs Grenoble automatically:
+uv run main.py spontaneous ai --city montpellier
+```
+
+Output goes to `Applied/YYYY-MM-DD_Spontannee_{role}_{lang}/`.
 
 ---
 
@@ -223,8 +257,7 @@ linkedin/
 ### Step 1 — Generate the carousel PDF
 
 ```bash
-# From the CV project root:
-cd /Users/su6i/@-github/CV/docs
+# From the repo root:
 amir pdf --theme carousel linkedin/02_data_science/carousel.md -o linkedin/02_data_science/carousel.pdf
 ```
 
