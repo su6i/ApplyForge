@@ -176,6 +176,11 @@ def build_spontaneous(
     cv_tex_path = output_dir / cv_tex_name
     shutil.copy2(src_tex, cv_tex_path)
 
+    # personal_data.tex uses \newcommand which conflicts with \providecommand already
+    # defined in the static template. Strip \providecommand lines so personal_data.tex
+    # can define the macros cleanly with \newcommand.
+    _strip_providecommands(cv_tex_path)
+
     # Inject location override
     _inject_location_override(cv_tex_path, job_location=city, language=lang)
 
@@ -242,6 +247,25 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
 
     logger.info(f"CV compiled: {cv_pdf}")
     return cv_pdf
+
+
+def _strip_providecommands(tex_path: Path) -> None:
+    """
+    Remove \\providecommand{\\cvXxx}{...} lines from a static template.
+
+    Static templates define macro defaults with \\providecommand so they compile
+    standalone. When personal_data.tex is present it tries \\newcommand for the
+    same macros, causing "Command already defined" errors. Stripping the
+    \\providecommand lines lets personal_data.tex own the definitions.
+    """
+    tex = tex_path.read_text(encoding="utf-8")
+    tex = re.sub(
+        r'^\\providecommand\{\\cv[A-Za-z]+\}\{[^}]*\}[ \t]*\n?',
+        '',
+        tex,
+        flags=re.MULTILINE,
+    )
+    tex_path.write_text(tex, encoding="utf-8")
 
 
 def _inject_location_override(tex_path: Path, job_location: str, language: str) -> None:
