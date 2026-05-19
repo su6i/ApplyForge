@@ -54,10 +54,15 @@ git diff --cached --stat   # لیست فایل‌های staged
 | فایل | نقش |
 |---|---|
 | `main.py` | Entry point — `uv run main.py apply URL` |
-| `src/pipeline/` | Pipeline پردازش: scraping، LLM، compile |
-| `templates/lato/` | قالب‌های LaTeX رزومه |
+| `src/pipeline/service.py` | `ApplicationService`: orchestrator اصلی pipeline |
+| `src/pipeline/latex_builder.py` | کامپایل LaTeX، `_SPONTANEOUS_MAP`، `build_spontaneous()` |
+| `src/core/location_utils.py` | تشخیص منطقه اکسیتانی → Montpellier/Grenoble |
+| `templates/altacv/` | قالب‌های AltaCV (xelatex) |
+| `templates/lato/` | قالب‌های Lato/article (pdflatex) |
+| `templates/classic/` | قالب‌های ModernCV banking (pdflatex) |
+| `templates/tina/` | قالب‌های Tina (pdflatex) |
+| `templates/shared/` | `personal_data.tex` — **private، گیت‌ایگنور** |
 | `cover_letters/` | قالب‌های LaTeX کاور لتر |
-| `compile.sh` | ساخت PDF از LaTeX (`./compile.sh ai|it|phd|all`) |
 | `master_cv.json` | پروفایل شخصی — **private، گیت‌ایگنور** |
 | `master_cv.example.json` | نمونه anonymized — safe to commit |
 
@@ -89,13 +94,17 @@ git diff --cached --stat   # لیست فایل‌های staged
 ### ساخت رزومه
 
 ```bash
-# تولید رزومه + کاور لتر از URL شغلی
+# تولید رزومه + کاور لتر از URL شغلی (با LLM)
 uv run main.py apply https://company.com/jobs/12345
 
-# ساخت PDF از LaTeX
-./compile.sh ai    # AI / Data Science
-./compile.sh it    # IT Support
-./compile.sh all   # همه
+# candidature spontanée — بدون LLM، از قالب آماده
+uv run main.py spontaneous ai                        # AI MLOps فرانسوی
+uv run main.py spontaneous ai-en                     # AI MLOps انگلیسی
+uv run main.py spontaneous devops-alternance         # DevOps Alternance
+uv run main.py spontaneous phd                       # PhD academic
+uv run main.py spontaneous polyvalent                # Polyvalent
+uv run main.py spontaneous ai --city montpellier     # با شهر مشخص (Occitanie → Montpellier)
+# نقش‌های موجود: ai, ai-en, mlops, mlops-en, devops, devops-alternance, phd, polyvalent
 ```
 
 ### LinkedIn Carousel
@@ -174,9 +183,36 @@ python scripts/linkedin_post.py --auth
 
 ---
 
+## قوانین قالب LaTeX
+
+- **هاردکد ممنوع** — هر فایل `.tex` tracked باید از ماکروها استفاده کند
+- **ماکروهای استاندارد:** `\cvname`، `\cvemail`، `\cvphone`، `\cvlocation`، `\cvgithub`، `\cvlinkedin`
+- **ModernCV (classic):** اضافه `\cvfirstname` و `\cvlastname` برای `\name{}{}`
+- **PhD academic (lato):** اضافه `\cvorcid` و `\cvauthorcitation`
+- **الگوی پرامبل:**
+  ```latex
+  \providecommand{\cvname}{Firstname LASTNAME}
+  ...
+  \input{../shared/personal_data}   % override کننده
+  ```
+- **naming:** قالب‌ها → `CV_{Role}_{lang}.tex` (بدون اسم شخصی)
+- **فایل نهایی** → `Applied/` (گیت‌ایگنور، اسم شخصی در نام فایل مجاز است)
+
+## منطق انتخاب شهر
+
+- موقعیت شغلی در **منطقه اکسیتانی** (34, 31, 30, 66, …) → `Montpellier, mobile en France`
+- هر جای دیگه → `Grenoble, mobile en France`
+- پیاده‌سازی: `src/core/location_utils.py` → `select_cv_city(job_location, language)`
+- برای candidature spontanée: `--city montpellier` یا `--city grenoble`
+
+---
+
 ## تصمیمات مهم (May 2026)
 
-- **gitignore whitelist strategy**: همه چیز ignore، فقط `.tex .md .sh .py .js .mjs .env.example .gitignore master_cv.example.json` whitelist شده‌اند
+- **gitignore whitelist strategy**: همه چیز ignore، فقط `.tex .md .sh .py .js .mjs .cls .env.example .gitignore master_cv.example.json` whitelist شده‌اند
 - **git filter-repo**: تاریخچه git تمیز شد — فایل‌های sensitive از تمام ۳۸ commit حذف شدند
 - **LinkedIn API version**: `202604` (calendar versioning — هر چند ماه باید آپدیت شود)
 - **carousel CSS**: `.slide { height:1080px; display:flex; flex-direction:column; justify-content:center }` — vertical centering با DOM wrapping
+- **قالب‌های جدید (May 2026):** 16 قالب classic (moderncv banking)، 4 قالب altacv (AI MLOps en/fr، DevOps Alternance، Polyvalent)، 1 قالب lato/PhD Research، 2 قالب tina
+- **candidature spontanée (May 2026):** `build_spontaneous()` در `latex_builder.py`، `generate_spontaneous()` در `service.py`، دستور CLI: `uv run main.py spontaneous <role>`
+- **`ApplicationBundle.cl_pdf`**: از `Path` به `Path | None` تغییر کرد — برای candidature spontanée که cover letter ندارد

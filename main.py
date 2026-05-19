@@ -4,9 +4,12 @@ main.py — Entry point for the CV automation system.
 Modes:
     uv run main.py bot                        → Start Telegram bot (recommended)
     uv run main.py apply <url> [--template] [--lang auto|<language>]   → Generate application from terminal
+    uv run main.py spontaneous <role> [--city <city>] [--lang <language>] → Candidature spontanée (no LLM)
     uv run main.py preview [--template] [--lang <language>] [--no-localize-preview] → Preview CV with full profile data
     uv run main.py init-profile [--cv path]   → Parse LaTeX CV into resume_profile.json
     uv run main.py test                       → Sanity-check settings
+
+Spontaneous roles: ai, ai-en, mlops, mlops-en, devops, devops-alternance, phd, polyvalent
 
     1. cp .env.example .env  (fill in OPENAI_API_KEY)
     2. uv run main.py init-profile
@@ -77,6 +80,28 @@ def cmd_apply(
     print(f"   CV          : {bundle.cv_pdf}")
     print(f"   Cover letter: {bundle.cl_pdf}")
     print(f"   Folder      : {bundle.output_dir}\n")
+
+
+def cmd_spontaneous(
+    role: str,
+    city: str = "",
+    language: str = "",
+) -> None:
+    """
+    Generate a spontaneous application CV (candidature spontanée) — no LLM.
+    Uses the pre-written static template for the given role.
+    """
+    from src.pipeline.service import ApplicationService
+
+    service = ApplicationService()
+    try:
+        bundle = service.generate_spontaneous(role=role, city=city, language=language)
+    except ValueError as exc:
+        print(f"❌ {exc}")
+        sys.exit(1)
+
+    print(f"✅ Spontaneous CV ready: {bundle.cv_pdf}")
+    print(f"   Folder: {bundle.output_dir}")
 
 
 def cmd_preview(
@@ -206,6 +231,26 @@ def main() -> None:
                 
         cmd_apply(url, template, color, output_language, enable_fallback)
 
+    elif command == "spontaneous":
+        if len(args) < 2:
+            print("Usage: uv run main.py spontaneous <role> [--city <city>] [--lang fr|en]")
+            print("Roles: ai, ai-en, mlops, mlops-en, devops, devops-alternance, phd, polyvalent")
+            sys.exit(1)
+
+        role = args[1]
+        city = ""
+        if "--city" in args:
+            idx = args.index("--city")
+            if idx + 1 < len(args):
+                city = args[idx + 1]
+        language = ""
+        if "--lang" in args:
+            idx = args.index("--lang")
+            if idx + 1 < len(args):
+                language = args[idx + 1].strip().lower()
+
+        cmd_spontaneous(role, city, language)
+
     elif command in ("init-profile", "init_profile"):
         # Optional: --cv path/to/file.tex
         cv_path = None
@@ -252,7 +297,7 @@ def main() -> None:
 
     else:
         print(f"Unknown command: {command!r}")
-        print("Available commands: bot, apply <url>, preview, test")
+        print("Available commands: bot, apply <url>, spontaneous <role>, preview, test")
         sys.exit(1)
 
 
