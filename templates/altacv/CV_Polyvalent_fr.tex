@@ -1,0 +1,149 @@
+\documentclass[7pt,a4paper,withhyper]{altacv}
+
+\geometry{left=0.9cm,right=0.9cm,top=0.7cm,bottom=0.7cm,columnsep=0.3cm}
+\usepackage{paracol}
+\usepackage[default]{lato}
+\usepackage{ragged2e}
+\linespread{0.95}
+
+\definecolor{VividPurple}{HTML}{3E0097}
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+
+\colorlet{name}{black}
+\colorlet{tagline}{VividPurple}
+\colorlet{heading}{VividPurple}
+\colorlet{headingrule}{VividPurple}
+\colorlet{subheading}{VividPurple}
+\colorlet{accent}{VividPurple}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+\renewcommand{\itemmarker}{{\small\textbullet}}
+\renewcommand{\ratingmarker}{\faCircle}
+\renewcommand{\taglinefont}{\Large\bfseries}
+
+\renewcommand{\cvevent}[4]{%
+  {\large\color{emphasis}\raggedright #1\par}
+  \smallskip\normalsize
+  \ifstrequal{#2}{}{}{%
+    \textbf{\color{accent}#2}%
+  }%
+  \ifstrequal{#4}{}{}{%
+    \ifstrequal{#2}{}{}{\hspace{1.5em}}%
+    {\small\cvLocationMarker~#4}%
+  }%
+  \ifstrequal{#3}{}{}{%
+    \hfill{\small\cvDateMarker~#3}%
+  }\par
+}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\input{../shared/personal_data}
+
+\begin{document}
+\enlargethispage{5cm}
+
+\name{\cvname}
+\tagline{Employé de libre-service / Équipier polyvalent\\ \vspace{0.2em} \normalsize \textbf{Disponible immédiatement (CDI, CDD, Intérim)}}
+\personalinfo{}
+\makecvheader
+\cvsection{Profil}
+{\small\justifying Profil dynamique, sérieux et très rapide à former, disponible immédiatement et avec une grande flexibilité horaire (matin très tôt, horaires décalés, week-ends, jours fériés). Habitué au travail manuel, aux tâches physiques et à l'exécution de missions sous pression. Fort sens du service client, de l'entraide et de l'esprit d'équipe. Capable d'être autonome tout en respectant strictement les consignes de la hiérarchie.\par}
+
+\columnratio{0.35}
+\vspace{0.1em}
+\backgroundcolor{c[0]}[HTML]{E6F0FA}
+\vspace{0.1em}
+\begin{paracol}{2}
+\vspace{-0.5em}
+\cvsection{Contact}
+\smallskip
+\textcolor{accent}{\faAt} \hspace{0.5em} \href{mailto:\cvemail}{\cvemail}\\\vspace{0.1em}
+\textcolor{accent}{\faPhone} \hspace{0.5em} \cvphone\\\vspace{0.1em}
+\textcolor{accent}{\cvLocationMarker} \hspace{0.5em} \cvlocation\\\vspace{0.1em}
+
+\vspace{0.1em}
+\cvsection{Compétences}
+\cvachievement{\faCode}{Dynamisme \& Réactivité}{Capacité à travailler de façon prolongée debout, port de charges, efficacité et rythme soutenu}
+\par\vspace{0.2em}
+\cvachievement{\faCode}{Sens du contact client}{Accueil souriant, aide aux clients, gestion calme des situations tendues}
+\par\vspace{0.2em}
+\cvachievement{\faCode}{Esprit d'Équipe}{Entraide avec les collègues, communication fluide, remplacement au pied levé}
+\par\vspace{0.2em}
+\cvachievement{\faCode}{Organisation \& Rigueur}{Respect des procédures d'hygiène/sécurité, ponctualité, polyvalence caisse/rayon}
+\par\vspace{0.2em}
+\cvachievement{\faDesktop}{Outil Informatique \& Maintenance}{Maîtrise du Pack Office, montage matériel PC, installation OS (Windows, Linux, macOS), et dépannage logiciel/matériel général}
+\par
+
+\switchcolumn
+\vspace{-0.5em}
+\cvsection{Expérience}
+
+\cvevent{Préparation des commandes \& Polyvalence}{Grande enseigne}{2017 – 2018}{Iran}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Préparation et contrôle des commandes clients dans un environnement à très fort rythme
+\item \justifying Conditionnement, emballage, manutention quotidienne et gestion des stocks
+\item \justifying Travail en équipe, respect rigoureux des consignes sanitaires et de sécurité
+\item \justifying Rapidité d'exécution, adaptabilité et sens du service pour garantir la satisfaction client
+\end{itemize}
+\smallskip\noindent\textit{Compétences : }Dynamisme, travail physique, relation client, polyvalence, rigueur\par
+\vspace{0.25em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.25em}
+
+\cvevent{Technicien Support \& Service Client}{Semahal}{2021 – 2024}{Iran}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Accueil et accompagnement quotidien de plus de 1 500 personnes, écoute active des besoins
+\item \justifying Résolution méthodique des problèmes avec une grande réactivité face à l'imprévu
+\item \justifying Travail sous pression avec des astreintes et respect exigeant des priorités fixées par la hiérarchie
+\item \justifying Sens du contact, patience et pédagogie pour assurer un service fluide
+\end{itemize}
+\smallskip\noindent\textit{Compétences : }Relation client, patience, application des procédures, esprit d'équipe, gestion du stress\par
+\vspace{0.25em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.25em}
+
+\cvevent{Agent Polyvalent / Gestion de Données (Stage)}{toHero}{2025}{Montpellier}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Saisie, tri et structuration rigoureuse d'importants volumes de données
+\item \justifying Collaboration étroite en équipe avec des objectifs de rendement journaliers
+\item \justifying Respect strict des consignes du chef d'équipe et contrôle qualité
+\end{itemize}
+\smallskip\noindent\textit{Compétences : }Organisation, fiabilité, concentration, attention au détail\par
+
+\switchcolumn*
+\vspace{-1.5ex}
+\cvsection{Disponibilité}
+\vspace{0.4em}
+\textbf{Horaires décalés}\\\vspace{0.15em}
+\textbf{Tôt le matin / Tard le soir}\\\vspace{0.15em}
+\textbf{Nuits, week-ends, 24h/7}\\\vspace{0.15em}
+\textbf{Jours fériés}\par
+
+\cvsection{Langues}
+\textbf{Français} (Opérationnel/Avancé)\\\vspace{0.15em}
+\textbf{Anglais} (Opérationnel/Avancé)\\\vspace{0.15em}
+\textbf{Persan} (Langue maternelle)\par
+
+\cvsection{Centres d'intérêt}
+\cvtag{Travail d'équipe}
+\cvtag{Bricolage}
+\cvtag{Technologie}
+\cvtag{Sport}
+\par
+
+\switchcolumn
+\vspace{0em}
+\cvsection{Formation}
+\cvevent{Formation Universitaire Supérieure}{Université de Montpellier}{2024 – 2026}{France}
+\textit{Formation scientifique (Bac+4/5) exigeant de la rigueur, des capacités d'analyse, et de l'adaptation rapide. Acquisition d'une méthode de travail structurée.}\par
+\par
+
+\end{paracol}
+\end{document}
