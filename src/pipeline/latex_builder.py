@@ -158,8 +158,9 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
     # Quality check before burning compile time
     verify_tex_files(cv_tex_path)
 
-    # Compile (pdflatex needs two passes for correct layout)
-    _run_latex(engine="pdflatex", tex_file=cv_tex_name, work_dir=output_dir, runs=2)
+    # altacv uses xelatex (fontspec); lato/classic use pdflatex
+    engine = "xelatex" if template == "altacv" else "pdflatex"
+    _run_latex(engine=engine, tex_file=cv_tex_name, work_dir=output_dir, runs=2)
 
     cv_pdf = cv_tex_path.with_suffix(".pdf")
     if not cv_pdf.exists():
