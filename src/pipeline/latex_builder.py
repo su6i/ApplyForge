@@ -163,6 +163,9 @@ def build_spontaneous(
     # Create output dir
     date_str = datetime.now().strftime("%Y-%m-%d")
     role_slug = role_key.replace("-", "_")
+    # Avoid double language tag (e.g. "ai_en" + "_en" → "ai_en_en")
+    if role_slug.endswith(f"_{lang}"):
+        role_slug = role_slug[: -len(f"_{lang}")]
     folder_name = f"{date_str}_Spontannee_{role_slug}_{lang}"
     output_dir = APPLIED_DIR / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
