@@ -128,7 +128,7 @@ async function run() {
     }
     md += `\n---\n<sub>*By [Su6iant](https://linkedin.com/in/su6i)*</sub>\n`;
     
-    const mdPath = '/Users/su6i/@-github/CV/docs/IT_Job_Market_Stats.fa.md';
+    const mdPath = new URL('../docs/IT_Job_Market_Stats.fa.md', import.meta.url).pathname;
     fs.writeFileSync(mdPath, md);
     console.log(`Markdown saved to ${mdPath}`);
 }
