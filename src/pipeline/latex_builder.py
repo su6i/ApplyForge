@@ -170,12 +170,19 @@ def build_spontaneous(
     output_dir = APPLIED_DIR / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Copy template + dependencies into output dir
-    _copy_deps(output_dir, template_folder)
+    # Copy only .cls/.sty files (not all templates in the folder)
+    from src.core.settings import REPO_ROOT
+    tmpl_dir = REPO_ROOT / "templates" / template_folder
+    for f in tmpl_dir.iterdir():
+        if f.suffix in (".cls", ".sty"):
+            shutil.copy2(f, output_dir / f.name)
+    # Copy shared/ (personal_data.tex etc.)
+    shared_dest = output_dir.parent / "shared"
+    shared_dest.mkdir(parents=True, exist_ok=True)
+    for f in TEMPLATES_SHARED.glob("*.tex"):
+        shutil.copy2(f, shared_dest / f.name)
 
-    # Determine output filename
-    role_label = _canonical_role_label(role_slug)
-    cv_tex_name = f"{CV_OWNER_SLUG}-CV_{role_label}_{lang}.tex"
+    cv_tex_name = f"{CV_OWNER_SLUG}-{template_file}"
     cv_tex_path = output_dir / cv_tex_name
     shutil.copy2(src_tex, cv_tex_path)
 
