@@ -204,7 +204,7 @@ async function run() {
         );
     }
 
-    const out = '/Users/su6i/@-github/CV/docs/data_jobs_stats.json';
+    const out = new URL('../docs/data_jobs_stats.json', import.meta.url).pathname;
     fs.writeFileSync(out, JSON.stringify({ scraped_at: new Date().toISOString(), source: 'France Travail / MétierScope', jobs: results }, null, 2));
     console.log(`\nSaved → ${out}`);
 }
