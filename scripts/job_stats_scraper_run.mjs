@@ -95,7 +95,7 @@ async function run() {
     }
 
     // Save raw JSON
-    const out = '/Users/su6i/@-github/CV/docs/job_stats_raw.json';
+    const out = new URL('../docs/job_stats_raw.json', import.meta.url).pathname;
     fs.writeFileSync(out, JSON.stringify(results, null, 2));
     console.log(`\n✅ Raw data saved → ${out}`);
 }
