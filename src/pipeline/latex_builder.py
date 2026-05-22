@@ -401,6 +401,10 @@ def _fill_cover_letter(template: str, content: TailoredContent) -> str:
             rf"\g<1>{content.variant}\g<2>",
         r"(\\newcommand\{\\WhyThisCompany\}\{)[^}]*(})":
             rf"\g<1>{latex_escape(content.why_this_company)}\g<2>",
+        r"(\\newcommand\{\\CLIntro\}\{)[^}]*(})":
+            rf"\g<1>{latex_escape(content.cl_intro)}\g<2>",
+        r"(\\newcommand\{\\CLBody\}\{)[^}]*(})":
+            rf"\g<1>{latex_escape(content.cl_body)}\g<2>",
     }
     result = template
     for pattern, repl in replacements.items():

@@ -41,6 +41,8 @@ class TailoredContent:
     selected_projects: list[dict] = field(default_factory=list)    # [{title,period,description,tech}]
     color_theme: str = ""     # Optional sidebar color highlight string
     job_location: str = ""   # City/region extracted from posting (drives \cvlocation selection)
+    cl_intro: str = ""        # LLM-generated CL intro paragraph (diplôme + candidature + hook)
+    cl_body: str = ""         # LLM-generated CL body paragraph (key achievement relevant to THIS job)
 
 
 _SYSTEM = """\
@@ -84,7 +86,18 @@ EXACTLY these keys (no extras, no markdown fences):
       "description": "<exact or lightly reworded to emphasise relevant aspects>",
       "tech": ["<most relevant tech, max 8>"]
     }}
-  ]
+  ],
+  "cl_intro": "<Cover letter paragraph 1 (2-3 sentences). \
+                Mention the candidate's diploma/formation. \
+                State the candidature for \\PositionTitle at \\CompanyName. \
+                Highlight the SPECIFIC skills/background that match THIS job — \
+                do NOT use a generic IT or AI paragraph; adapt to the actual job.>",
+  "cl_body": "<Cover letter paragraph 2 (2-3 sentences). \
+               Cite ONE concrete achievement from the candidate's experience \
+               that is most transferable to THIS specific job. \
+               Focus on transferable skills (analysis, problem-solving, teamwork, \
+               technical aptitude) if the job domain differs from IT. \
+               No percentages in this paragraph.>"
 }}
 
 Selection rules:
@@ -102,9 +115,13 @@ Selection rules:
   "Éviter de mettre des métriques dans ton profil (-70% d'interventions manuelles,
   +500% de vitesse). À réserver pour les expériences professionnelles."
   Therefore, `cv_summary` must NOT contain percentages or uplift/reduction metrics.
-- NEVER mention a specific number of years of experience in `cv_summary` or
-  `why_this_company` (no "7 ans", "7+ years", "plus de 7 ans", etc.). Describe
+- NEVER mention a specific number of years of experience in any field
+  (no "7 ans", "7+ years", "plus de 7 ans", etc.). Describe
   the nature and depth of experience instead.
+- `cl_intro` and `cl_body` MUST be adapted to the actual job domain.
+  If the job is not IT/network (e.g. railway maintenance, industrial technician),
+  emphasise transferable skills (analysis, troubleshooting, teamwork, technical
+  aptitude, rigor) instead of IT-specific tools.
 
 Variant rules:
   If language = "fr":  "ai" or "it"
@@ -182,6 +199,8 @@ def tailor(
         selected_experience=data.get("selected_experience", []),
         selected_projects=data.get("selected_projects", []),
         job_location=data.get("job_location", ""),
+        cl_intro=_strip_years_and_metrics(data.get("cl_intro", "")),
+        cl_body=_strip_years_and_metrics(data.get("cl_body", "")),
     )
     logger.info(
         f"Tailored → company={content.company_name!r}, "
