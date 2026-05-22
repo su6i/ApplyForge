@@ -70,6 +70,7 @@ EXACTLY these keys (no extras, no markdown fences):
   "selected_experience": [
     {{
       "company": "<exact from profile>",
+      "location": "<exact from profile — city and country, e.g. 'Montpellier, France'>",
       "role": "<exact from profile>",
       "period": "<exact from profile>",
       "highlights": ["<select 2-4 most relevant bullet points from profile for THIS job>"],
@@ -101,6 +102,9 @@ Selection rules:
   "Éviter de mettre des métriques dans ton profil (-70% d'interventions manuelles,
   +500% de vitesse). À réserver pour les expériences professionnelles."
   Therefore, `cv_summary` must NOT contain percentages or uplift/reduction metrics.
+- NEVER mention a specific number of years of experience in `cv_summary` or
+  `why_this_company` (no "7 ans", "7+ years", "plus de 7 ans", etc.). Describe
+  the nature and depth of experience instead.
 
 Variant rules:
   If language = "fr":  "ai" or "it"
@@ -171,10 +175,10 @@ def tailor(
         position_title=data.get("position_title", "Unknown Position"),
         language=data.get("language", "fr"),        # type: ignore[arg-type]
         variant=data.get("variant", role),
-        why_this_company=data.get("why_this_company", ""),
+        why_this_company=_strip_years_and_metrics(data.get("why_this_company", "")),
         match_score=int(data.get("match_score", 0)),
         tailored_skills=data.get("tailored_skills", []),
-        cv_summary=_strip_metrics_in_summary(data.get("cv_summary", "")),
+        cv_summary=_strip_years_and_metrics(data.get("cv_summary", "")),
         selected_experience=data.get("selected_experience", []),
         selected_projects=data.get("selected_projects", []),
         job_location=data.get("job_location", ""),
@@ -211,4 +215,25 @@ def _strip_metrics_in_summary(text: str) -> str:
         return text
     cleaned = re.sub(r"[+-]?\d+[\.,]?\d*\s*%", "", text)
     cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+    return cleaned
+
+
+def _strip_years_and_metrics(text: str) -> str:
+    """Remove years-of-experience mentions and numeric metrics."""
+    if not text:
+        return text
+    # Remove patterns like "7 ans d'expérience", "plus de 7 ans", "7+ years", "more than 7 years"
+    cleaned = re.sub(
+        r"\b(plus de |more than |over )?\d+\+?\s+an[ns]?\b[^,.]*(d['']expérience|d'exp\.?)?",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(r"\b(plus de |more than |over )?\d+\+?\s+years?\b[^,.]*",
+                     "", cleaned, flags=re.IGNORECASE)
+    # Remove numeric % metrics
+    cleaned = re.sub(r"[+-]?\d+[\.,]?\d*\s*%", "", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+    # Remove leftover sentence fragments starting with comma/and
+    cleaned = re.sub(r"^[,\s]+", "", cleaned)
     return cleaned
