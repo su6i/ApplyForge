@@ -296,7 +296,10 @@ def _inject_location_override(tex_path: Path, job_location: str, language: str) 
     """
     from src.core.location_utils import select_cv_city
     city = select_cv_city(job_location, language)
-    override = f"\\renewcommand{{\\cvlocation}}{{{city}}}  % auto: {job_location or 'unknown'}\n"
+    override = (
+        f"\\providecommand{{\\cvlocation}}{{}}\n"
+        f"\\renewcommand{{\\cvlocation}}{{{city}}}  % auto: {job_location or 'unknown'}\n"
+    )
     tex = tex_path.read_text(encoding="utf-8")
     if "\\begin{document}" not in tex:
         return
@@ -386,13 +389,11 @@ def _build_cover_letter(role: RoleType, content: TailoredContent, output_dir: Pa
 
 def _fill_cover_letter(template: str, content: TailoredContent) -> str:
     """
-    Replace the placeholder \newcommand values in the template.
-
-    We only replace between the opening brace and closing brace of the
-    4 mandatory \newcommand definitions — leaving the rest of the file intact.
+    Replace the placeholder \newcommand values in the template and inject
+    actual personal data from personal_data.tex into \providecommand lines.
     """
     replacements = {
-        r"(\\newcommand\{\\CompanyName\}\{)[^}]*(})": 
+        r"(\\newcommand\{\\CompanyName\}\{)[^}]*(})":
             rf"\g<1>{latex_escape(content.company_name)}\g<2>",
         r"(\\newcommand\{\\PositionTitle\}\{)[^}]*(})":
             rf"\g<1>{latex_escape(content.position_title)}\g<2>",
@@ -404,6 +405,19 @@ def _fill_cover_letter(template: str, content: TailoredContent) -> str:
     result = template
     for pattern, repl in replacements.items():
         result = re.sub(pattern, repl, result, count=1)
+
+    # Inject real personal data to replace placeholder \providecommand values
+    personal_data_tex = TEMPLATES_SHARED / "personal_data.tex"
+    if personal_data_tex.exists():
+        pd_text = personal_data_tex.read_text(encoding="utf-8")
+        for m in re.finditer(r"\\newcommand\{\\(\w+)\}\{([^}]*)\}", pd_text):
+            key, value = m.group(1), m.group(2)
+            result = re.sub(
+                rf"(\\providecommand\{{\\{key}\}})\{{[^}}]*\}}",
+                rf"\g<1>{{{value}}}",
+                result,
+                count=1,
+            )
     return result
 
 
