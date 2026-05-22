@@ -44,6 +44,7 @@ class TailoredContent:
     cl_intro: str = ""        # LLM-generated CL intro paragraph (diplôme + candidature + hook)
     cl_body: str = ""         # LLM-generated CL body paragraph (key achievement relevant to THIS job)
     extra_education: list[dict] = field(default_factory=list)  # conditional education entries to add to CV
+    selected_education: list[dict] = field(default_factory=list)  # profile education with optional trimmed honors
 
 
 _SYSTEM = """\
@@ -88,9 +89,17 @@ EXACTLY these keys (no extras, no markdown fences):
       "tech": ["<most relevant tech, max 8>"]
     }}
   ],
+  "selected_education": [
+    {{
+      "degree": "<exact from profile education>",
+      "institution": "<exact from profile education>",
+      "period": "<exact from profile education>",
+      "honors": "<exact from profile OR trimmed — see space budget rule below>"
+    }}
+  ],
   "extra_education": [
     {{
-      "degree": "<exact from conditional_education, or omit array entry if not relevant>",
+      "degree": "<exact from conditional_education, or omit entry if not relevant>",
       "institution": "<exact from conditional_education>",
       "period": "<exact from conditional_education>",
       "gpa": "<exact from conditional_education>",
@@ -131,6 +140,17 @@ Selection rules:
     minimum"), AND the candidate has at least N relevant years in that domain,
     THEN you MAY write exactly N years (not more) in `cl_intro` or `cv_summary`.
   * Never invent years not requested. Never exceed the number asked.
+- `selected_education`: Always include ALL degrees from the profile's `education` list.
+  For each entry, copy `honors` exactly — UNLESS the space budget rule below requires trimming.
+  Trimming rule: you may ONLY remove individual grade items (e.g. "Web Avancé : X/20").
+  NEVER rewrite, reorder, or change wording. Only delete the least relevant grade items.
+- Space budget rule (applies ONLY when extra_education is non-empty):
+  Adding a conditional degree takes ~2-3 lines. You MUST compensate in this order:
+  1. Trim honors in selected_education: remove the least relevant grade items for THIS job.
+     (e.g. for a maintenance job, "Web Avancé" is less relevant than "Réseaux Avancés".)
+  2. Reduce selected_projects to maximum 1 entry (the single most relevant project).
+  3. Only as last resort: reduce highlights to 2 per experience entry.
+  Priority: prefer step 1 + 2 combined. Never rewrite any sentence.
 - `extra_education`: The profile may contain a `conditional_education` array.
   Include its entries in `extra_education` ONLY when the job domain is in their
   `relevant_domains` list (e.g. maintenance, electrotechnique, ferroviaire, industrial).
@@ -219,6 +239,7 @@ def tailor(
         cl_intro=_strip_years_and_metrics(data.get("cl_intro", "")),
         cl_body=_strip_years_and_metrics(data.get("cl_body", "")),
         extra_education=data.get("extra_education", []),
+        selected_education=data.get("selected_education", []),
     )
     logger.info(
         f"Tailored → company={content.company_name!r}, "
