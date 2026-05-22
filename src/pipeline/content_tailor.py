@@ -151,6 +151,9 @@ Selection rules:
   2. Reduce selected_projects to maximum 1 entry (the single most relevant project).
   3. Only as last resort: reduce highlights to 2 per experience entry.
   Priority: prefer step 1 + 2 combined. Never rewrite any sentence.
+  ⛔ LEFT COLUMN IS FROZEN: NEVER remove or reduce tailored_skills, skill categories,
+  certifications, languages, or hobbies — space cuts come ONLY from the right column
+  (education honors and projects).
 - `extra_education`: The profile may contain a `conditional_education` array.
   Include its entries in `extra_education` ONLY when the job domain is in their
   `relevant_domains` list (e.g. maintenance, electrotechnique, ferroviaire, industrial).
