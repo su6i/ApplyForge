@@ -22,7 +22,6 @@
 \usepackage{ragged2e}
 \usepackage{parskip}
 \usepackage{xcolor}
-\usepackage{ifthen}
 \geometry{margin=2cm}
 
 % Font
@@ -36,37 +35,14 @@
 \providecommand{\cvmobilityFR}{Mobile}
 
 % =============================================================================
-% >>>  MANDATORY: FILL IN ALL 4 VARIABLES BELOW FOR EACH APPLICATION  <<<
+% >>>  VARIABLES — AUTO-FILLED BY APPLYFORGE PIPELINE  <<<
 % =============================================================================
-%
-% --- VARIABLE 1 [MANDATORY] ---
-% Company name exactly as it appears in the job posting.
-% Example: {Capgemini} or {Orange Business Services}
 \newcommand{\CompanyName}{[NOM DE L'ENTREPRISE]}
-%
-% --- VARIABLE 2 [MANDATORY] ---
-% Job title exactly as it appears in the job posting.
-% Example: {Ingénieur Data / IA} or {Technicien Support Réseau N2}
 \newcommand{\PositionTitle}{[INTITULÉ DU POSTE]}
-%
-% --- VARIABLE 3 [MANDATORY] ---
-% Choose EXACTLY ONE of these two values (no other value is valid):
-%   "ai"  → for AI, Data Science, Python Developer, Machine Learning positions
-%   "it"  → for IT Support, Network Technician, Infrastructure, SysAdmin positions
-% This controls the entire letter body — choosing the wrong variant will produce
-% an irrelevant letter. Match this to the CV you are sending:
-%   "ai" → send with CV_AI_Data.pdf
-%   "it" → send with CV_IT_Infra.pdf
-\newcommand{\Variant}{ai}
-%
-% --- VARIABLE 4 [MANDATORY] ---
-% Write 2-3 sentences IN FRENCH about why THIS SPECIFIC company interests you.
-% This paragraph must be unique per application — never copy-paste between companies.
-% Mention: their projects, values, tech stack, industry, or recent news.
-% Example: ``Votre engagement dans l'IA appliquée au secteur de l'assurance
-%            correspond parfaitement à mon expérience chez toHero.''
+\newcommand{\Variant}{it}
 \newcommand{\WhyThisCompany}{[PARAGRAPHE PERSONNALISÉ]}
-%
+\newcommand{\CLIntro}{[INTRO AUTO-GÉNÉRÉE]}
+\newcommand{\CLBody}{[CORPS AUTO-GÉNÉRÉ]}
 % =============================================================================
 
 \begin{document}
@@ -96,20 +72,11 @@ Madame, Monsieur,
 
 \vspace{0.3cm}
 
-% === Paragraph 1: Hook + Motivation ===
-\ifthenelse{\equal{\Variant}{ai}}{%
-% ---- AI/DATA VARIANT ----
-Titulaire d'un \textbf{Master en Informatique} et d'un \textbf{DU Big Data \& Data Science obtenu} à l'Université de Montpellier, je me permets de vous soumettre ma candidature pour le poste de \PositionTitle{} au sein de \CompanyName. Mon expertise en \textbf{LLMs, NLP et systèmes multi-agents} (OpenAI API, LangChain, CrewAI), couplée à des résultats concrets en automatisation IA, correspond directement aux enjeux de ce poste.
+% === Paragraph 1: Hook + Motivation (LLM-generated per job) ===
+\CLIntro
 
-% === Paragraph 2: Key Achievement ===
-Lors de mon stage chez toHero, j'ai conçu et déployé un système d'IA pour l'analyse automatisée de documents d'assurance. Ce projet a permis \textbf{d'augmenter la vitesse de traitement de 500\%} et \textbf{de réduire les coûts de 99\%} grâce à une architecture combinant OpenAI API, LangChain et des embeddings vectoriels. J'ai également généré 476 scénarios de tests multi-agents via CrewAI, validant la couverture fonctionnelle complète d'une plateforme e-commerce. Ma maîtrise de \textbf{Python}, \textbf{SQL}, et des outils de visualisation (\textbf{Power BI}, Streamlit) me permettra de contribuer rapidement à vos projets data.
-}{%
-% ---- IT/INFRA VARIANT ----
-Titulaire d'un \textbf{Master en Informatique} et d'un \textbf{DU Big Data \& Data Science} à l'Université de Montpellier, je me permets de vous soumettre ma candidature pour le poste de \PositionTitle{} au sein de \CompanyName. Mon expertise en \textbf{support technique, infrastructure réseau et automatisation} correspond directement aux exigences de ce poste.
-
-% === Paragraph 2: Key Achievement ===
-Au sein de Semahal, j'ai assuré le support technique de niveau 2 pour \textbf{1 500+ utilisateurs}, tout en développant des scripts Python pour la gestion SNMP des switches Cisco 2960, réduisant les interventions manuelles de \textbf{70\%}. J'ai également mis en place une surveillance proactive via SolarWinds, permettant la détection proactive d'incidents et maintenant une disponibilité de \textbf{99,9\%}. Mon parcours récent chez toHero m'a permis de renforcer mes compétences en \textbf{Docker}, \textbf{CI/CD} et automatisation de pipelines de données.
-}
+% === Paragraph 2: Key Achievement (LLM-generated per job) ===
+\CLBody
 
 % === Paragraph 3: Why This Company (CUSTOMIZABLE) ===
 \WhyThisCompany
