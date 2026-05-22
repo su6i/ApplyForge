@@ -15,6 +15,8 @@
 !*.py
 !*.js
 !*.mjs
+!*.svg
+!*.jpg
 !.env.example
 !.gitignore
 !master_cv.example.json
@@ -98,3 +100,8 @@ test_*.py
 
 # ── macOS ─────────────────────────────────────────────────────
 .DS_Store
+
+# Whitelist project logo assets
+!assets/project_logo.jpg
+!assets/linkedin_su6i.svg
+
