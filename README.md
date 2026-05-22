@@ -1,4 +1,13 @@
-# CV & Application Generator
+<div align="center">
+  <img src="assets/project_logo.jpg" width="350" alt="ApplyForge Logo">
+  <h1>ApplyForge - Automated CV &amp; Cover Letter Crafter</h1>
+
+  <br>
+
+  <p align="center" style="white-space: nowrap;">
+    <img src="https://img.shields.io/badge/Version-0.1.0-blue.svg" alt="Version">&nbsp;<img src="https://img.shields.io/badge/Python-3.12+-yellow.svg" alt="Python">&nbsp;<img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">&nbsp;<a href="https://www.linkedin.com/in/su6i/"><img src="assets/linkedin_su6i.svg" height="20" alt="LinkedIn"></a>
+  </p>
+</div>
 
 **What it does:** You send a job posting link — the system reads it, picks the right CV,
 writes a personalised cover letter, and delivers two ready-to-send PDFs.
