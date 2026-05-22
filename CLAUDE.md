@@ -220,3 +220,46 @@ python scripts/linkedin_post.py --auth
 - **`ApplicationBundle.cl_pdf`**: از `Path` به `Path | None` تغییر کرد — برای candidature spontanée که cover letter ندارد
 - **نامگذاری خروجی:** pattern ثابت `{CV_OWNER_SLUG}-{DocumentType}_{Role}_{lang}.pdf` — برای tailored و spontaneous یکسان؛ پوشه spontanée از نام شرکت خالی است (`Spontannee_{role}_{lang}`). `CV_OWNER_SLUG` باید در `.env` ست شود.
 - **`build_spontaneous` output folder:** فقط `.cls/.sty` از پوشه template کپی می‌شود (نه همه قالب‌ها) — خروجی تمیز
+
+---
+
+## تصمیمات مهم (22 مه 2026) — سیستم tailored pipeline
+
+### LLM model
+- **`LLM_MODEL=deepseek-v4-flash`** در `.env` — مدل DeepSeek جایگزین `gpt-4o-mini` شد.
+  اگر خطای `model not found` دیدی، مطمئن شو `.env` این مقدار را دارد.
+
+### `conditional_education` — مدرک شرطی
+- پروفایل‌های source JSON می‌توانند آرایه `conditional_education` داشته باشند.
+- هر entry دارای `relevant_domains` است (مثل `["maintenance", "ferroviaire", "electronique"]`).
+- `format_for_prompt()` در `resume_loader.py` این بخش را به LLM می‌دهد.
+- LLM مدرک را **فقط اگر** حوزه شغل با `relevant_domains` تطبیق دارد در `extra_education` می‌گذارد.
+- برای نقش‌های AI/Data/IT محض، `extra_education` خالی برمی‌گردد.
+
+### `selected_education` و space budget rule
+- LLM لیست `selected_education` را با اختیار trim کردن `honors` کنترل می‌کند.
+- **Space budget rule:** وقتی `extra_education` غیر‌خالی است، LLM باید از راست جبران کند:
+  1. حذف جزئی‌ترین grade ها از `honors`
+  2. کاهش `selected_projects` به حداکثر ۱ پروژه
+  3. فقط در آخرین حالت: کاهش highlights به ۲ مورد
+- **⛔ ستون چپ قفل است:** هرگز `tailored_skills`، category‌های skills، certifications، languages یا hobbies حذف نمی‌شوند.
+
+### Dynamic cover letter — `cl_intro` + `cl_body`
+- قالب `Cover_Letter_Template_Fr.tex` دیگر `\ifthenelse` ندارد.
+- LLM دو پاراگراف کاملاً متناسب با آگهی تولید می‌کند: `cl_intro` (معرفی + دیپلم) و `cl_body` (یک دستاورد کلیدی).
+- `latex_builder.py` در `_fill_cover_letter` این مقادیر را به `\newcommand{\CLIntro}` و `\newcommand{\CLBody}` inject می‌کند.
+- برای مشاغل غیر IT (مثل نگهداری قطار)، LLM باید transferable skills را تأکید کند.
+
+### Personal data injection در cover letter
+- `_fill_cover_letter` اکنون `templates/shared/personal_data.tex` را می‌خواند و `\providecommand` placeholder ها را با مقادیر واقعی جایگزین می‌کند.
+- بدون این، `\cvname{Firstname LASTNAME}` و سایر placeholder‌ها در CL باقی می‌ماندند.
+
+### `_strip_years_and_metrics()` — post-processing
+- `content_tailor.py` تابع `_strip_years_and_metrics()` دارد که روی `why_this_company`، `cv_summary`، `cl_intro` و `cl_body` اجرا می‌شود.
+- الگوهای حذف: `"X ans d'expérience"`, `"plus de X ans"`, `"X+ years"`, و درصدها (`±N%`).
+- قانون در prompt هم تعریف شده: سال‌ها فقط وقتی آگهی به‌صراحت N سال خواسته مجاز است.
+
+### `--color blue` به عنوان پیش‌فرض
+- `amir apply` به‌صورت پیش‌فرض `--color blue` به pipeline اضافه می‌کند.
+- می‌توان override کرد: `amir apply <url> --color green`
+- رنگ `blue` = `\backgroundcolor{c[0]}[HTML]{E6F0FA}` در altacv.
