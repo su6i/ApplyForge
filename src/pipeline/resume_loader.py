@@ -245,6 +245,18 @@ def format_for_prompt(role: str = "ai") -> str:
         if edu_item.get("honors"):
             lines.append(f"    Honors: {edu_item['honors']}")
 
+    # Conditional education (only shown to LLM, not always on CV)
+    cond_edu = p.get("conditional_education", [])
+    if cond_edu:
+        lines.append("\nConditional education (include in extra_education ONLY if job domain matches relevant_domains):")
+        for ce in cond_edu:
+            domains = ", ".join(ce.get("relevant_domains", []))
+            lines.append(
+                f"  {ce.get('degree', '')} — {ce.get('institution', '')} ({ce.get('period', '')}) | GPA: {ce.get('gpa', '')} | relevant_domains: [{domains}]"
+            )
+            if ce.get("honors"):
+                lines.append(f"    Honors: {ce['honors']}")
+
     # Languages & Certifications
     lang_str = ", ".join(f"{k} ({v})" for k, v in p.get("languages", {}).items())
     lines.append(f"\nLanguages: {lang_str}")
