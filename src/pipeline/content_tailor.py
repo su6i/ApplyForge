@@ -115,9 +115,12 @@ Selection rules:
   "Éviter de mettre des métriques dans ton profil (-70% d'interventions manuelles,
   +500% de vitesse). À réserver pour les expériences professionnelles."
   Therefore, `cv_summary` must NOT contain percentages or uplift/reduction metrics.
-- NEVER mention a specific number of years of experience in any field
-  (no "7 ans", "7+ years", "plus de 7 ans", etc.). Describe
-  the nature and depth of experience instead.
+- Years of experience rule (STRICT):
+  * DEFAULT: NEVER mention a specific number of years. Describe depth/nature instead.
+  * EXCEPTION: IF the job posting explicitly requires N years (e.g. "3 ans d'expérience
+    minimum"), AND the candidate has at least N relevant years in that domain,
+    THEN you MAY write exactly N years (not more) in `cl_intro` or `cv_summary`.
+  * Never invent years not requested. Never exceed the number asked.
 - `cl_intro` and `cl_body` MUST be adapted to the actual job domain.
   If the job is not IT/network (e.g. railway maintenance, industrial technician),
   emphasise transferable skills (analysis, troubleshooting, teamwork, technical
