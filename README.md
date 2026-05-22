@@ -39,7 +39,8 @@ cp .env.example .env
 
 Open `.env` and fill in:
 - `CV_OWNER_SLUG` — your name slug used in all output filenames (e.g. `Firstname_LASTNAME`)
-- `OPENAI_API_KEY` — from [platform.openai.com](https://platform.openai.com)
+- `LLM_MODEL` — LLM model identifier (e.g. `deepseek-v4-flash` for DeepSeek, or `gpt-4o` for OpenAI)
+- `OPENAI_API_KEY` or `DEEPSEEK_API_KEY` — depending on your chosen LLM provider
 - `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` — only needed for the Telegram bot
   *(see [docs/bot-setup.md](docs/bot-setup.md))*
 - `LINKEDIN_CLIENT_ID` / `LINKEDIN_CLIENT_SECRET` — only needed for LinkedIn posting
@@ -237,8 +238,13 @@ Open the relevant template in `cover_letters/`:
 | `Cover_Letter_Template_En.tex` | English |
 
 Only edit the **stock paragraphs** (the text that describes your experience).
-The four personalisation variables at the top (`\CompanyName`, `\PositionTitle`, etc.)
+The personalisation variables at the top (`\CompanyName`, `\PositionTitle`, etc.)
 are filled automatically for each application — do not touch them.
+
+**Cover letter body is now fully LLM-generated.** `\CLIntro` and `\CLBody` are
+written by the LLM based on the actual job posting — no hardcoded variant blocks.
+The LLM adapts tone and content: technical for IT/AI roles, transferable-skills focused
+for maintenance or industrial roles.
 
 ---
 
