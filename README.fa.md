@@ -1,4 +1,13 @@
-# راهنمای استفاده — نسخهٔ فارسی
+<div align="center">
+  <img src="assets/project_logo.jpg" width="350" alt="لوگوی اپلای‌فورج">
+  <h1>اپلای‌فورج - ابزار خودکار تولید رزومه و کاور لتر</h1>
+
+  <br>
+
+  <p align="center" style="white-space: nowrap;">
+    <img src="https://img.shields.io/badge/%D9%86%D8%B3%D8%AE%D9%87-0.1.0-blue.svg" alt="نسخه">&nbsp;<img src="https://img.shields.io/badge/%D9%BE%D8%A7%DB%8C%D8%AA%D9%88%D9%86-3.12+-yellow.svg" alt="پایتون">&nbsp;<img src="https://img.shields.io/badge/%D9%85%D8%AC%D9%88%D8%B2-MIT-green.svg" alt="مجوز">&nbsp;<a href="https://www.linkedin.com/in/su6i/"><img src="assets/linkedin_su6i.svg" height="20" alt="لینکدین"></a>
+  </p>
+</div>
 
 این مخزن ابزار تولید و ارسال خودکار رزومه و نامهٔ پوششی از روی آگهی شغلی است.
 
