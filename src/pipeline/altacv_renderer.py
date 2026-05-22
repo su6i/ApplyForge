@@ -493,14 +493,8 @@ def _section_skills(
     language: str = "en",
 ) -> str:
     items = [f"\\cvsection{{{_label('skills', language)}}}"]
-    
-    # Core Tailored Skills as tags
-    if tailored_skills:
-        for s in tailored_skills[:8]:
-            items.append(f"\\cvtag{{{latex_escape(s)}}}")
-        items.append("\\smallskip\\par")
-        
-    already_shown = set(tailored_skills[:8]) if tailored_skills else set()
+
+    already_shown: set[str] = set()
 
     if language == "fr":
         labels = {
