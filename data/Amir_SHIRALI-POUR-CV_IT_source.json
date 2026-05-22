@@ -1,0 +1,119 @@
+{
+  "_comment": "IT/Network-focused profile. Feed this to the LLM for Network & Systems Engineer applications.",
+  "_updated": "2026-03-26",
+
+  "identity": {
+    "name": "Amir SHIRALI POUR",
+    "title": "Network & Systems Engineer (AI-Augmented Automation)",
+    "email": "sushiant60@gmail.com",
+    "phone": "+33 7 75 86 77 26",
+    "location": "Grenoble, Mobile in France",
+    "github": "github.com/su6i",
+    "linkedin": "linkedin.com/in/su6i"
+  },
+
+  "profile_summary": "Network & Systems Engineer with 7+ years at Semahal (Cisco, VoIP, SNMP). Recently completed a Master's in CS at Montpellier. I leverage Python and AI tools to automate infrastructure operations — monitoring, reporting, and incident detection.",
+
+  "skills": {
+    "networks_support": ["Cisco IOS", "SNMP", "TCP/IP", "VLAN", "VoIP", "SolarWinds", "Network Monitoring", "Troubleshooting"],
+    "mlops_devops": ["Docker", "FastAPI", "AWS", "CI/CD", "Linux/Bash", "Git"],
+    "ai_ml": ["Python", "LLMs (APIs)", "LangChain", "CrewAI", "NLP", "Deep Learning"],
+    "data": ["Pandas", "NumPy", "SQL (PostgreSQL, MySQL)", "MongoDB", "ETL", "Power BI"]
+  },
+
+  "experience": [
+    {
+      "company": "Semahal",
+      "location": "Iran",
+      "role": "Network Support Engineer & Automation Developer",
+      "period": "2021 – 2024",
+      "highlights": [
+        "Managed network and VoIP infrastructure for 1,500+ users — incident resolution, SLA compliance, 24/7 on-call",
+        "Built Python/SNMP automation scripts to manage 70 Cisco 2960 switches remotely, eliminating 70% of on-site interventions",
+        "Deployed SolarWinds dashboards for proactive monitoring — detected 30% of incidents before user reports",
+        "Wrote Bash scripts reducing diagnostic time by 40%; automated reporting pipelines via Python"
+      ],
+      "tech": ["Python", "Cisco IOS", "SNMP", "SolarWinds", "Bash", "VoIP", "SQL"]
+    },
+    {
+      "company": "toHero",
+      "location": "Montpellier, France",
+      "role": "AI R&D & Automation Engineer (Internship)",
+      "period": "Jan 2025 – Jun 2025",
+      "highlights": [
+        "Built AI-powered data extraction pipelines (PDF, Excel) using LLMs and vector embeddings",
+        "Generated 476 automated test scenarios via multi-agent framework, reducing manual QA effort"
+      ],
+      "tech": ["Python", "LangChain", "OpenAI API", "Docker", "FastAPI", "CI/CD"]
+    }
+  ],
+
+  "projects": [
+    {
+      "title": "Cisco Switch & IP Phone Manager | Semahal",
+      "type": "Personal Project",
+      "period": "2021 – 2025",
+      "highlights": [
+        "v1 (Semahal, Internal) : Python/SNMP monitoring tool for 70 Cisco switches — detects failures before user reports, -70% on-site visits",
+        "v2 (Personal) : Evolved into full-stack app with real-time web dashboard and automated Telegram alerts"
+      ],
+      "tech": ["Python", "PySNMP", "FastAPI", "PostgreSQL/PostGIS", "Next.js", "Docker", "Bash"]
+    },
+    {
+      "title": "Multimodal AI Telegram Bot - Su6i-Yar",
+      "type": "Personal Project",
+      "period": "2025",
+      "url": "https://github.com/su6i/Su6i-Yar",
+      "highlights": [
+        "Personal AI assistant deployed on VPS — handles voice, image, finance and multilingual queries for daily use",
+        "Developed async data pipelines for live finance tracking"
+      ],
+      "tech": ["LangChain", "Gemini/Grok APIs", "Pyrogram", "Faster-Whisper", "Fish Speech"]
+    }
+  ],
+
+  "education": [
+    {
+      "degree": "University Diploma (DU) in Big Data, Data Science and Risk Analysis with Python",
+      "institution": "Faculty of Economics, University of Montpellier, France",
+      "period": "2025 – 2026"
+    },
+    {
+      "degree": "Master's Degree in Computer Science (Bac+5)",
+      "institution": "Faculty of Sciences, University of Montpellier, France",
+      "period": "2024 – 2025",
+      "honors": "Advanced Networks: 16.33/20 (1st/13), Advanced Web: 17.15/20 (2nd/17), Systems: 16.5/20"
+    }
+  ],
+
+  "conditional_education": [
+    {
+      "degree": "Bachelor's Degree in Electronics Engineering (Licence, Bac+2+2)",
+      "institution": "Jahade Daneshgahi Institute of Higher Education of Khuzestan, Ahvaz, Iran",
+      "period": "2013 – 2015",
+      "gpa": "17.94/20",
+      "honors": "6 courses 20/20 (Computer Programming, Differential Equations, Linear Integrated Circuits). Notable: Computer Networks (19.75), Numerical Analysis (19.50), Electronic Circuit Analysis (19.50)",
+      "relevant_domains": ["maintenance", "industrial", "electrotechnique", "electricite", "electronique", "ferroviaire", "mecanique", "hardware", "embedded", "automatisme", "instrumentation"]
+    }
+  ],
+
+  "languages": {
+    "French": "Advanced",
+    "English": "Advanced",
+    "Persian": "Native"
+  },
+
+  "hobbies": [
+    "Cycling",
+    "Open Source Contributions",
+    "Chess",
+    "Group Mountain Hiking"
+  ],
+
+  "certifications": [
+    "MCP: Build Rich-Context AI Apps with Anthropic (2025)",
+    "Multi-Agent Systems — CrewAI (2025)",
+    "Prompt Engineering (2025)",
+    "Technical Training: Microwave & NMS — SIAE Microelettronica (Italy, 2012)"
+  ]
+}

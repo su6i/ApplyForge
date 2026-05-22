@@ -335,7 +335,7 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     
     sections.append("\\switchcolumn")
     sections.append(EDUCATION_TOP_MARGIN)
-    education = profile.get("education", [])
+    education = profile.get("education", []) + (tailored.extra_education or [])
     if education:
         sections.append(_section_education(education, language))
 

@@ -43,6 +43,7 @@ class TailoredContent:
     job_location: str = ""   # City/region extracted from posting (drives \cvlocation selection)
     cl_intro: str = ""        # LLM-generated CL intro paragraph (diplôme + candidature + hook)
     cl_body: str = ""         # LLM-generated CL body paragraph (key achievement relevant to THIS job)
+    extra_education: list[dict] = field(default_factory=list)  # conditional education entries to add to CV
 
 
 _SYSTEM = """\
@@ -87,6 +88,15 @@ EXACTLY these keys (no extras, no markdown fences):
       "tech": ["<most relevant tech, max 8>"]
     }}
   ],
+  "extra_education": [
+    {{
+      "degree": "<exact from conditional_education, or omit array entry if not relevant>",
+      "institution": "<exact from conditional_education>",
+      "period": "<exact from conditional_education>",
+      "gpa": "<exact from conditional_education>",
+      "honors": "<exact from conditional_education>"
+    }}
+  ],
   "cl_intro": "<Cover letter paragraph 1 (2-3 sentences). \
                 Mention the candidate's diploma/formation. \
                 State the candidature for \\PositionTitle at \\CompanyName. \
@@ -121,6 +131,10 @@ Selection rules:
     minimum"), AND the candidate has at least N relevant years in that domain,
     THEN you MAY write exactly N years (not more) in `cl_intro` or `cv_summary`.
   * Never invent years not requested. Never exceed the number asked.
+- `extra_education`: The profile may contain a `conditional_education` array.
+  Include its entries in `extra_education` ONLY when the job domain is in their
+  `relevant_domains` list (e.g. maintenance, electrotechnique, ferroviaire, industrial).
+  For AI/Data/IT-only roles, return an empty array [].
 - `cl_intro` and `cl_body` MUST be adapted to the actual job domain.
   If the job is not IT/network (e.g. railway maintenance, industrial technician),
   emphasise transferable skills (analysis, troubleshooting, teamwork, technical
@@ -204,6 +218,7 @@ def tailor(
         job_location=data.get("job_location", ""),
         cl_intro=_strip_years_and_metrics(data.get("cl_intro", "")),
         cl_body=_strip_years_and_metrics(data.get("cl_body", "")),
+        extra_education=data.get("extra_education", []),
     )
     logger.info(
         f"Tailored → company={content.company_name!r}, "
