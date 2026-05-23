@@ -1,6 +1,6 @@
 {
   "_comment": "IT/Network-focused profile. Feed this to the LLM for Network & Systems Engineer applications.",
-  "_updated": "2026-03-26",
+  "_updated": "2026-05-23",
 
   "identity": {
     "name": "Amir SHIRALI POUR",
@@ -114,6 +114,10 @@
     "MCP: Build Rich-Context AI Apps with Anthropic (2025)",
     "Multi-Agent Systems — CrewAI (2025)",
     "Prompt Engineering (2025)",
-    "Technical Training: Microwave & NMS — SIAE Microelettronica (Italy, 2012)"
+    "Technical Training: Microwave & NMS — SIAE Microelettronica (Italy, 2012)",
+    "Automates Programmables (PLC) — Siemens Step 7",
+    "Servomoteurs et Contrôle de Mouvement (SM)",
+    "HSE (Health, Safety, Environment) & Industrial Hygiene — Energy Sector",
+    "ISO 9001:2000 Quality Management"
   ]
 }
