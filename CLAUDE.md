@@ -263,3 +263,14 @@ python scripts/linkedin_post.py --auth
 - `amir apply` به‌صورت پیش‌فرض `--color blue` به pipeline اضافه می‌کند.
 - می‌توان override کرد: `amir apply <url> --color green`
 - رنگ `blue` = `\backgroundcolor{c[0]}[HTML]{E6F0FA}` در altacv.
+
+## قوانین Agent
+
+### قوانین مشترک (از agent-constitution)
+تمام فایل‌های `.agent/constitution/rules/` را بخوان و رعایت کن.
+آپدیت: `git submodule update --remote .agent/constitution`
+
+### قوانین اختصاصی این پروژه
+تمام فایل‌های `.agent/local-rules/` را بخوان.
+در صورت تناقض، **قوانین اختصاصی (local-rules) اولویت دارند.**
+
