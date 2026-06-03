@@ -265,7 +265,7 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
 # here and must keep their \providecommand fallback.
 _PERSONAL_DATA_MACROS: frozenset[str] = frozenset({
     "cvname", "cvemail", "cvphone", "cvlocation",
-    "cvgithub", "cvlinkedin", "cvfirstname", "cvlastname",
+    "cvgithub", "cvlinkedin", "cvfirstname", "cvlastname", "cvwebsite",
 })
 
 
