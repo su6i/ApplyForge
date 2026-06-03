@@ -245,6 +245,7 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     location = identity.get("location", "")
     linkedin = identity.get("linkedin", "")
     github = identity.get("github", "")
+    website = identity.get("website", "")
 
     sections.append("\\personalinfo{}")
     sections.append("\\makecvheader")
@@ -283,7 +284,7 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     
     # --- ROW 1: [Contact, Skills] | [Experience] ---
     sections.append(CONTACT_TOP_MARGIN)
-    sections.append(_section_contact(email, phone, location, linkedin, github, language))
+    sections.append(_section_contact(email, phone, location, linkedin, github, language, website))
     
     sections.append(SKILLS_TOP_MARGIN)
     sections.append(
@@ -351,6 +352,7 @@ def _section_contact(
     linkedin: str,
     github: str,
     language: str,
+    website: str = "",
 ) -> str:
     sections = [f"\\cvsection{{{_label('contact', language)}}}\n\\smallskip"]
     items = []
@@ -366,6 +368,9 @@ def _section_contact(
     if github:
         gh_url = f"https://{github}" if not github.startswith("http") else github
         items.append(f"\\textcolor{{accent}}{{\\faGithub}} \\hspace{{0.5em}} \\href{{{gh_url}}}{{{latex_escape(github)}}}")
+    if website:
+        ws_url = f"https://{website}" if not website.startswith("http") else website
+        items.append(f"\\textcolor{{accent}}{{\\faGlobe}} \\hspace{{0.5em}} \\href{{{ws_url}}}{{{latex_escape(website)}}}")
     
     # Join items with a LaTeX line break, then configured vertical spacing.
     if items:
