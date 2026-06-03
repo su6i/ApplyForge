@@ -26,7 +26,8 @@ from urllib.parse import urlparse
 from src.core.logger import logger
 from src.core.quality_guard import verify_tex_files
 from src.core.settings import (
-    APPLIED_DIR,
+    JOB_APPLY_DIR,
+    PHD_APPLY_DIR,
     COVER_LETTERS_DIR,
     CV_OWNER_SLUG,
     TEMPLATES_LATO,
@@ -167,7 +168,8 @@ def build_spontaneous(
     if role_slug.endswith(f"_{lang}"):
         role_slug = role_slug[: -len(f"_{lang}")]
     folder_name = f"{date_str}_Spontannee_{role_slug}_{lang}"
-    output_dir = APPLIED_DIR / folder_name
+    base_dir = PHD_APPLY_DIR if "phd" in role_key else JOB_APPLY_DIR
+    output_dir = base_dir / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Copy only .cls/.sty files (not all templates in the folder)
@@ -434,7 +436,8 @@ def _create_output_dir(content: TailoredContent, role: str = "") -> Path:
     lang_tag     = (content.language or "en").lower()
     folder_name  = f"{date_str}_{company_slug}_{role_label}_{lang_tag}"
 
-    output_dir = APPLIED_DIR / folder_name
+    base_dir = PHD_APPLY_DIR if role == "phd" else JOB_APPLY_DIR
+    output_dir = base_dir / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir
 

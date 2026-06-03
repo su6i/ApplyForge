@@ -36,4 +36,6 @@ TEMPLATES_ALTACV = REPO_ROOT / "templates" / "altacv"
 TEMPLATES_SHARED = REPO_ROOT / "templates" / "shared"
 COVER_LETTERS_DIR = REPO_ROOT / "cover_letters"
 OUTPUT_DIR = REPO_ROOT / "output"
-APPLIED_DIR = REPO_ROOT / "Applied"
+JOB_APPLY_DIR = Path(os.getenv("JOB_APPLY_DIR", str(REPO_ROOT / "Applied")))
+PHD_APPLY_DIR = Path(os.getenv("PHD_APPLY_DIR", str(REPO_ROOT / "Applied")))
+APPLIED_DIR = JOB_APPLY_DIR  # legacy alias
