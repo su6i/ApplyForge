@@ -42,7 +42,7 @@ def scrape(url: str, headless: bool = True) -> JobPosting:
     Parameters
     ----------
     url      : Full job posting URL.
-    headless : If Selenium fallback is triggered, run Chrome headlessly.
+    headless : If browser fallback is triggered, run headlessly.
 
     Returns
     -------
@@ -53,7 +53,13 @@ def scrape(url: str, headless: bool = True) -> JobPosting:
     posting = _scrape_with_requests(url)
     if len(posting.body) < _MIN_BODY_LENGTH:
         logger.warning(
-            f"requests body too short ({len(posting.body)} chars), trying Selenium fallback…"
+            f"requests body too short ({len(posting.body)} chars), trying Playwright fallback…"
+        )
+        posting = _scrape_with_playwright(url, headless=headless)
+
+    if len(posting.body) < _MIN_BODY_LENGTH:
+        logger.warning(
+            f"Playwright body too short ({len(posting.body)} chars), trying Selenium fallback…"
         )
         posting = _scrape_with_selenium(url, headless=headless)
 
@@ -80,6 +86,34 @@ def _scrape_with_requests(url: str) -> JobPosting:
         return JobPosting(url=url)
 
     return _parse_html(url, resp.text)
+
+
+# ─── Playwright fallback ──────────────────────────────────────────────────────
+
+def _scrape_with_playwright(url: str, headless: bool = True) -> JobPosting:
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        logger.warning("Playwright not installed; skipping.")
+        return JobPosting(url=url)
+
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=headless)
+            page = browser.new_page(
+                user_agent=(
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/122.0.0.0 Safari/537.36"
+                )
+            )
+            page.goto(url, wait_until="networkidle", timeout=30_000)
+            html = page.content()
+            browser.close()
+        return _parse_html(url, html)
+    except Exception as exc:
+        logger.error(f"Playwright scrape failed for {url}: {exc}")
+        return JobPosting(url=url)
 
 
 # ─── Selenium fallback ────────────────────────────────────────────────────────
