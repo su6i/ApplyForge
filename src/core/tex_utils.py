@@ -7,9 +7,27 @@ from __future__ import annotations
 
 import re
 
+# Unicode characters that have a LaTeX-safe replacement
+_UNICODE_REPLACEMENTS: dict[str, str] = {
+    " ": " ",   # non-breaking space
+    " ": " ",   # narrow no-break space (e.g. French "80 000")
+    " ": " ",   # thin space
+    "‘": "'",   # left single quotation mark
+    "’": "'",   # right single quotation mark
+    "“": "``",  # left double quotation mark
+    "”": "''",  # right double quotation mark
+    "–": "--",  # en dash
+    "—": "---", # em dash
+    "…": "...", # ellipsis
+}
+
 
 def latex_escape(text: str) -> str:
     """Escape characters that have special meaning in LaTeX."""
+    # Replace known Unicode chars that pdflatex cannot handle
+    for char, replacement in _UNICODE_REPLACEMENTS.items():
+        text = text.replace(char, replacement)
+
     # Order matters — backslash must be first
     escapes = [
         ("\\", r"\textbackslash{}"),
