@@ -108,12 +108,69 @@ def _scrape_with_playwright(url: str, headless: bool = True) -> JobPosting:
                 )
             )
             page.goto(url, wait_until="networkidle", timeout=30_000)
+            _dismiss_cookie_banners(page)
+            _remove_noise_elements(page)
             html = page.content()
             browser.close()
         return _parse_html(url, html)
     except Exception as exc:
         logger.error(f"Playwright scrape failed for {url}: {exc}")
         return JobPosting(url=url)
+
+
+# ─── Cookie banner dismissal ──────────────────────────────────────────────────
+
+def _remove_noise_elements(page) -> None:
+    """Remove cookie banners, modals and nav noise from the DOM before extraction."""
+    page.evaluate("""
+        const noiseSelectors = [
+            // Axeptio (WTTJ, many French sites)
+            '#axeptio_overlay', '#axeptio-widget', '[id^="axeptio"]',
+            // Didomi
+            '#didomi-popup', '#didomi-host',
+            // OneTrust
+            '#onetrust-banner-sdk', '#onetrust-consent-sdk',
+            // Generic overlays
+            '[class*="cookie"]', '[id*="cookie"]',
+            '[class*="consent"]', '[id*="consent"]',
+            '[class*="gdpr"]', '[id*="gdpr"]',
+            // Navigation noise
+            'header', 'footer', 'nav',
+        ];
+        noiseSelectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(el => el.remove());
+        });
+    """)
+
+
+def _dismiss_cookie_banners(page) -> None:
+    """Click common cookie accept buttons so they don't pollute extracted text."""
+    selectors = [
+        # Axeptio (used by WTTJ and many French sites)
+        "#axeptio_btn_acceptAll",
+        "#didomi-notice-agree-button",
+        "#onetrust-accept-btn-handler",
+        # Generic
+        "button[id*='acceptAll']",
+        "button[id*='accept-all']",
+        # French RGPD text
+        "button:has-text('OK pour moi')",
+        "button:has-text('Tout accepter')",
+        "button:has-text('Accepter tout')",
+        "button:has-text('Accept all')",
+    ]
+    for sel in selectors:
+        try:
+            btn = page.locator(sel).first
+            btn.click(timeout=3_000)
+            # Wait for the banner container to disappear
+            page.locator("#axeptio_overlay, .axeptio-widget, [class*='cookie']").first.wait_for(
+                state="hidden", timeout=3_000
+            )
+            logger.debug(f"Cookie banner dismissed via: {sel}")
+            return
+        except Exception:
+            continue
 
 
 # ─── Selenium fallback ────────────────────────────────────────────────────────
