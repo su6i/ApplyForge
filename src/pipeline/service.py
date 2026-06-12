@@ -83,6 +83,18 @@ class ApplicationService:
                 f"Could not extract text from the job URL: {job_url}"
             )
 
+        # Availability guard — abort early if the posting has been taken down.
+        _EXPIRED_SIGNALS = [
+            "plus disponible", "offre expirée", "offre clôturée",
+            "offre retirée", "n'est plus disponible",
+            "this job is no longer available", "not available",
+        ]
+        body_lower = posting.body.lower()
+        if any(sig in body_lower for sig in _EXPIRED_SIGNALS):
+            raise RuntimeError(
+                f"Job posting appears to be expired or no longer available: {job_url}"
+            )
+
         # 2 — Classify role
         logger.info("[2/4] Classifying role…")
         role: RoleType = classify(posting.body)
