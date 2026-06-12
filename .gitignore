@@ -27,6 +27,9 @@
 *.token.json
 *.credentials.json
 
+# ── Project instructions — personal data inside ───────────────
+CLAUDE.md
+
 # ── Personal CV data — keep private ───────────────────────────
 master_cv.json
 master_cv*.json

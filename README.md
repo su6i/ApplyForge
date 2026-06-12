@@ -30,6 +30,7 @@ cp master_cv.example.json master_cv.json
 
 Edit `master_cv.json` with your real name, contact info, work history, and skills.
 This file is private and gitignored — it never gets committed.
+`CLAUDE.md` (AI agent instructions) is also gitignored as it may contain personal workflow details.
 
 **Step 3 — Add your API keys**
 
