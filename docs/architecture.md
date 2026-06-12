@@ -30,6 +30,8 @@ LLM extracts four cover-letter variables:
   │
   ▼  src/pipeline/latex_builder.py
 • Select CV template (role → file mapping below)
+• Availability guard: abort if posting body contains expiry signals
+  ("plus disponible", "offre clôturée", etc.) — prevents wasted generation
 • Select cover letter template (language → FR or EN template)
 • Copy files into Applied/YYYY-MM-DD_CompanySlug_Role_lang/ workspace
 • Fill cover letter: regex-replace the 4 \newcommand placeholders
