@@ -33,6 +33,8 @@ LLM extracts four cover-letter variables:
 • Select cover letter template (language → FR or EN template)
 • Copy files into Applied/YYYY-MM-DD_CompanySlug_Role_lang/ workspace
 • Fill cover letter: regex-replace the 4 \newcommand placeholders
+  Note: personal_data.tex provides \cvlinkedin and \cvgithub as full paths
+  (e.g. "linkedin.com/in/su6i") — templates must NOT prepend the base URL.
 • Generate standardized filenames: {CV_OWNER_SLUG}-{DocumentType}_{Role}_{Language}.tex
 • pdflatex ×2  →  CV.pdf
 • xelatex  ×1  →  CoverLetter.pdf
@@ -52,7 +54,7 @@ Applied/2026-05-19_Capgemini_AI_fr/
 |---|---|---|
 | `job_scraper.py` | `scrape(url)` | URL → `JobPosting` (`.body` text) |
 | `role_classifier.py` | `classify(body)` | text → `"ai"` / `"it"` / `"phd"` |
-| `content_tailor.py` | `tailor(body, role, resume_profile="")` | text + role + optional resume profile → `TailoredContent` (includes `match_score`, `tailored_skills`, `cv_summary`, `selected_experience`, `selected_projects`) |
+| `content_tailor.py` | `tailor(body, role, resume_profile="")` | text + role + optional resume profile → `TailoredContent` (includes `match_score`, `tailored_skills`, `cv_summary`, `cv_tagline`, `selected_experience`, `selected_projects`, `extra_education`) |
 | `latex_builder.py` | `build(role, content, profile: dict | None = None)` | role + content + optional profile → `ApplicationBundle` (CV can be generated dynamically from `profile`) |
 | `service.py` | `ApplicationService.generate(url)` | URL → `ApplicationBundle` |
 
@@ -68,15 +70,18 @@ class JobPosting:
 @dataclass
 class TailoredContent:
   company_name: str
-  position_title: str
+  position_title: str        # exact job title from posting (used for metadata/folder naming)
   language: Literal["fr", "en"]
-  variant: str       # value written into \Variant in the .tex file
+  variant: str               # value written into \Variant in the .tex file
   why_this_company: str
   match_score: int = 0
   tailored_skills: list[str] = field(default_factory=list)
   cv_summary: str = ""                    # 3-5 line tailored profile paragraph
+  cv_tagline: str = ""                    # short professional title for CV header (3-5 words, not the job title)
+  color_theme: str = ""                   # sidebar background color (from profile json, e.g. "blue")
   selected_experience: list[dict] = field(default_factory=list)  # reduced set chosen for this job
   selected_projects: list[dict] = field(default_factory=list)
+  extra_education: list[dict] = field(default_factory=list)  # conditional education (enforced in service.py)
 
 @dataclass
 class ApplicationBundle:
