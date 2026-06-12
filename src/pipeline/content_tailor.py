@@ -101,8 +101,8 @@ EXACTLY these keys (no extras, no markdown fences):
     {{
       "degree": "<exact from conditional_education, or omit entry if not relevant>",
       "institution": "<exact from conditional_education>",
-      "period": "<exact from conditional_education>",
-      "gpa": "<exact from conditional_education>",
+      "period": "<exact from conditional_education, or empty string \"\" if not present>",
+      "gpa": "<exact from conditional_education, or empty string if not present>",
       "honors": "<exact from conditional_education>"
     }}
   ],

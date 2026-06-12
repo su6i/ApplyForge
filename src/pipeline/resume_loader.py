@@ -251,8 +251,9 @@ def format_for_prompt(role: str = "ai") -> str:
         lines.append("\nConditional education (include in extra_education ONLY if job domain matches relevant_domains):")
         for ce in cond_edu:
             domains = ", ".join(ce.get("relevant_domains", []))
+            period_part = f" ({ce['period']})" if ce.get("period") else ""
             lines.append(
-                f"  {ce.get('degree', '')} — {ce.get('institution', '')} ({ce.get('period', '')}) | GPA: {ce.get('gpa', '')} | relevant_domains: [{domains}]"
+                f"  {ce.get('degree', '')} — {ce.get('institution', '')}{period_part} | GPA: {ce.get('gpa', '')} | relevant_domains: [{domains}]"
             )
             if ce.get("honors"):
                 lines.append(f"    Honors: {ce['honors']}")
