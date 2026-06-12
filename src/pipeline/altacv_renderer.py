@@ -234,7 +234,7 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     # --- HEADER / IDENTITY ---
     name = identity.get("name", "")
     
-    cv_title = tailored.position_title or identity.get("title", "AI & IT Infrastructure Engineer")
+    cv_title = tailored.cv_tagline or identity.get("title", "AI & IT Infrastructure Engineer")
         
     sections.append(f"\\name{{{latex_escape(name)}}}")
     sections.append(f"\\tagline{{{latex_escape(cv_title)}}}")

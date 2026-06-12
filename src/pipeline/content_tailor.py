@@ -39,6 +39,7 @@ class TailoredContent:
     cv_summary: str = ""      # tailored profile paragraph rewritten for THIS job
     selected_experience: list[dict] = field(default_factory=list)  # [{company,role,period,highlights,tech}]
     selected_projects: list[dict] = field(default_factory=list)    # [{title,period,description,tech}]
+    cv_tagline: str = ""      # Short professional tagline for CV header (not the full job title)
     color_theme: str = ""     # Optional sidebar color highlight string
     job_location: str = ""   # City/region extracted from posting (drives \cvlocation selection)
     cl_intro: str = ""        # LLM-generated CL intro paragraph (diplôme + candidature + hook)
@@ -59,6 +60,7 @@ EXACTLY these keys (no extras, no markdown fences):
 {{
   "company_name": "<exact company name from the posting>",
   "position_title": "<exact job title from the posting>",
+  "cv_tagline": "<short professional title for CV header, 3-5 words max, representing the CANDIDATE's identity adapted to this role — NOT a copy of the job title. E.g. 'Ingénieur Informatique & Réseaux', 'Technicien Systèmes & Automatisation', 'Développeur Python & Infrastructure'>",
   "language": "<fr or en — the language the posting is written in>",
   "variant": "<see variant rules below>",
   "job_location": "<city or region where the job is located, e.g. 'Montpellier', 'Paris', 'Lyon'. Use 'remote' or 'télétravail' if fully remote. Use 'France' if no specific city is mentioned.>",
@@ -158,6 +160,13 @@ Selection rules:
   Include its entries in `extra_education` ONLY when the job domain is in their
   `relevant_domains` list (e.g. maintenance, electrotechnique, ferroviaire, industrial).
   For AI/Data/IT-only roles, return an empty array [].
+- `cv_tagline` MUST be a short professional identity (3-5 words), NOT a copy of the job title.
+  It represents WHO the candidate is, not the job they're applying for.
+  Bad: "Assistant-e ingénieur informatique instrumentale au sein du Pôle Technologique en Métrologie"
+  Good: "Ingénieur Informatique & Réseaux" or "Technicien Systèmes & Automatisation"
+- `cv_summary` MUST NOT start with "Ingénieur X avec un Master en X" or any formulation
+  that repeats the same concept twice (e.g. "Ingénieur informatique avec un Master en informatique").
+  Prefer: "Diplômé d'un Master en informatique, spécialisé en..." or start directly with the specialization.
 - `cl_intro` and `cl_body` MUST be adapted to the actual job domain.
   If the job is not IT/network (e.g. railway maintenance, industrial technician),
   emphasise transferable skills (analysis, troubleshooting, teamwork, technical
@@ -243,6 +252,7 @@ def tailor(
         cl_body=_strip_years_and_metrics(data.get("cl_body", "")),
         extra_education=data.get("extra_education", []),
         selected_education=data.get("selected_education", []),
+        cv_tagline=data.get("cv_tagline", ""),
     )
     logger.info(
         f"Tailored → company={content.company_name!r}, "
