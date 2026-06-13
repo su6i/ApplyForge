@@ -99,15 +99,7 @@ EXACTLY these keys (no extras, no markdown fences):
       "honors": "<exact from profile OR trimmed — see space budget rule below>"
     }}
   ],
-  "extra_education": [
-    {{
-      "degree": "<exact from conditional_education, or omit entry if not relevant>",
-      "institution": "<exact from conditional_education>",
-      "period": "<exact from conditional_education, or empty string \"\" if not present>",
-      "gpa": "<exact from conditional_education, or empty string if not present>",
-      "honors": "<exact from conditional_education>"
-    }}
-  ],
+  "extra_education": [],
   "cl_intro": "<Cover letter paragraph 1 (2-3 sentences). \
                 Mention the candidate's diploma/formation. \
                 State the candidature for \\PositionTitle at \\CompanyName. \
@@ -146,20 +138,7 @@ Selection rules:
   For each entry, copy `honors` exactly — UNLESS the space budget rule below requires trimming.
   Trimming rule: you may ONLY remove individual grade items (e.g. "Web Avancé : X/20").
   NEVER rewrite, reorder, or change wording. Only delete the least relevant grade items.
-- Space budget rule (applies ONLY when extra_education is non-empty):
-  Adding a conditional degree takes ~2-3 lines. You MUST compensate in this order:
-  1. Trim honors in selected_education: remove the least relevant grade items for THIS job.
-     (e.g. for a maintenance job, "Web Avancé" is less relevant than "Réseaux Avancés".)
-  2. Reduce selected_projects to maximum 1 entry (the single most relevant project).
-  3. Only as last resort: reduce highlights to 2 per experience entry.
-  Priority: prefer step 1 + 2 combined. Never rewrite any sentence.
-  ⛔ LEFT COLUMN IS FROZEN: NEVER remove or reduce tailored_skills, skill categories,
-  certifications, languages, or hobbies — space cuts come ONLY from the right column
-  (education honors and projects).
-- `extra_education`: The profile may contain a `conditional_education` array.
-  Include its entries in `extra_education` ONLY when the job domain is in their
-  `relevant_domains` list (e.g. maintenance, electrotechnique, ferroviaire, industrial).
-  For AI/Data/IT-only roles, return an empty array [].
+- `extra_education`: Always return an empty array [].
 - `cv_tagline` MUST be a short professional identity (3-5 words), NOT a copy of the job title.
   It represents WHO the candidate is, not the job they're applying for.
   Bad: "Assistant-e ingénieur informatique instrumentale au sein du Pôle Technologique en Métrologie"

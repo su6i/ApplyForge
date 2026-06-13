@@ -176,3 +176,17 @@ As of the latest update, all generated CV and cover letter files follow a standa
 
 **Implementation:** Standardization applied in `src/pipeline/latex_builder.py` lines 216–220
 via the `_build_cover_letter()` function.
+
+---
+
+## `--licence` Flag
+
+By default the Bachelor's in Electronics Engineering (from `conditional_education` in the source profile) is **never** included in any generated CV.
+
+Pass `--licence` at the CLI to inject it:
+
+```
+uv run main.py apply <url> --lang fr --licence
+```
+
+This sets `include_licence=True` in `ApplicationService.generate()`, which appends the `conditional_education` entries directly to `content.extra_education` after the LLM step.  The LLM itself never sees or generates `extra_education` entries.
