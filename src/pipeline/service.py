@@ -96,6 +96,35 @@ class ApplicationService:
                 f"Job posting appears to be expired or no longer available: {job_url}"
             )
 
+        # Eligibility guards — hard blockers for this candidate profile.
+        _BLOCKERS: list[tuple[list[str], str]] = [
+            (
+                ["permis b obligatoire", "permis de conduire obligatoire",
+                 "permis b exigé", "permis b requis", "permis b indispensable",
+                 "driving license required", "driver's license required"],
+                "⛔  Permis B obligatoire — le candidat n'a pas de permis de conduire.",
+            ),
+            (
+                ["être fonctionnaire", "titulaire de la fonction publique",
+                 "réservé aux agents titulaires", "fonctionnaire de catégorie",
+                 "mutation interne", "détachement uniquement"],
+                "⛔  Poste réservé aux fonctionnaires titulaires — candidat non-fonctionnaire.",
+            ),
+            (
+                ["nationalité française obligatoire", "réservé aux ressortissants français",
+                 "nationalité française exigée", "être de nationalité française"],
+                "⛔  Nationalité française obligatoire — candidat de nationalité iranienne.",
+            ),
+            (
+                ["habilitation secret défense", "habilitation confidentiel défense",
+                 "secret-défense", "accès à des informations classifiées secret"],
+                "⛔  Habilitation Secret/Confidentiel Défense requise — nécessite la nationalité française.",
+            ),
+        ]
+        for signals, message in _BLOCKERS:
+            if any(sig in body_lower for sig in signals):
+                raise RuntimeError(f"{message} Aucun CV généré.")
+
         # 2 — Classify role
         logger.info("[2/4] Classifying role…")
         role: RoleType = classify(posting.body)

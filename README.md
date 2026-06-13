@@ -107,6 +107,8 @@ Notes:
 - If you only use a LaTeX `.tex` source, you do NOT need `tesseract` or the OCR
   Python packages — the `.tex` path works without extra system deps.
 - The `--template` flag for `apply` supports `altacv` (default) and `lato`.
+- The `--licence` flag for `apply` forces inclusion of the conditional electronics degree.
+- The pipeline automatically blocks applications that require: Permis B, fonctionnaire status, French nationality, or Secret Défense clearance.
 
 ### Option A — Telegram (easiest)
 
