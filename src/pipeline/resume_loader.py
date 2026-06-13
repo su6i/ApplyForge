@@ -65,16 +65,30 @@ def _migrate_legacy_profile_if_needed(role: str) -> Path:
 
     return canonical
 
-def generate_role_profile(role: str) -> Path:
+def _resolve_master_cv_path(lang: str = "en") -> Path:
+    """Return the correct master CV path for the given language."""
+    data_dir = REPO_ROOT / "data"
+    lang = (lang or "en").strip().lower()
+    candidates = [
+        data_dir / f"master_cv_{lang}.json",   # master_cv_fr.json or master_cv_en.json
+        data_dir / "master_cv.json",            # legacy fallback
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    raise FileNotFoundError(
+        f"Master CV not found. Expected one of: {[str(p) for p in candidates]}"
+    )
+
+
+def generate_role_profile(role: str, lang: str = "en") -> Path:
     """
-    Generate a tailored JSON profile from the master_cv.json using the LLM.
+    Generate a tailored JSON profile from master_cv_<lang>.json using the LLM.
+    Falls back to master_cv.json for backward compatibility.
     """
-    master_path = REPO_ROOT / "data" / "master_cv.json"
-    if not master_path.exists():
-        raise FileNotFoundError(f"Ultimate Source of Truth missing: {master_path}")
-        
-    logger.info(f"Generating new profile for '{role}' from master_cv.json via LLM...")
-    
+    master_path = _resolve_master_cv_path(lang)
+    logger.info(f"Generating new profile for '{role}' from {master_path.name} via LLM...")
+
     with master_path.open(encoding="utf-8") as fh:
         master_json_text = fh.read()
         
@@ -166,16 +180,16 @@ Rules:
 
 
 @lru_cache(maxsize=4)
-def load_profile(role: str = "ai") -> dict[str, Any]:
+def load_profile(role: str = "ai", lang: str = "en") -> dict[str, Any]:
     """
     Load and cache canonical role source profile JSON.
-    If it doesn't exist, trigger generation from `master_cv.json`.
+    If it doesn't exist, trigger generation from master_cv_<lang>.json.
     """
     profile_path = _migrate_legacy_profile_if_needed(role)
-    
+
     if not profile_path.exists():
         logger.info(f"Profile {profile_path.name} not found. Triggering generation...")
-        profile_path = generate_role_profile(role)
+        profile_path = generate_role_profile(role, lang=lang)
             
     with profile_path.open(encoding="utf-8") as fh:
         profile = json.load(fh)
