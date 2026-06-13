@@ -27,6 +27,7 @@ from src.pipeline.job_scraper import JobPosting, scrape
 from src.pipeline.latex_builder import ApplicationBundle, build
 from src.pipeline.resume_loader import format_for_prompt, load_profile
 from src.pipeline.role_classifier import RoleType, classify
+from src.pipeline import technicien_adapter
 
 # Default: warn (but don't abort) when match score is below this threshold.
 DEFAULT_MIN_MATCH = 40
@@ -206,6 +207,11 @@ class ApplicationService:
             source_profile=profile_dict,
             use_llm_translation=True,
         )
+
+        # Technicien-tier adapter — deterministic post-processing, no LLM.
+        if technicien_adapter.is_technicien_tier(posting.body):
+            logger.info("Technicien tier detected — applying deterministic adapter (drop DU, filter honors, normalize titles)")
+            profile_for_build, content = technicien_adapter.apply(profile_for_build, content)
 
         # 4 — Compile LaTeX (CV generated dynamically from profile + LLM selections)
         logger.info("[4/4] Building PDF bundle…")
