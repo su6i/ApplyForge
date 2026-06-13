@@ -96,6 +96,12 @@ def filter_it_jobs(jobs: list[dict]) -> list[dict]:
 
 ---
 
+## معیارهای حذفی — قبل از تولید CV بررسی کن
+
+قبل از هر candidature، فایل `eligibility_screening.md` را بخوان و تمام معیارهای بلاک‌کننده را از متن آگهی استخراج کن.
+
+---
+
 ## نکات مهم
 
 1. **Input field ID:** `#InputSearchBy` — فیلد متنی اصلی جستجو
