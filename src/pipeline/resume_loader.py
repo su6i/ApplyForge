@@ -43,14 +43,22 @@ def _legacy_profile_path(role: str) -> Path:
     return REPO_ROOT / "data" / f"resume_profile_{safe_role}.json"
 
 
-def get_profile_path(role: str) -> Path:
+def get_profile_path(role: str, lang: str = "en") -> Path:
+    """Return path for domain source profile, language-specific when lang != 'en'."""
     role_label = _canonical_role_label(role)
+    lang = (lang or "en").strip().lower()
+    if lang != "en":
+        return REPO_ROOT / "data" / f"{CV_OWNER_SLUG}-CV_{role_label}_{lang}_source.json"
     return REPO_ROOT / "data" / f"{CV_OWNER_SLUG}-CV_{role_label}_source.json"
 
 
-def _migrate_legacy_profile_if_needed(role: str) -> Path:
-    canonical = get_profile_path(role)
+def _migrate_legacy_profile_if_needed(role: str, lang: str = "en") -> Path:
+    canonical = get_profile_path(role, lang=lang)
     if canonical.exists():
+        return canonical
+
+    # For non-English: don't migrate legacy (legacy files are English-only)
+    if lang != "en":
         return canonical
 
     legacy = _legacy_profile_path(role)
@@ -171,10 +179,10 @@ Rules:
         logger.error(f"Failed to parse LLM JSON for role '{role}':\n{clean_json}")
         raise ValueError(f"LLM returned invalid JSON for the '{role}' profile.") from exc
         
-    out_path = get_profile_path(role)
+    out_path = get_profile_path(role, lang=lang)
     with out_path.open("w", encoding="utf-8") as fh:
         json.dump(parsed, fh, indent=2, ensure_ascii=False)
-        
+
     logger.success(f"Successfully generated profile: {out_path.name}")
     return out_path
 
@@ -183,12 +191,13 @@ Rules:
 def load_profile(role: str = "ai", lang: str = "en") -> dict[str, Any]:
     """
     Load and cache canonical role source profile JSON.
-    If it doesn't exist, trigger generation from master_cv_<lang>.json.
+    For lang='fr': loads CV_IT_fr_source.json, generating from master_cv_fr.json if absent.
+    For lang='en': loads CV_IT_source.json (current behavior).
     """
-    profile_path = _migrate_legacy_profile_if_needed(role)
+    profile_path = _migrate_legacy_profile_if_needed(role, lang=lang)
 
     if not profile_path.exists():
-        logger.info(f"Profile {profile_path.name} not found. Triggering generation...")
+        logger.info(f"Profile {profile_path.name} not found. Triggering generation from master_cv_{lang}.json...")
         profile_path = generate_role_profile(role, lang=lang)
             
     with profile_path.open(encoding="utf-8") as fh:
@@ -197,7 +206,7 @@ def load_profile(role: str = "ai", lang: str = "en") -> dict[str, Any]:
     return profile
 
 
-def format_for_prompt(role: str = "ai") -> str:
+def format_for_prompt(role: str = "ai", lang: str = "en") -> str:
     """
     Return a compact, token-efficient text representation of the candidate
     profile, suitable for injection into system or human prompts.
@@ -209,7 +218,7 @@ def format_for_prompt(role: str = "ai") -> str:
         Location: Montpellier, France
         ...
     """
-    p = load_profile(role)
+    p = load_profile(role, lang=lang)
 
     identity = p.get("identity", {})
     skills   = p.get("skills", {})

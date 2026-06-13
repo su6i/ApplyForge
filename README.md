@@ -110,7 +110,7 @@ Notes:
 - The `--licence` flag for `apply` forces inclusion of the conditional electronics degree.
 - The pipeline automatically blocks applications that require: Permis B, fonctionnaire status, French nationality, or Secret Défense clearance.
 - For **Technicien-tier** postings (catégorie B, Bac+2/3 keywords), the pipeline automatically drops the DU degree, filters Master honors to Réseaux/Systèmes modules only, and normalizes experience titles from "Ingénieur" to "Technicien" — no LLM involved.
-- **Bilingual master CV**: `data/master_cv_en.json` (English source of truth) and `data/master_cv_fr.json` (French). When `--lang fr` is used, the pipeline generates domain profiles from the French master CV, eliminating manual translation of titles, degrees, and certifications.
+- **Bilingual master CV**: `data/master_cv_en.json` (English source of truth) and `data/master_cv_fr.json` (French). When `--lang fr` is used, the pipeline loads `CV_<Role>_fr_source.json` and generates it from `master_cv_fr.json` if absent — experience titles, degrees, and certifications are French from the start, no manual translation needed.
 
 ### Option A — Telegram (easiest)
 
