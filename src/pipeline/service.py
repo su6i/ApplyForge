@@ -157,7 +157,7 @@ class ApplicationService:
         # Load profile dynamically using the resolved role
         _master_lang = output_language.strip().lower() if output_language and output_language != "auto" else "en"
         try:
-            resume_profile_str: str = format_for_prompt(role)
+            resume_profile_str: str = format_for_prompt(role, lang=_master_lang)
             profile_dict: dict = load_profile(role, lang=_master_lang)
         except Exception as exc:
             logger.warning(f"Could not load profile: {exc}")
