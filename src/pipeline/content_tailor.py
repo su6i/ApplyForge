@@ -79,7 +79,7 @@ EXACTLY these keys (no extras, no markdown fences):
       "location": "<exact from profile — city and country, e.g. 'Montpellier, France'>",
       "role": "<exact from profile>",
       "period": "<exact from profile>",
-      "highlights": ["<select 2-4 most relevant bullet points from profile for THIS job>"],
+      "highlights": ["<select 2-3 most relevant bullet points from profile for THIS job>"],
       "tech": ["<most relevant tech from that job, max 6>"]
     }}
   ],
@@ -115,15 +115,17 @@ EXACTLY these keys (no extras, no markdown fences):
 
 Selection rules:
 - selected_experience: include ALL jobs from the profile (keep them all), but for each job
-  choose only the 2-4 highlights most relevant to the job posting.
-- selected_projects: include 2-3 projects from the profile most relevant to this job.
-  Omit projects with no relevance to the posting.
+  choose exactly 2-3 highlights most relevant to the job posting. Never exceed 3.
+- selected_projects: include 2 projects minimum. Add a 3rd only if experience highlights total fewer than 6 across all jobs.
+  Rank by relevance to this job.
 - cv_summary: MUST follow the requested output language (or posting language if auto).
   4-6 lines. Focus on skills/results matching the posting.
 - tailored_skills: ordered by relevance to this job, use exact names from profile.
 - All free-text fields MUST follow output language: `why_this_company`, `cv_summary`,
-  `selected_experience[*].highlights`, and `selected_projects[*].description`.
-  Keep factual meaning unchanged.
+  `selected_experience[*].highlights`, `selected_experience[*].role`,
+  `selected_projects[*].description`, `selected_projects[*].title`,
+  `selected_education[*].degree`, `selected_education[*].honors`.
+  Keep factual meaning unchanged. Do NOT translate company names, institution names, or product names.
 - French profile-writing rule to follow strictly:
   "Éviter de mettre des métriques dans ton profil (-70% d'interventions manuelles,
   +500% de vitesse). À réserver pour les expériences professionnelles."
@@ -135,9 +137,8 @@ Selection rules:
     THEN you MAY write exactly N years (not more) in `cl_intro` or `cv_summary`.
   * Never invent years not requested. Never exceed the number asked.
 - `selected_education`: Always include ALL degrees from the profile's `education` list.
-  For each entry, copy `honors` exactly — UNLESS the space budget rule below requires trimming.
-  Trimming rule: you may ONLY remove individual grade items (e.g. "Web Avancé : X/20").
-  NEVER rewrite, reorder, or change wording. Only delete the least relevant grade items.
+  For `honors`, keep only the 3 most relevant grade items for THIS job — always trim to max 3 items.
+  NEVER rewrite or reorder wording. Only delete the least relevant grade items.
 - `extra_education`: Always return an empty array [].
 - `cv_tagline` MUST be a short professional identity (3-5 words), NOT a copy of the job title.
   It represents WHO the candidate is, not the job they're applying for.
