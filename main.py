@@ -3,7 +3,7 @@ main.py — Entry point for the CV automation system.
 
 Modes:
     uv run main.py bot                        → Start Telegram bot (recommended)
-    uv run main.py apply <url> [--template] [--lang auto|<language>]   → Generate application from terminal
+    uv run main.py apply <url> [--template] [--lang auto|<language>] [--licence]   → Generate application from terminal
     uv run main.py spontaneous <role> [--city <city>] [--lang <language>] → Candidature spontanée (no LLM)
     uv run main.py preview [--template] [--lang <language>] [--no-localize-preview] → Preview CV with full profile data
     uv run main.py init-profile [--cv path]   → Parse LaTeX CV into resume_profile.json
@@ -34,11 +34,13 @@ def cmd_apply(
     color: str = "",
     output_language: str = "auto",
     enable_fallback: bool = True,
+    include_licence: bool = False,
 ) -> None:
     """
     Generate a tailored application from the terminal (no Telegram).
-    
+
     If LLM translation fails and enable_fallback=True, offers offline dictionary fallback.
+    Pass --licence to include the Bachelor's (Electronics) degree in the CV.
     """
     from src.pipeline.service import ApplicationService
 
@@ -49,8 +51,9 @@ def cmd_apply(
         color=color,
         output_language=output_language,
         enable_fallback=enable_fallback,
+        include_licence=include_licence,
     )
-    
+
     # If LLM failed but fallback not enabled, try asking user interactively
     if bundle is None and error_msg and enable_fallback is False:
         print(f"\n⚠️  LLM-based generation failed: {error_msg}\n")
@@ -65,6 +68,7 @@ def cmd_apply(
                     color=color,
                     output_language=output_language,
                     enable_fallback=True,
+                    include_licence=include_licence,
                 )
         except (EOFError, KeyboardInterrupt):
             print("\nCancelled.")
@@ -202,7 +206,7 @@ def main() -> None:
 
     elif command == "apply":
         if len(args) < 2:
-            print("Usage: uv run main.py apply <job-url> [--template altacv|lato] [--lang auto|<language>] [--no-fallback]")
+            print("Usage: uv run main.py apply <job-url> [--template altacv|lato] [--lang auto|<language>] [--licence] [--no-fallback]")
             sys.exit(1)
             
         url = args[1]
@@ -228,8 +232,9 @@ def main() -> None:
                     sys.exit(1)
         
         enable_fallback = "--no-fallback" not in args
-                
-        cmd_apply(url, template, color, output_language, enable_fallback)
+        include_licence = "--licence" in args
+
+        cmd_apply(url, template, color, output_language, enable_fallback, include_licence)
 
     elif command == "spontaneous":
         if len(args) < 2:

@@ -59,6 +59,7 @@ class ApplicationService:
         template: str = "altacv",
         color: str = "",
         output_language: str = "auto",
+        include_licence: bool = False,
     ) -> ApplicationBundle:
         """
         Given a job URL, produce a tailored CV + cover letter PDF pair.
@@ -118,33 +119,12 @@ class ApplicationService:
         )
         content.color_theme = color or profile_dict.get("color_theme", "")
 
-        # Enforce conditional_education: LLMs sometimes slip conditional entries into
-        # extra_education OR selected_education despite non-matching relevant_domains.
-        # Re-verify both lists against the actual job posting text.
-        if profile_dict.get("conditional_education"):
-            job_lower = posting.body.lower()
-            cond_list = profile_dict["conditional_education"]
-
-            def _drop_unmatched(edu_list: list[dict]) -> list[dict]:
-                kept = []
-                for edu_entry in edu_list:
-                    source = next(
-                        (c for c in cond_list if c.get("degree", "")[:25] in edu_entry.get("degree", "")),
-                        None,
-                    )
-                    if source:
-                        domains = [d.lower() for d in source.get("relevant_domains", [])]
-                        if not any(d in job_lower for d in domains):
-                            logger.debug(
-                                f"Dropping conditional edu '{edu_entry.get('degree', '')[:40]}' "
-                                f"— no domain match (domains: {domains})"
-                            )
-                            continue
-                    kept.append(edu_entry)
-                return kept
-
-            content.extra_education = _drop_unmatched(content.extra_education)
-            content.selected_education = _drop_unmatched(content.selected_education)
+        # --licence flag: explicitly inject the conditional Bachelor's degree.
+        if include_licence:
+            cond_edu = profile_dict.get("conditional_education") or []
+            if cond_edu:
+                content.extra_education = list(cond_edu)
+                logger.info(f"--licence: injecting {len(cond_edu)} conditional education entries")
 
         # Optional hard override from CLI/API: force output language.
         forced_lang = output_language.strip().lower()
@@ -286,17 +266,18 @@ class ApplicationService:
         color: str = "",
         output_language: str = "auto",
         enable_fallback: bool = True,
+        include_licence: bool = False,
     ) -> tuple[ApplicationBundle | None, str, bool]:
         """
         Generate application with LLM translation first, fallback to offline if LLM fails.
-        
+
         Returns
         -------
         Tuple of (bundle, error_message, used_fallback)
         - bundle: ApplicationBundle if successful, else None
         - error_message: descriptive error string if LLM failed (empty if success)
         - used_fallback: True if offline dictionary was used, False otherwise
-        
+
         If LLM fails and enable_fallback=False, returns (None, error_msg, False).
         If LLM fails and enable_fallback=True, returns (bundle, error_msg, True) using offline.
         """
@@ -307,6 +288,7 @@ class ApplicationService:
                 template=template,
                 color=color,
                 output_language=output_language,
+                include_licence=include_licence,
             )
             return bundle, "", False  # Success, no error, no fallback
         except Exception as exc:
