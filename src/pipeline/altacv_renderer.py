@@ -312,7 +312,17 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     
     sections.append("\\switchcolumn")
     sections.append(PROJECTS_TOP_MARGIN)
-    projects = tailored.selected_projects or profile.get("projects", [])
+    # Enrich LLM-selected projects with url from source profile (LLM schema doesn't carry url)
+    _profile_projects_by_title = {p.get("title", ""): p for p in profile.get("projects", [])}
+    projects_raw = tailored.selected_projects or profile.get("projects", [])
+    projects = []
+    for _p in projects_raw:
+        _enriched = dict(_p)
+        if not _enriched.get("url"):
+            _src = _profile_projects_by_title.get(_p.get("title", ""))
+            if _src:
+                _enriched["url"] = _src.get("url", "")
+        projects.append(_enriched)
     if projects:
         sections.append(_section_projects(projects[:MAX_PROJECTS], language))
     

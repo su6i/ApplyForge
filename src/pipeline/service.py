@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import re
+import requests
 from copy import deepcopy
 from pathlib import Path
 
@@ -95,6 +96,29 @@ class ApplicationService:
             raise RuntimeError(
                 f"Job posting appears to be expired or no longer available: {job_url}"
             )
+
+        # Apply URL guard — check the direct application link, not just the job listing.
+        if posting.apply_url and posting.apply_url != job_url:
+            logger.info(f"Checking apply URL: {posting.apply_url}")
+            try:
+                _headers = {"User-Agent": "Mozilla/5.0 (compatible; ApplyForge/1.0)"}
+                apply_resp = requests.get(
+                    posting.apply_url, headers=_headers, timeout=15, allow_redirects=True
+                )
+                if apply_resp.status_code >= 400:
+                    raise RuntimeError(
+                        f"⛔  Application link is unreachable (HTTP {apply_resp.status_code}): "
+                        f"{posting.apply_url}"
+                    )
+                apply_body_lower = apply_resp.text.lower()
+                if any(sig in apply_body_lower for sig in _EXPIRED_SIGNALS):
+                    raise RuntimeError(
+                        f"⛔  Application link appears expired or closed: {posting.apply_url}"
+                    )
+            except RuntimeError:
+                raise
+            except Exception as exc:
+                logger.warning(f"Could not verify apply URL {posting.apply_url}: {exc}")
 
         # Eligibility guards — hard blockers for this candidate profile.
         _BLOCKERS: list[tuple[list[str], str]] = [

@@ -26,6 +26,9 @@ _MIN_BODY_LENGTH = 300
 # Tags whose text is never useful (navigation, scripts, styles, …)
 _NOISE_TAGS = {"script", "style", "noscript", "header", "footer", "nav", "aside"}
 
+# Keywords that identify direct application links ("postuler", "apply", …)
+_APPLY_LINK_SIGNALS = {"postuler", "postulez", "je postule", "apply", "candidater", "candidature", "s'inscrire"}
+
 
 @dataclass
 class JobPosting:
@@ -33,6 +36,7 @@ class JobPosting:
     title: str = ""
     body: str = ""
     raw_html: str = field(default="", repr=False)
+    apply_url: str = ""  # direct application link extracted from page (postuler/apply)
 
 
 def scrape(url: str, headless: bool = True) -> JobPosting:
@@ -217,8 +221,26 @@ def _parse_html(url: str, html: str) -> JobPosting:
     # Body text: join all visible text, collapse whitespace
     raw_text = soup.get_text(separator="\n", strip=True)
     body = _clean_text(raw_text)
+    apply_url = _extract_apply_url(url, soup)
 
-    return JobPosting(url=url, title=title, body=body, raw_html=html)
+    return JobPosting(url=url, title=title, body=body, raw_html=html, apply_url=apply_url)
+
+
+def _extract_apply_url(base_url: str, soup: BeautifulSoup) -> str:
+    """Return the first direct application link found on the page, or empty string."""
+    from urllib.parse import urljoin, urlparse
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        if not href or href.startswith("#") or href.startswith("mailto:"):
+            continue
+        text = a.get_text(strip=True).lower()
+        href_lower = href.lower()
+        if any(sig in text for sig in _APPLY_LINK_SIGNALS) or any(sig in href_lower for sig in _APPLY_LINK_SIGNALS):
+            if href.startswith("http"):
+                return href
+            parsed = urlparse(base_url)
+            return urljoin(f"{parsed.scheme}://{parsed.netloc}", href)
+    return ""
 
 
 def _clean_text(text: str) -> str:
