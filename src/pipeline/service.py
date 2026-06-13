@@ -118,27 +118,33 @@ class ApplicationService:
         )
         content.color_theme = color or profile_dict.get("color_theme", "")
 
-        # Enforce conditional_education: LLMs sometimes include extra_education despite
-        # non-matching relevant_domains. Re-verify against the actual job posting text.
-        if content.extra_education and profile_dict.get("conditional_education"):
+        # Enforce conditional_education: LLMs sometimes slip conditional entries into
+        # extra_education OR selected_education despite non-matching relevant_domains.
+        # Re-verify both lists against the actual job posting text.
+        if profile_dict.get("conditional_education"):
             job_lower = posting.body.lower()
             cond_list = profile_dict["conditional_education"]
-            verified = []
-            for edu_entry in content.extra_education:
-                source = next(
-                    (c for c in cond_list if c.get("degree", "")[:25] in edu_entry.get("degree", "")),
-                    None,
-                )
-                if source:
-                    domains = [d.lower() for d in source.get("relevant_domains", [])]
-                    if any(d in job_lower for d in domains):
-                        verified.append(edu_entry)
-                    else:
-                        logger.debug(
-                            f"Dropping extra_education entry '{edu_entry.get('degree', '')[:40]}' "
-                            f"— no domain match in posting (domains: {domains})"
-                        )
-            content.extra_education = verified
+
+            def _drop_unmatched(edu_list: list[dict]) -> list[dict]:
+                kept = []
+                for edu_entry in edu_list:
+                    source = next(
+                        (c for c in cond_list if c.get("degree", "")[:25] in edu_entry.get("degree", "")),
+                        None,
+                    )
+                    if source:
+                        domains = [d.lower() for d in source.get("relevant_domains", [])]
+                        if not any(d in job_lower for d in domains):
+                            logger.debug(
+                                f"Dropping conditional edu '{edu_entry.get('degree', '')[:40]}' "
+                                f"— no domain match (domains: {domains})"
+                            )
+                            continue
+                    kept.append(edu_entry)
+                return kept
+
+            content.extra_education = _drop_unmatched(content.extra_education)
+            content.selected_education = _drop_unmatched(content.selected_education)
 
         # Optional hard override from CLI/API: force output language.
         forced_lang = output_language.strip().lower()
