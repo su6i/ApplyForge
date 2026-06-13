@@ -109,6 +109,7 @@ Notes:
 - The `--template` flag for `apply` supports `altacv` (default) and `lato`.
 - The `--licence` flag for `apply` forces inclusion of the conditional electronics degree.
 - The pipeline automatically blocks applications that require: Permis B, fonctionnaire status, French nationality, or Secret Défense clearance.
+- For **Technicien-tier** postings (catégorie B, Bac+2/3 keywords), the pipeline automatically drops the DU degree, filters Master honors to Réseaux/Systèmes modules only, and normalizes experience titles from "Ingénieur" to "Technicien" — no LLM involved.
 
 ### Option A — Telegram (easiest)
 
