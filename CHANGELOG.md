@@ -1,0 +1,1 @@
+- Fixed French CV layout (switched language/certificates, strictly aligned left/right columns, and limited projects to fit in 1 page)

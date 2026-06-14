@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from src.pipeline.content_tailor import TailoredContent
 
 
-_DOC_PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
+_DOC_PREAMBLE = r"""\documentclass[10pt,a4paper]{article}
 \input{lato_macros}
 \input{../shared/personal_data}
 \renewcommand{\itemspace}{\vspace{0.25em}}

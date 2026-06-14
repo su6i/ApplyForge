@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from src.pipeline.content_tailor import TailoredContent
 
 
-_DOC_PREAMBLE = r"""\documentclass[7pt,a4paper,withhyper]{altacv}
+_DOC_PREAMBLE = r"""\documentclass[10pt,a4paper,withhyper]{altacv}
 
 \geometry{left=0.9cm,right=0.9cm,top=0.7cm,bottom=0.7cm,columnsep=0.3cm}
 \usepackage{paracol}
@@ -114,13 +114,13 @@ PROFILE_TOP_MARGIN = "\\vspace{0em}"  # Space reserved before profile section
 # ──────────────────────────────────────────────────────────────────────────────
 # SKILLS SECTION (Tags and categorized skills)
 # ──────────────────────────────────────────────────────────────────────────────
-SKILLS_TOP_MARGIN = "\\vspace{0.1em}"             # Space before skills section
-SKILLS_CATEGORY_VERTICAL_SPACING = "\\vspace{0.2em}" # Gap between skill categories
+SKILLS_TOP_MARGIN = "\\vspace{0em}"             # Space before skills section
+SKILLS_CATEGORY_VERTICAL_SPACING = "\\vfill" # Gap between skill categories
 
 # ──────────────────────────────────────────────────────────────────────────────
 # EXPERIENCE SECTION (Job positions and employment history)
 # ──────────────────────────────────────────────────────────────────────────────
-EXPERIENCE_TOP_MARGIN = "\\vspace{-0.5em}"          # Space before experience section
+EXPERIENCE_TOP_MARGIN = "\\vspace{0em}"          # Space before experience section
 EXPERIENCE_ENTRY_DIVIDER = "\\divider"              # Visual separator between jobs
 EXPERIENCE_HIGHLIGHTS_GAP = "\\smallskip"           # Gap between job header and bullet points
 
@@ -178,8 +178,8 @@ RIGHT_COLUMN_DASHED_SEPARATOR = (
 # ──────────────────────────────────────────────────────────────────────────────
 # CONTENT LIMITS (Maximum items to display per section)
 # ──────────────────────────────────────────────────────────────────────────────
-MAX_EXPERIENCE_HIGHLIGHTS = 4  # Max bullet points per job
-MAX_PROJECTS = 3               # Max projects to show
+MAX_EXPERIENCE_HIGHLIGHTS = 2  # Max bullet points per job
+MAX_PROJECTS = 2               # Max projects to show
 
 _TEXT = {
     "en": {
@@ -247,7 +247,21 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     github = identity.get("github", "")
     website = identity.get("website", "")
 
-    sections.append("\\personalinfo{}")
+    p_info = []
+    if email:
+        p_info.append(f"\\email{{{latex_escape(email)}}}")
+    if phone:
+        p_info.append(f"\\phone{{{latex_escape(phone)}}}")
+    if location:
+        p_info.append(f"\\location{{{latex_escape(location)}}}")
+    if linkedin:
+        p_info.append(f"\\linkedin{{{latex_escape(linkedin.split('linkedin.com/in/')[-1].strip('/'))}}}")
+    if github:
+        p_info.append(f"\\github{{{latex_escape(github.split('github.com/')[-1].strip('/'))}}}")
+    if website:
+        p_info.append(f"\\homepage{{{latex_escape(website.replace('https://', '').replace('http://', '').strip('/'))}}}")
+
+    sections.append(f"\\personalinfo{{ {' '.join(p_info)} }}")
     sections.append("\\makecvheader")
 
     # Profile summary (Full Width)
@@ -259,22 +273,25 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     # Start paracol columns with new ratio (narrow left, wide right)
     sections.append("\\columnratio{0.35}")
     
-    if hasattr(tailored, "color_theme") and tailored.color_theme:
-        color_map = {
-            "blue": "E6F0FA",
-            "green": "E8F4E9",
-            "orange": "FFF3E0",
-            "red": "FFEBEE",
-            "purple": "F3E5F5",
-            "gray": "F5F5F5"
-        }
-        theme = tailored.color_theme.lower().strip()
-        hex_color = color_map.get(theme)
-        if not hex_color:
-            hex_color = theme.lstrip("#")
+    color_theme = getattr(tailored, "color_theme", "")
+    if not color_theme:
+        color_theme = "blue"
         
-        # Super basic manual validation: roughly check if it looks like a hex string
-        if len(hex_color) in (3, 6) and all(c in "0123456789ABCDEFabcdef" for c in hex_color):
+    color_map = {
+        "blue": "E6F0FA",
+        "green": "E8F4E9",
+        "orange": "FFF3E0",
+        "red": "FFEBEE",
+        "purple": "F3E5F5",
+        "gray": "F5F5F5"
+    }
+    theme = color_theme.lower().strip()
+    hex_color = color_map.get(theme)
+    if not hex_color:
+        hex_color = theme.lstrip("#")
+    
+    # Super basic manual validation: roughly check if it looks like a hex string
+    if len(hex_color) in (3, 6) and all(c in "0123456789ABCDEFabcdef" for c in hex_color):
             # Ultra tight top gap to save space
             sections.append("\\vspace{0.1em}")
             sections.append(f"\\backgroundcolor{{c[0]}}[HTML]{{{hex_color.upper()}}}")
@@ -282,9 +299,7 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
 
     sections.append("\\begin{paracol}{2}")
     
-    # --- ROW 1: [Contact, Skills] | [Experience] ---
-    sections.append(CONTACT_TOP_MARGIN)
-    sections.append(_section_contact(email, phone, location, linkedin, github, language, website))
+    # --- ROW 1: [Skills] | [Experience] ---
     
     sections.append(SKILLS_TOP_MARGIN)
     sections.append(
@@ -340,7 +355,7 @@ def render(profile: dict, tailored: "TailoredContent") -> str:
     hobbies = profile.get("hobbies", [])
     if hobbies:
         sections.append(_section_hobbies(hobbies, language))
-    
+        
     # Ensure left column background stretches to match right column height
     sections.append("\\vfill")
     
@@ -393,7 +408,7 @@ def _section_contact(
 def _section_profile(summary: str, language: str) -> str:
     return (
         f"\\cvsection{{{_label('profile', language)}}}\n"
-        f"{{\\small\\justifying {latex_escape(summary)}\\par}}\n"
+        f"{{\\small {latex_escape(summary)}\\par}}\n"
     )
 
 
@@ -431,7 +446,7 @@ def _section_experience(experience: list[dict], language: str) -> str:
         if highlights:
             items.append("\\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]")
             for h in highlights:
-                items.append(f"\\item \\justifying {latex_escape(h)}")
+                items.append(f"\\item {latex_escape(h)}")
             items.append("\\end{itemize}")
             
         if tech:
@@ -474,11 +489,13 @@ def _section_projects(projects: list[dict], language: str) -> str:
         items.append(f"\\cvevent{{{title_with_period}}}{{}}{{}}{{}}") 
         
         if desc:
-            items.append(f"{{\\justifying {desc}\\smallskip\\par}}")
+            # Hide generic description to save vertical space if highlights exist
+            if not highlights:
+                items.append(f"{{{desc}\\smallskip\\par}}")
         if highlights:
             items.append("\\begin{itemize}[leftmargin=1.25em, nosep]")
-            for h in highlights[:4]: # Limit to 4 highlights for space
-                items.append(f"\\item \\justifying {latex_escape(h)}")
+            for h in highlights[:2]: # Limit to 2 highlights for space
+                items.append(f"\\item {latex_escape(h)}")
             items.append("\\end{itemize}")
             
         if tech:

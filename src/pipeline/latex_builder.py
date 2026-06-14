@@ -331,7 +331,7 @@ def _copy_deps(output_dir: Path, template: str = "altacv") -> None:
         template_dir = REPO_ROOT / "templates" / template
         if template_dir.exists() and template_dir.is_dir():
              for f in template_dir.iterdir():
-                if f.suffix in (".tex", ".cls", ".sty"):
+                if f.suffix in (".cls", ".sty") or (f.suffix == ".tex" and not f.name.startswith("CV_")):
                     shutil.copy2(f, output_dir / f.name)
         else:
             # Fallback to altacv
@@ -514,7 +514,7 @@ def _save_job_posting_snapshot(
             tex_meta_lines.append(f"\\textbf{{{latex_escape(label)}:}} {latex_escape(value)}\\\\")
     tex_meta_block = "\n".join(tex_meta_lines)
 
-    tex_content = f"""\\documentclass[11pt,a4paper]{{article}}
+    tex_content = f"""\\documentclass[10pt,a4paper]{{article}}
 \\usepackage[margin=2cm]{{geometry}}
 \\usepackage[T1]{{fontenc}}
 \\usepackage[utf8]{{inputenc}}

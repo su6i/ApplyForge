@@ -114,10 +114,11 @@ EXACTLY these keys (no extras, no markdown fences):
 }}
 
 Selection rules:
-- selected_experience: include ALL jobs from the profile (keep them all), but for each job
-  choose exactly 2-3 highlights most relevant to the job posting. Never exceed 3.
-- selected_projects: include 2 projects minimum. Add a 3rd only if experience highlights total fewer than 6 across all jobs.
-  Rank by relevance to this job.
+- selected_experience: Select only the most relevant jobs from `experience`.
+  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.
+  * Adjust highlights to focus heavily on aspects relevant to this specific job.
+- `selected_projects`: Select only the most relevant projects. Include 2 projects minimum.
+  Translate `title` and `description` to the target language. Rank by relevance to this job.
 - cv_summary: MUST follow the requested output language (or posting language if auto).
   4-6 lines. Focus on skills/results matching the posting.
 - tailored_skills: ordered by relevance to this job, use exact names from profile.
@@ -138,7 +139,7 @@ Selection rules:
   * Never invent years not requested. Never exceed the number asked.
 - `selected_education`: Always include ALL degrees from the profile's `education` list.
   For `honors`, keep only the 3 most relevant grade items for THIS job — always trim to max 3 items.
-  NEVER rewrite or reorder wording. Only delete the least relevant grade items.
+  Translate `degree`, `institution`, and `honors` exactly into the requested output language.
 - `extra_education`: Always return an empty array [].
 - `cv_tagline` MUST be a short professional identity (3-5 words), NOT a copy of the job title.
   It represents WHO the candidate is, not the job they're applying for.

@@ -118,7 +118,7 @@ IMPORTANT: The output JSON MUST follow this FLAT schema (different from the Mast
   "identity": {{ 
      "name": "...", 
      "title": "Professional Title tailored to {role} e.g. 'DevOps Engineer' or 'AI Engineer'", 
-     "email": "...", "phone": "...", "location": "...", "github": "...", "linkedin": "..." 
+     "email": "...", "phone": "...", "location": "...", "github": "...", "linkedin": "...", "website": "..." 
   }},
   "profile_summary": "rewritten for {role}",
   "skills": {{ "ai_ml": [], "mlops_devops": [], "networks_support": [], "data": [] }},
