@@ -118,4 +118,6 @@ test_*.py
 !assets/project_logo.jpg
 !assets/linkedin_su6i.svg
 
+# ── Personal session logs & task lists — NEVER track (privacy) ──
+SESSION.md
 TODO.md
