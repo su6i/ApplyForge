@@ -59,6 +59,16 @@ cover_letters/review/
 # ── LinkedIn content — post ideas and strategies are private ──
 linkedin/idees_posts.md
 
+# ── LinkedIn profile rebuild & career roadmap — personal data ──
+LINKEDIN_REBUILD.md
+NETDEVOPS_ROADMAP.md
+
+# ── One-off / throwaway scripts & scraped data — private, not part of the app ──
+scripts/oneoff/
+
+# ── IDE / editor configs ──────────────────────────────────────
+.cursor/
+
 # ── Data folder — personal cache and profile data ─────────────
 data/
 
