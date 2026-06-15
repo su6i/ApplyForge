@@ -43,7 +43,7 @@ class TailoredContent:
     color_theme: str = ""     # Optional sidebar color highlight string
     job_location: str = ""   # City/region extracted from posting (drives \cvlocation selection)
     cl_intro: str = ""        # LLM-generated CL intro paragraph (diplôme + candidature + hook)
-    cl_body: str = ""         # LLM-generated CL body paragraph (key achievement relevant to THIS job)
+    cl_body: list[str] | str = "" # LLM-generated CL body paragraph(s) (key achievement relevant to THIS job)
     extra_education: list[dict] = field(default_factory=list)  # conditional education entries to add to CV
     selected_education: list[dict] = field(default_factory=list)  # profile education with optional trimmed honors
 
@@ -64,9 +64,7 @@ EXACTLY these keys (no extras, no markdown fences):
   "language": "<fr or en — the language the posting is written in>",
   "variant": "<see variant rules below>",
   "job_location": "<city or region where the job is located, e.g. 'Montpellier', 'Paris', 'Lyon'. Use 'remote' or 'télétravail' if fully remote. Use 'France' if no specific city is mentioned.>",
-  "why_this_company": "<2-3 sentences in the SAME language as the posting. \
-                        Reference the candidate's ACTUAL experience. \
-                        Mention the company's product/tech/industry. Never generic.>",
+  "why_this_company": "<1-2 personalized sentences explaining why the candidate wants to join this company. AT THE END of this paragraph, seamlessly append a short closing statement expressing eagerness for an interview. Do NOT create a separate paragraph for the closing.>",
   "match_score": <integer 0-100>,
   "tailored_skills": [<candidate's skills most relevant to this job, max 10, ranked>],
   "cv_summary": "<one concise paragraph (4-6 lines) rewritten from the profile summary \
@@ -86,6 +84,7 @@ EXACTLY these keys (no extras, no markdown fences):
   "selected_projects": [
     {{
       "title": "<exact from profile>",
+      "url": "<MUST be exactly the url from profile, never leave empty if it exists>",
       "period": "<exact from profile>",
       "description": "<exact or lightly reworded to emphasise relevant aspects>",
       "tech": ["<most relevant tech, max 8>"]
@@ -105,16 +104,11 @@ EXACTLY these keys (no extras, no markdown fences):
                 State the candidature for \\PositionTitle at \\CompanyName. \
                 Highlight the SPECIFIC skills/background that match THIS job — \
                 do NOT use a generic IT or AI paragraph; adapt to the actual job.>",
-  "cl_body": "<Cover letter paragraph 2 (2-3 sentences). \
-               Cite ONE concrete achievement from the candidate's experience \
-               that is most transferable to THIS specific job. \
-               Focus on transferable skills (analysis, problem-solving, teamwork, \
-               technical aptitude) if the job domain differs from IT. \
-               No percentages in this paragraph.>"
+  "cl_body": ["<First paragraph: Detail the 'toHero' RAG and document analysis project.>", "<Second paragraph: Detail the multi-agent architecture projects ('ApplyForge', 'Su6i-Yar', or custom elevator project). Adapt the descriptions to match the required skills of THIS job.>"]
 }}
 
 Selection rules:
-- selected_experience: Select only the most relevant jobs from `experience`.
+- selected_experience: You MUST include ALL jobs from the `experience` list. Do NOT drop any job.
   Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.
   * Adjust highlights to focus heavily on aspects relevant to this specific job.
 - `selected_projects`: Select only the most relevant projects. Include 2 projects minimum.
@@ -270,8 +264,10 @@ def _strip_metrics_in_summary(text: str) -> str:
     return cleaned
 
 
-def _strip_years_and_metrics(text: str) -> str:
+def _strip_years_and_metrics(text: str | list[str]) -> str | list[str]:
     """Remove years-of-experience mentions and numeric metrics."""
+    if isinstance(text, list):
+        return [_strip_years_and_metrics(t) for t in text] # type: ignore
     if not text:
         return text
     # Remove patterns like "7 ans d'expérience", "plus de 7 ans", "7+ years", "more than 7 years"

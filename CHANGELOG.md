@@ -1,1 +1,2 @@
+- Pipeline: multi-paragraph cover letter (merged "why company" + closing), robust project URL recovery, title-aware technicien-tier detection, and role-relevant certification filtering
 - Fixed French CV layout (switched language/certificates, strictly aligned left/right columns, and limited projects to fit in 1 page)
