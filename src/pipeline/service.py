@@ -210,9 +210,20 @@ class ApplicationService:
         )
 
         # Technicien-tier adapter — deterministic post-processing, no LLM.
-        if technicien_adapter.is_technicien_tier(posting.body):
+        if technicien_adapter.is_technicien_tier(posting.body, posting.title):
             logger.info("Technicien tier detected — applying deterministic adapter (drop DU, filter honors, normalize titles)")
             profile_for_build, content = technicien_adapter.apply(profile_for_build, content)
+
+        # Robust URL recovery for projects (LLMs often drop URLs)
+        for tp in content.selected_projects:
+            if not tp.get("url"):
+                # Try to find matching project in source profile
+                for sp in profile_dict.get("projects", []):
+                    # Match by checking if a significant keyword from source title is in tailored title
+                    source_title = sp.get("title", "")
+                    if source_title and source_title.split()[0].lower() in tp.get("title", "").lower():
+                        tp["url"] = sp.get("url", "")
+                        break
 
         # 4 — Compile LaTeX (CV generated dynamically from profile + LLM selections)
         logger.info("[4/4] Building PDF bundle…")

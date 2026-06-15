@@ -394,23 +394,23 @@ def _fill_cover_letter(template: str, content: TailoredContent) -> str:
     Replace the placeholder \newcommand values in the template and inject
     actual personal data from personal_data.tex into \providecommand lines.
     """
+    def _safe_escape_and_join(body: str | list[str]) -> str:
+        if isinstance(body, list):
+            return r"\\[0.3cm]".join(latex_escape(p) for p in body)
+        return latex_escape(body)
+
     replacements = {
-        r"(\\newcommand\{\\CompanyName\}\{)[^}]*(})":
-            rf"\g<1>{latex_escape(content.company_name)}\g<2>",
-        r"(\\newcommand\{\\PositionTitle\}\{)[^}]*(})":
-            rf"\g<1>{latex_escape(content.position_title)}\g<2>",
-        r"(\\newcommand\{\\Variant\}\{)[^}]*(})":
-            rf"\g<1>{content.variant}\g<2>",
-        r"(\\newcommand\{\\WhyThisCompany\}\{)[^}]*(})":
-            rf"\g<1>{latex_escape(content.why_this_company)}\g<2>",
-        r"(\\newcommand\{\\CLIntro\}\{)[^}]*(})":
-            rf"\g<1>{latex_escape(content.cl_intro)}\g<2>",
-        r"(\\newcommand\{\\CLBody\}\{)[^}]*(})":
-            rf"\g<1>{latex_escape(content.cl_body)}\g<2>",
+        r"(\\newcommand\{\\CompanyName\}\{)[^}]*(})": latex_escape(content.company_name),
+        r"(\\newcommand\{\\PositionTitle\}\{)[^}]*(})": latex_escape(content.position_title),
+        r"(\\newcommand\{\\Variant\}\{)[^}]*(})": content.variant,
+        r"(\\newcommand\{\\WhyThisCompany\}\{)[^}]*(})": latex_escape(content.why_this_company),
+        r"(\\newcommand\{\\CLIntro\}\{)[^}]*(})": latex_escape(content.cl_intro),
+        r"(\\newcommand\{\\CLBody\}\{)[^}]*(})": _safe_escape_and_join(content.cl_body),
     }
     result = template
-    for pattern, repl in replacements.items():
-        result = re.sub(pattern, repl, result, count=1)
+    for pattern, repl_text in replacements.items():
+        # Using a lambda avoids any backslash interpretation issues by re.sub
+        result = re.sub(pattern, lambda m, r=repl_text: m.group(1) + r + m.group(2), result, count=1)
 
     # Inject real personal data to replace placeholder \providecommand values
     personal_data_tex = TEMPLATES_SHARED / "personal_data.tex"

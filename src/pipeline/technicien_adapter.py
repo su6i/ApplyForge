@@ -46,7 +46,10 @@ _ROLE_REPLACEMENTS: list[tuple[str, str]] = [
 ]
 
 
-def is_technicien_tier(body: str) -> bool:
+def is_technicien_tier(body: str, title: str = "") -> bool:
+    title_lower = title.lower()
+    if any(kw in title_lower for kw in ["ingénieur", "architecte", "développeur", "developer", "engineer"]):
+        return False
     body_lower = body.lower()
     return any(sig in body_lower for sig in _TECHNICIEN_SIGNALS)
 

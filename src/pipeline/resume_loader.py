@@ -136,6 +136,7 @@ IMPORTANT: The output JSON MUST follow this FLAT schema (different from the Mast
     {{
       "title": "...",
       "period": "...",
+      "url": "...",
       "description": "...",
       "highlights": ["max 4 points"],
       "tech": ["max 8 tech"]
@@ -156,7 +157,8 @@ Rules:
     "Éviter de mettre des métriques dans ton profil (-70% d'intervention manuelles,
     + 500% de vitesse). A réserver pour les expériences professionnelles."
     So do NOT include percentages or quantified uplift/reduction metrics in profile_summary.
-6. Start immediately with {{. Return ONLY valid JSON."""
+6. Filter `certifications` to keep ONLY those highly relevant to "{role}". Drop outdated or irrelevant certifications (e.g., do not include electronics/PLC for AI roles).
+7. Start immediately with {{. Return ONLY valid JSON."""
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
