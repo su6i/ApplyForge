@@ -196,8 +196,15 @@ def tailor(
     from src.core.llm_factory import get_llm
     llm = get_llm(temperature=0.4)
 
+    system_prompt = _SYSTEM
+    if role == "phd":
+        system_prompt = system_prompt.replace(
+            "more than will\nfit on a one-page CV.",
+            "more than will fit on a one-page CV.\nHowever, since this is a PhD application, ignore the 1-page limit and include ALL relevant academic, research, and professional experiences to build a comprehensive multi-page CV."
+        )
+
     prompt = ChatPromptTemplate.from_messages(
-        [("system", _SYSTEM), ("human", _HUMAN)]
+        [("system", system_prompt), ("human", _HUMAN)]
     )
     chain = prompt | llm | StrOutputParser()
 
