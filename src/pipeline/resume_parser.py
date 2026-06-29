@@ -9,7 +9,7 @@ Supported input formats:
 Run via:
     python main.py init-profile [--cv-path path/to/CV.tex|.pdf|.jpg]
 
-If --cv-path is omitted, the default is templates/lato/CV_AI_Data_Lato.tex.
+If --cv-path is omitted, the default is templates/lato/CV_AI_en.tex.
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from src.core.logger import logger
 from src.core.settings import CV_OWNER_SLUG, LLM_MODEL, OPENAI_API_KEY, REPO_ROOT
 
 PROFILE_PATH = REPO_ROOT / "data" / f"{CV_OWNER_SLUG}-CV_AI_source.json"
-DEFAULT_CV_TEX = REPO_ROOT / "templates" / "lato" / "CV_AI_Data_Lato.tex"
+DEFAULT_CV_TEX = REPO_ROOT / "templates" / "lato" / "CV_AI_en.tex"
 
 # ── Prompt ────────────────────────────────────────────────────────────────────
 
@@ -133,7 +133,7 @@ def parse_cv_to_profile(cv_path_arg: Path | None = None) -> dict:
 
     Parameters
     ----------
-    cv_path_arg : path to the source file (defaults to CV_AI_Data_Lato.tex).
+    cv_path_arg : path to the source file (defaults to CV_AI_en.tex).
                   Supported formats: .tex, .pdf, .jpg, .jpeg, .png, .webp
     """
     cv_path = Path(cv_path_arg) if cv_path_arg else DEFAULT_CV_TEX
@@ -170,7 +170,7 @@ def parse_cv_to_profile(cv_path_arg: Path | None = None) -> dict:
         raise ValueError("LLM did not return valid JSON for the resume profile.") from exc
 
     # Preserve any manual comment fields from the existing file
-    profile["_comment"] = "Source of truth for Amir's profile. Feed this to the LLM for tailored applications."
+    profile["_comment"] = "Source of truth for the candidate's profile. Feed this to the LLM for tailored applications."
 
     PROFILE_PATH.parent.mkdir(parents=True, exist_ok=True)
     with PROFILE_PATH.open("w", encoding="utf-8") as fh:

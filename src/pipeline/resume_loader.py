@@ -14,17 +14,9 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from src.core import roles as roles_registry
 from src.core.logger import logger
 from src.core.settings import CV_OWNER_SLUG, REPO_ROOT
-
-
-_ROLE_LABEL_MAP = {
-    "ai": "AI",
-    "it": "IT",
-    "phd": "PhD",
-    "python": "Python",
-    "devops": "DevOps",
-}
 
 
 def _normalized_role(role: str) -> str:
@@ -32,10 +24,8 @@ def _normalized_role(role: str) -> str:
 
 
 def _canonical_role_label(role: str) -> str:
-    normalized = _normalized_role(role).replace("_", "-")
-    if normalized in _ROLE_LABEL_MAP:
-        return _ROLE_LABEL_MAP[normalized]
-    return role.strip().replace("_", " ").replace("-", " ").title().replace(" ", "")
+    # Role → filename label is owned by the Roles Registry (config/roles.yaml).
+    return roles_registry.label(role)
 
 
 def _legacy_profile_path(role: str) -> Path:

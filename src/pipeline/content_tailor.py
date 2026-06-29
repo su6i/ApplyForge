@@ -187,7 +187,7 @@ def tailor(
     Parameters
     ----------
     job_text       : Raw text of the job posting.
-    role           : Pre-classified role type ("ai", "it", "phd").
+    role           : Pre-classified canonical role key (e.g. "ai", "devops", "phd").
     resume_profile : Formatted candidate profile text (from resume_loader).
                      If empty, the LLM will work without candidate context.
     """

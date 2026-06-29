@@ -50,6 +50,7 @@ templates/experimental/
 
 # ── Job applications — private (names, letters, rejections) ───
 Applied/
+recommendation_letter/
 
 # ── Specific applications with personal name / company info ───
 cover_letters/CoverLetter_*.tex
@@ -121,3 +122,13 @@ test_*.py
 # ── Personal session logs & task lists — NEVER track (privacy) ──
 SESSION.md
 TODO.md
+
+# ── Roles registry — safe to track (NO personal data; needed at runtime) ──
+# ONLY this specific file is whitelisted. Any OTHER file under config/ stays
+# ignored, so personal data accidentally written to a new config file is NOT
+# committed. NEVER put names / emails / phones / local paths in roles.yaml —
+# personal data belongs only in templates/shared/personal_data.* (gitignored).
+!config/roles.yaml
+
+# ── Registry contract tests (override the test_*.py ignore above) ──
+!tests/test_roles.py

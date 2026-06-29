@@ -75,7 +75,7 @@ cp .env.example .env
 # 3) Create the internal profile (accepts .tex, .pdf, .jpg/.png)
 Examples:
 
-uv run main.py init-profile --cv templates/lato/CV_AI_Data_Lato.tex
+uv run main.py init-profile --cv templates/lato/CV_AI_en.tex
 uv run main.py init-profile --cv path/to/my_cv.pdf
 uv run main.py init-profile --cv path/to/photo_of_cv.jpg
 ```
@@ -179,32 +179,35 @@ All CVs pull from this file — you never need to update the same detail in mult
 
 Templates are organized by style family:
 
+Filenames follow `CV_<Label>_<lang>.tex`, matching the role labels in
+`config/roles.yaml` and the profile JSON files (`…-CV_<Label>_source.json`).
+
 **`templates/altacv/`** — AltaCV style (xelatex), used for spontaneous applications:
 
-| File | Use for |
-|---|---|
-| `CV_AI_MLOps_fr.tex` | AI / MLOps roles (French) |
-| `CV_AI_MLOps_en.tex` | AI / MLOps roles (English) |
-| `CV_DevOps_Alternance_fr.tex` | DevOps alternance (French) |
-| `CV_Polyvalent_fr.tex` | Polyvalent / interim agency (French) |
+| File | Role | Use for |
+|---|---|---|
+| `CV_AI_fr.tex` / `CV_AI_en.tex` | `ai` | AI / MLOps roles |
+| `CV_DevOpsAlternance_fr.tex` | `devops`, `devops_alternance` | DevOps (alternance layout) |
+| `CV_Polyvalent_fr.tex` | `polyvalent` | Polyvalent / interim agency (French) |
+| `CV_Python_fr.tex` | `python` | Generalist Python (placeholder copy of Polyvalent) |
 
 **`templates/lato/`** — Lato/article style (pdflatex):
 
-| File | Use for |
-|---|---|
-| `CV_AI_Data_Lato.tex` | AI / Data Science / Python roles (English) |
-| `CV_IT_Infra_Lato.tex` | IT Support / Network roles (French) |
-| `CV_PhD_Research_en.tex` | PhD / Research applications (English) |
+| File | Role | Use for |
+|---|---|---|
+| `CV_AI_en.tex` | `ai` | AI / Data Science / Python roles (English) |
+| `CV_Support_fr.tex` | `support` | IT Support / Network technicien (French) |
+| `CV_PhD_en.tex` | `phd` | PhD / Research applications (English) |
 
 **`templates/classic/`** — ModernCV banking style (pdflatex), 16 role variants.
 
 After editing a lato or classic template, rebuild the PDF:
 
 ```bash
-./compile.sh ai    # CV_AI_Data_Lato
-./compile.sh it    # CV_IT_Infra_Lato
-./compile.sh phd   # CV_PhD_Research_en
-./compile.sh all   # rebuild all CV_*.tex across all template folders
+./compile.sh ai        # CV_AI_en
+./compile.sh support   # CV_Support_fr
+./compile.sh phd       # CV_PhD_en
+./compile.sh all       # rebuild all CV_*.tex across all template folders
 ```
 
 ---
@@ -214,12 +217,12 @@ After editing a lato or classic template, rebuild the PDF:
 Generate a pre-written CV without LLM — no job URL needed:
 
 ```bash
+uv run main.py spontaneous python                # Generalist Python (French)
 uv run main.py spontaneous ai                    # AI / MLOps (French)
 uv run main.py spontaneous ai-en                 # AI / MLOps (English)
-uv run main.py spontaneous mlops                 # MLOps (French)
-uv run main.py spontaneous mlops-en              # MLOps (English)
 uv run main.py spontaneous devops                # DevOps (French)
-uv run main.py spontaneous devops-alternance     # DevOps alternance (French)
+uv run main.py spontaneous devops_alternance     # DevOps alternance / work-study (French)
+uv run main.py spontaneous support               # Network / support technicien (French)
 uv run main.py spontaneous phd                   # PhD / Research (English)
 uv run main.py spontaneous polyvalent            # Polyvalent / interim (French)
 
@@ -228,6 +231,34 @@ uv run main.py spontaneous ai --city montpellier
 ```
 
 Output goes to `Applied/YYYY-MM-DD_Spontannee_{role}_{lang}/`.
+
+---
+
+## Roles Registry (`config/roles.yaml`)
+
+All CV tracks are defined in one file: **`config/roles.yaml`**. The role
+classifier, filename labels, CV + spontaneous template maps, cover-letter
+variant, and per-role skill ordering are all derived from it — nothing is
+hardcoded elsewhere.
+
+Canonical roles: **`general`**, **`devops`**, **`ai`**, **`phd`**. Each entry
+lists `aliases` that route fuzzy or legacy inputs to a canonical role (e.g.
+`it`, `network` → `devops`; `python`, `mlops` → `ai`; `polyvalent` → `general`).
+Append `-en`/`-fr` to a spontaneous role to override its language (`ai-en`).
+
+**Add a new role** by adding an entry under `roles:` — or auto-scaffold one
+(clones a base template stub + registers the entry):
+
+```python
+from src.core import roles
+roles.scaffold_role("cloud", base="devops", lang="fr")
+```
+
+Run the registry contract tests with:
+
+```bash
+python tests/test_roles.py        # or: pytest tests/test_roles.py
+```
 
 ---
 

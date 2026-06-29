@@ -19,6 +19,7 @@ import requests
 from copy import deepcopy
 from pathlib import Path
 
+from src.core import roles as roles_registry
 from src.core.logger import logger
 from src.core.llm_factory import get_llm
 from src.core.settings import CV_OWNER_SLUG, REPO_ROOT
@@ -32,14 +33,6 @@ from src.pipeline import technicien_adapter
 # Default: warn (but don't abort) when match score is below this threshold.
 DEFAULT_MIN_MATCH = 40
 GENERATED_PROFILES_DIR = REPO_ROOT / "data"
-
-_ROLE_LABEL_MAP = {
-    "ai": "AI",
-    "it": "IT",
-    "phd": "PhD",
-    "python": "Python",
-    "devops": "DevOps",
-}
 
 
 class ApplicationService:
@@ -187,10 +180,8 @@ class ApplicationService:
             content.language = forced_lang  # type: ignore[assignment]
 
             # Keep cover letter variant consistent with target language.
-            if forced_lang == "fr" and content.variant == "python":
-                content.variant = "ai" if role == "ai" else "it"
-            elif forced_lang == "en" and content.variant == "it":
-                content.variant = "ai" if role == "ai" else "python"
+            # Cover-letter variant follows the role + forced language (registry).
+            content.variant = roles_registry.variant_for(role, forced_lang)
 
         if content.match_score < self.min_match_score:
             logger.warning(
@@ -249,7 +240,7 @@ class ApplicationService:
     def preview(
         self,
         template: str = "altacv",
-        role: RoleType = "it",
+        role: RoleType = "support",
         color: str = "",
         output_language: str = "fr",
         localize_preview: bool = True,
@@ -319,11 +310,14 @@ class ApplicationService:
                    "Montpellier, mobile en France"; leave empty for Grenoble (default).
         language : Override output language ("fr" or "en"). Empty → template default.
         """
-        from src.pipeline.latex_builder import _SPONTANEOUS_MAP, build_spontaneous
+        from src.pipeline.latex_builder import build_spontaneous
 
         if role == "?":
-            available = sorted(_SPONTANEOUS_MAP.keys())
-            raise ValueError(f"Available spontaneous roles: {', '.join(available)}")
+            available = roles_registry.canonical_keys()
+            raise ValueError(
+                f"Available spontaneous roles: {', '.join(available)} "
+                f"(append -en/-fr to override language, e.g. 'ai-en')"
+            )
 
         logger.info(f"Generating spontaneous CV: role={role!r}, city={city!r}")
         bundle = build_spontaneous(role_key=role, city=city, language=language)
@@ -428,10 +422,8 @@ class ApplicationService:
         forced_lang = output_language.strip().lower()
         if forced_lang and forced_lang != "auto":
             content.language = forced_lang  # type: ignore[assignment]
-            if forced_lang == "fr" and content.variant == "python":
-                content.variant = "ai" if role == "ai" else "it"
-            elif forced_lang == "en" and content.variant == "it":
-                content.variant = "ai" if role == "ai" else "python"
+            # Cover-letter variant follows the role + forced language (registry).
+            content.variant = roles_registry.variant_for(role, forced_lang)
 
         target_lang = str(content.language).strip().lower() if content.language else "en"
         if not target_lang:
@@ -460,11 +452,7 @@ class ApplicationService:
 def _profile_variant_path(role: str, output_language: str, position_title: str) -> Path:
     del position_title
     lang_tag = (output_language or "en").lower()
-    normalized_role = role.strip().lower().replace("_", "-")
-    role_label = _ROLE_LABEL_MAP.get(
-        normalized_role,
-        role.strip().replace("_", " ").replace("-", " ").title().replace(" ", ""),
-    )
+    role_label = roles_registry.label(role)
     filename = f"{CV_OWNER_SLUG}-CV_{role_label}_{lang_tag}.json"
     return GENERATED_PROFILES_DIR / filename
 
@@ -655,8 +643,8 @@ def _tailor_offline(
                     skills.extend(category[:3])
     skills = skills[:10]
     
-    # Determine variant based on language
-    variant = "ai" if role == "ai" else ("it" if detected_lang == "fr" else "python")
+    # Determine variant based on role + language (registry-driven)
+    variant = roles_registry.variant_for(role, detected_lang)
     
     # Build content with offline data
     content = TailoredContent(

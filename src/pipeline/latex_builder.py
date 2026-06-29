@@ -23,6 +23,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
+from src.core import roles as roles_registry
 from src.core.logger import logger
 from src.core.quality_guard import verify_tex_files
 from src.core.settings import (
@@ -41,45 +42,19 @@ from src.pipeline.role_classifier import RoleType
 
 
 # ─── Template mapping ─────────────────────────────────────────────────────────
-
-# Canonical source filenames in templates/lato/ (used by _find_template_file as hint)
-_CV_TEMPLATES: dict[RoleType, str] = {
-    "ai":  "CV_AI_Data_Lato.tex",
-    "it":  "CV_IT_Infra_Lato.tex",
-    "phd": "CV_PhD_Lato.tex",
-}
-
-# Spontaneous application templates: role_key → (template_folder, filename, default_lang)
-_SPONTANEOUS_MAP: dict[str, tuple[str, str, str]] = {
-    "devops-alternance": ("altacv", "CV_DevOps_Alternance_fr.tex", "fr"),
-    "devops":            ("altacv", "CV_DevOps_Alternance_fr.tex", "fr"),
-    "ai":                ("altacv", "CV_AI_MLOps_fr.tex",          "fr"),
-    "ai-en":             ("altacv", "CV_AI_MLOps_en.tex",          "en"),
-    "mlops":             ("altacv", "CV_AI_MLOps_fr.tex",          "fr"),
-    "mlops-en":          ("altacv", "CV_AI_MLOps_en.tex",          "en"),
-    "phd":               ("lato",   "CV_PhD_Research_en.tex",      "en"),
-    "polyvalent":        ("altacv", "CV_Polyvalent_fr.tex",         "fr"),
-}
+#
+# Role → template / label maps all come from the Roles Registry
+# (config/roles.yaml via src.core.roles). The spontaneous "-en"/"-fr" language
+# suffix is parsed by build_spontaneous, not stored as a separate map.
 
 _CL_TEMPLATES: dict[str, str] = {
     "fr": "Cover_Letter_Template_Fr.tex",
     "en": "Cover_Letter_Template_En.tex",
 }
 
-_ROLE_LABEL_MAP = {
-    "ai": "AI",
-    "it": "IT",
-    "phd": "PhD",
-    "python": "Python",
-    "devops": "DevOps",
-}
-
 
 def _canonical_role_label(role: str) -> str:
-    normalized = role.strip().lower().replace("_", "-")
-    if normalized in _ROLE_LABEL_MAP:
-        return _ROLE_LABEL_MAP[normalized]
-    return role.strip().replace("_", " ").replace("-", " ").title().replace(" ", "")
+    return roles_registry.label(role)
 
 
 @dataclass
@@ -144,31 +119,47 @@ def build_spontaneous(
 
     Parameters
     ----------
-    role_key : Key from _SPONTANEOUS_MAP (e.g., "ai", "phd", "devops-alternance").
+    role_key : Role key or alias from the registry (e.g., "ai", "devops",
+               "phd", "polyvalent"). An optional "-en"/"-fr" suffix overrides
+               the output language (e.g. "ai-en", "mlops-en").
     city     : Job location hint for city selection (e.g., "montpellier", "grenoble").
                Empty string → defaults to Grenoble.
     language : Override output language. Empty → use template's default language.
     """
-    if role_key not in _SPONTANEOUS_MAP:
-        available = ", ".join(sorted(_SPONTANEOUS_MAP.keys()))
+    # Parse an optional language suffix (ai-en / mlops_fr) before resolving role.
+    lang_suffix = ""
+    base_key = role_key.strip().lower()
+    for suffix in ("-en", "-fr", "_en", "_fr"):
+        if base_key.endswith(suffix):
+            lang_suffix = suffix[1:]
+            base_key = base_key[: -len(suffix)]
+            break
+
+    canonical = roles_registry.resolve(base_key)
+    if canonical is None:
+        available = ", ".join(roles_registry.canonical_keys())
         raise ValueError(f"Unknown spontaneous role {role_key!r}. Available: {available}")
 
     from src.core.settings import REPO_ROOT
-    template_folder, template_file, default_lang = _SPONTANEOUS_MAP[role_key]
-    lang = (language or default_lang).strip().lower()
+    template_folder, template_file, default_lang = roles_registry.spontaneous(canonical)
+    lang = (language or lang_suffix or default_lang).strip().lower()
 
-    src_tex = REPO_ROOT / "templates" / template_folder / template_file
+    # Prefer the standardized per-language file CV_<Label>_<lang>.tex when it
+    # exists (e.g. "ai-en" → CV_AI_en.tex); otherwise use the registry default.
+    tmpl_folder_path = REPO_ROOT / "templates" / template_folder
+    lang_specific = tmpl_folder_path / f"CV_{roles_registry.label(canonical)}_{lang}.tex"
+    if lang_specific.exists():
+        template_file = lang_specific.name
+
+    src_tex = tmpl_folder_path / template_file
     if not src_tex.exists():
         raise FileNotFoundError(f"Spontaneous template not found: {src_tex}")
 
     # Create output dir
     date_str = datetime.now().strftime("%Y-%m-%d")
-    role_slug = role_key.replace("-", "_")
-    # Avoid double language tag (e.g. "ai_en" + "_en" → "ai_en_en")
-    if role_slug.endswith(f"_{lang}"):
-        role_slug = role_slug[: -len(f"_{lang}")]
+    role_slug = canonical.replace("-", "_")
     folder_name = f"{date_str}_Spontannee_{role_slug}_{lang}"
-    base_dir = PHD_APPLY_DIR if "phd" in role_key else JOB_APPLY_DIR
+    base_dir = PHD_APPLY_DIR if canonical == "phd" else JOB_APPLY_DIR
     output_dir = base_dir / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -436,7 +427,7 @@ def _create_output_dir(content: TailoredContent, role: str = "") -> Path:
     lang_tag     = (content.language or "en").lower()
     folder_name  = f"{date_str}_{company_slug}_{role_label}_{lang_tag}"
 
-    base_dir = PHD_APPLY_DIR if role == "phd" else JOB_APPLY_DIR
+    base_dir = PHD_APPLY_DIR if roles_registry.resolve(role) == "phd" else JOB_APPLY_DIR
     output_dir = base_dir / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir
@@ -667,17 +658,19 @@ def _find_template_file(directory: Path, role: RoleType, template_name: str) -> 
     """
     Search for the best-matching .tex file in the directory based on role and template name.
     """
-    # 1. Exact match e.g. CV_AI_Data_Lato.tex
-    role_map = {"ai": "AI_Data", "it": "IT_Infra", "phd": "PhD"}
-    role_str = role_map.get(role, "AI_Data")
-    
+    # 1. Exact match — the registry's lato filename + label-based names first.
+    lato_file, role_str = roles_registry.lato_template(role)
+    role_label = roles_registry.label(role)
+
     candidates = [
+        lato_file,
+        f"CV_{role_label}.tex",
         f"CV_{role_str}_{template_name.capitalize()}.tex",
         f"CV_{role_str}.tex",
         f"CV_{role.upper()}.tex",
     ]
-    
-    for c in candidates:
+
+    for c in filter(None, candidates):
         if (directory / c).exists():
             return c
             

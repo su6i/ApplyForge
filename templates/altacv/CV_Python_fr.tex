@@ -1,0 +1,158 @@
+\documentclass[7pt,a4paper,withhyper]{altacv}
+
+\geometry{left=0.9cm,right=0.9cm,top=0.7cm,bottom=0.7cm,columnsep=0.3cm}
+\usepackage{paracol}
+\usepackage[default]{lato}
+\usepackage{ragged2e}
+\linespread{0.95}
+
+\definecolor{VividPurple}{HTML}{3E0097}
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+
+\colorlet{name}{black}
+\colorlet{tagline}{VividPurple}
+\colorlet{heading}{VividPurple}
+\colorlet{headingrule}{VividPurple}
+\colorlet{subheading}{VividPurple}
+\colorlet{accent}{VividPurple}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+\renewcommand{\itemmarker}{{\small\textbullet}}
+\renewcommand{\ratingmarker}{\faCircle}
+\renewcommand{\taglinefont}{\Large\bfseries}
+
+\renewcommand{\cvevent}[4]{%
+  {\large\color{emphasis}\raggedright #1\par}
+  \smallskip\normalsize
+  \ifstrequal{#2}{}{}{%
+    \textbf{\color{accent}#2}%
+  }%
+  \ifstrequal{#4}{}{}{%
+    \ifstrequal{#2}{}{}{\hspace{1.5em}}%
+    {\small\cvLocationMarker~#4}%
+  }%
+  \ifstrequal{#3}{}{}{%
+    \hfill{\small\cvDateMarker~#3}%
+  }\par
+}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\providecommand{\cvwebsite}{website-url}
+\input{../shared/personal_data}
+
+\begin{document}
+\enlargethispage{5cm}
+
+\name{\cvname}
+\tagline{Préparateur de commandes · Employé libre-service · Manutentionnaire\\
+\vspace{0.2em}\normalsize\textbf{Intérim · CDD · CDI — Disponible immédiatement, mobilité totale}}
+\personalinfo{}
+\makecvheader
+
+\cvsection{Profil}
+{\small\justifying
+Profil polyvalent, très rapide à former et immédiatement opérationnel. Habitué au travail physique en cadence soutenue (debout, port de charges, rythme d'entrepôt ou de grande surface). Rigoureux dans le respect des procédures HSE et des consignes de la hiérarchie. Grande flexibilité horaire : disponible tôt le matin, en horaires décalés, week-ends et jours fériés. Zéro absence injustifiée — fiabilité garantie.\par}
+
+\columnratio{0.35}
+\vspace{0.1em}
+\backgroundcolor{c[0]}[HTML]{E6F0FA}
+\vspace{0.1em}
+\begin{paracol}{2}
+\vspace{-0.5em}
+
+% ---- COLONNE GAUCHE ----
+
+\cvsection{Contact}
+\smallskip
+\textcolor{accent}{\faAt} \hspace{0.5em} \href{mailto:\cvemail}{\cvemail}\\\vspace{0.1em}
+\textcolor{accent}{\faPhone} \hspace{0.5em} \cvphone\\\vspace{0.1em}
+\textcolor{accent}{\cvLocationMarker} \hspace{0.5em} \cvlocation\\\vspace{0.1em}
+
+\vspace{0.1em}
+\cvsection{Compétences}
+
+\cvachievement{\faBox}{Préparation de commandes}{Picking par bon de commande / scan douchette, palettisation, filmage, FIFO/FEFO, port de charges jusqu'à 25 kg}
+\par\vspace{0.2em}
+\cvachievement{\faShoppingCart}{Grande surface \& Mise en rayon}{Réassortiment rayon, facing, gestion des DLC/DDM, tenue caisse, accueil et orientation clients}
+\par\vspace{0.2em}
+\cvachievement{\faUsers}{Esprit d'équipe \& Communication}{Coordination avec les équipes, remplacement au pied levé, briefings quotidiens, transmission des consignes}
+\par\vspace{0.2em}
+\cvachievement{\faCheckDouble}{Rigueur \& Conformité HSE}{Respect strict des procédures sécurité et hygiène, ponctualité absolue, traçabilité, reporting}
+\par\vspace{0.2em}
+\cvachievement{\faBolt}{Dynamisme \& Endurance}{Cadence soutenue sur longue durée, adaptation immédiate aux pics d'activité, gestion du stress}
+\par
+
+\vspace{0.1em}
+\cvsection{Postes visés}
+\cvtag{Préparateur de commandes}\\[0.2em]
+\cvtag{Employé libre-service}\\[0.2em]
+\cvtag{Manutentionnaire}\\[0.2em]
+\cvtag{Agent logistique}\\[0.2em]
+\cvtag{Equipier polyvalent}
+\par
+
+\vspace{0.1em}
+\cvsection{Disponibilité}
+\vspace{0.2em}
+\textbf{Tôt le matin (5h–)}\\\vspace{0.1em}
+\textbf{Horaires décalés / nuit}\\\vspace{0.1em}
+\textbf{Week-ends \& jours fériés}\\\vspace{0.1em}
+\textbf{Temps plein ou partiel}\par
+
+\vspace{0.1em}
+\cvsection{Langues}
+\textbf{Français} (C1) · \textbf{Anglais} (B2)\\\vspace{0.1em}
+\textbf{Persan} (Langue maternelle)\par
+
+% ---- COLONNE DROITE ----
+\switchcolumn
+\vspace{-0.5em}
+
+\cvsection{Expérience}
+
+\cvevent{Préparateur de commandes \& Manutentionnaire}{Grande enseigne de distribution}{2017 – 2018}{Iran}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Préparation de commandes par picking sur bon de commande, scan douchette, contrôle des références et des quantités
+\item \justifying Palettisation, filmage et étiquetage des palettes ; chargement/déchargement de marchandises ; port de charges quotidien jusqu'à 25 kg
+\item \justifying Mise en rayon, facing, réassortiment et gestion des DLC dans le respect de la règle FIFO
+\item \justifying Respect strict des procédures d'hygiène et de sécurité ; cadence soutenue dans un environnement très rythmé
+\end{itemize}
+\smallskip\noindent\textit{Mots-clés : picking, palettisation, FIFO, manutention, scan, mise en rayon, rigueur HSE}\par
+
+\vspace{0.2em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.2em}
+
+\cvevent{Technicien Support \& Accueil polyvalent}{Semahal}{2021 – 2024}{Iran}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Accueil, orientation et accompagnement quotidien de plus de 1 500 personnes ; écoute active et résolution rapide des demandes
+\item \justifying Application rigoureuse des procédures internes et des priorités fixées par l'encadrement ; astreinte et disponibilité 24/7
+\item \justifying Travail en équipe sous pression, polyvalence sur plusieurs postes simultanément
+\end{itemize}
+\smallskip\noindent\textit{Mots-clés : accueil, service, procédures, polyvalence, fiabilité, travail sous pression}\par
+
+\vspace{0.2em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.2em}
+
+\cvevent{Agent polyvalent (Stage de fin d'études)}{toHero}{Jan – Juin 2025}{Montpellier}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Saisie, contrôle et structuration de volumes importants de données avec objectifs de rendement journaliers
+\item \justifying Collaboration en équipe, respect des délais et des consignes du responsable, contrôle qualité rigoureux
+\end{itemize}
+\smallskip\noindent\textit{Mots-clés : organisation, fiabilité, rendement, contrôle qualité, travail en équipe}\par
+
+\vspace{0.2em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.2em}
+
+\cvsection{Formation}
+\cvevent{Diplôme universitaire — Informatique}{Université de Montpellier}{2025 – 2026}{France}\par
+
+\end{paracol}
+\end{document}
