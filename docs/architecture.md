@@ -143,7 +143,7 @@ Applied/2026-05-19_Capgemini_AI_fr/
 ├── {CV_OWNER_SLUG}-LettreMotivation_AI_fr.tex   ← instantiated from cover_letters/
 ├── {CV_OWNER_SLUG}-LettreMotivation_AI_fr.pdf   ← compiled with xelatex
 └── shared/
-    └── personal_data.tex                        ← copied from templates/shared/
+    └── personal_data.tex                        ← copied from the vault's shared/ (APPLYFORGE_DATA_DIR)
 ```
 
 The `shared/` sibling dir is required so that `\input{../shared/personal_data}`

@@ -7,11 +7,11 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 import re
 
-from src.core.settings import REPO_ROOT
+from src.core.settings import DATA_DIR
 from src.core.logger import logger
 from src.pipeline.resume_loader import load_profile
 
-JOB_BOARDS_FILE = REPO_ROOT / "data" / "job_boards.txt"
+JOB_BOARDS_FILE = DATA_DIR / "job_boards.txt"
 
 def read_job_boards() -> List[str]:
     """خواندن آدرس‌های کاریابی از فایل."""
@@ -187,7 +187,7 @@ def update_job_matches(target_roles: Optional[List[str]] = None, use_ai_scoring:
     print(f"\n✅ لیست مشاغل با موفقیت به روز رسانی شد و در فایل‌های زیر ذخیره شد:")
     
     for role, role_matches in grouped.items():
-        role_file = REPO_ROOT / "data" / f"job_matches_{role}.json"
+        role_file = DATA_DIR / f"job_matches_{role}.json"
         role_file.parent.mkdir(parents=True, exist_ok=True)
         with open(role_file, "w", encoding="utf-8") as f:
             json.dump({
