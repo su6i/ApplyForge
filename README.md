@@ -324,4 +324,6 @@ For developers, AI agents, or anyone who wants to understand the internals:
 
 ## Contact
 
-Contact details are in `templates/shared/personal_data.tex` (private, not committed).
+Contact details live in the personal-data vault outside the repo
+(`~/.local/share/agent-projects/applyforge/shared/personal_data.tex`, override with
+`APPLYFORGE_DATA_DIR`) — private, never committed.
