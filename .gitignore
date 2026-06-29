@@ -20,6 +20,9 @@
 !.env.example
 !.gitignore
 !master_cv.example.json
+# uv project files — required for reproducible `uv sync` installs
+!pyproject.toml
+!uv.lock
 
 # ── Secrets and credentials — NEVER commit ────────────────────
 .env
@@ -102,6 +105,10 @@ log/
 scratch*.py
 test_*.tex
 test_*.py
+*_mock.py
+run_mock.py
+*_draft.*
+tmp_*.py
 
 # ── Binaries and media ────────────────────────────────────────
 *.jpg
