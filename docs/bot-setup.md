@@ -15,7 +15,7 @@
 
 ```bash
 # From the repo root
-pip install -r requirements.txt
+uv sync
 cp .env.example .env
 ```
 

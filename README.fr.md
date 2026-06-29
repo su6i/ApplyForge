@@ -14,7 +14,7 @@ Ce dépôt contient l'outil de génération et d'envoi automatique de CV et de l
 ## Installation des Dépendances
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Configuration

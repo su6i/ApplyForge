@@ -1,0 +1,30 @@
+[project]
+name = "cv"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.12",
+    "langchain-core>=0.2",
+    "langchain-google-genai>=4.2.1",
+    "langchain-openai>=0.1",
+    "loguru>=0.7",
+    "lxml>=5.0",
+    "pdfminer-six>=20221105",
+    "pillow>=10.0",
+    "playwright>=1.60.0",
+    "pytesseract>=0.3",
+    "python-dotenv>=1.0",
+    "python-telegram-bot>=21.0",
+    "pyyaml>=6.0",  # Roles Registry (config/roles.yaml)
+    "requests>=2.32",
+    "selenium>=4.9",
+    "webdriver-manager>=4.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.15.20",
+]
