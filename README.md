@@ -19,7 +19,7 @@ writes a personalised cover letter, and delivers two ready-to-send PDFs.
 **Step 1 — Install dependencies** *(run once)*
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 **Step 2 — Create your personal profile**
@@ -62,7 +62,7 @@ If you want to try the tool quickly, run these commands from the repository root
 ```bash
 # 1) Install Python deps
 
-pip install -r requirements.txt
+uv sync
 ```
 ```bash
 # 2) Copy env and set your OpenAI key
@@ -101,7 +101,7 @@ Notes:
 - The `--cv` flag for `init-profile` and `apply` accepts `.tex`, `.pdf`, and common
   image formats (`.jpg`, `.jpeg`, `.png`, `.webp`).
 - PDF extraction and image OCR require additional system/software:
-  - `pdfminer.six`, `pytesseract`, and `Pillow` are Python dependencies (in `requirements.txt`).
+  - `pdfminer.six`, `pytesseract`, and `Pillow` are Python dependencies (declared in `pyproject.toml`).
   - `tesseract` OCR engine must be installed on your system for OCR to work.
     On macOS: `brew install tesseract`.
 - If you only use a LaTeX `.tex` source, you do NOT need `tesseract` or the OCR
