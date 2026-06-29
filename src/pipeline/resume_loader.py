@@ -16,7 +16,7 @@ from typing import Any
 
 from src.core import roles as roles_registry
 from src.core.logger import logger
-from src.core.settings import CV_OWNER_SLUG, REPO_ROOT
+from src.core.settings import CV_OWNER_SLUG, DATA_DIR
 
 
 def _normalized_role(role: str) -> str:
@@ -30,7 +30,7 @@ def _canonical_role_label(role: str) -> str:
 
 def _legacy_profile_path(role: str) -> Path:
     safe_role = _normalized_role(role)
-    return REPO_ROOT / "data" / f"resume_profile_{safe_role}.json"
+    return DATA_DIR / f"resume_profile_{safe_role}.json"
 
 
 def get_profile_path(role: str, lang: str = "en") -> Path:
@@ -38,8 +38,8 @@ def get_profile_path(role: str, lang: str = "en") -> Path:
     role_label = _canonical_role_label(role)
     lang = (lang or "en").strip().lower()
     if lang != "en":
-        return REPO_ROOT / "data" / f"{CV_OWNER_SLUG}-CV_{role_label}_{lang}_source.json"
-    return REPO_ROOT / "data" / f"{CV_OWNER_SLUG}-CV_{role_label}_source.json"
+        return DATA_DIR / f"{CV_OWNER_SLUG}-CV_{role_label}_{lang}_source.json"
+    return DATA_DIR / f"{CV_OWNER_SLUG}-CV_{role_label}_source.json"
 
 
 def _migrate_legacy_profile_if_needed(role: str, lang: str = "en") -> Path:
@@ -65,7 +65,7 @@ def _migrate_legacy_profile_if_needed(role: str, lang: str = "en") -> Path:
 
 def _resolve_master_cv_path(lang: str = "en") -> Path:
     """Return the correct master CV path for the given language."""
-    data_dir = REPO_ROOT / "data"
+    data_dir = DATA_DIR
     lang = (lang or "en").strip().lower()
     candidates = [
         data_dir / f"master_cv_{lang}.json",   # master_cv_fr.json or master_cv_en.json

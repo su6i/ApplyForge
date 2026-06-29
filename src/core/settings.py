@@ -11,6 +11,26 @@ load_dotenv()
 # ─── Repo root (one level above src/) ────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+
+# ─── Personal-data vault (outside the repo) ──────────────────────────────────
+# Personal data (CV profiles, master CVs, tracker DB, personal_data.tex) must
+# never live inside the public repo. It is stored in a central vault outside the
+# tree. Resolution order:
+#   1. APPLYFORGE_DATA_DIR  — explicit override
+#   2. $XDG_DATA_HOME       — XDG base dir spec
+#   3. ~/.local/share       — XDG default
+# under .../agent-projects/applyforge/
+def _data_home() -> Path:
+    override = os.getenv("APPLYFORGE_DATA_DIR")
+    if override:
+        return Path(override).expanduser()
+    xdg = os.getenv("XDG_DATA_HOME")
+    base = Path(xdg).expanduser() if xdg else Path.home() / ".local" / "share"
+    return base / "agent-projects" / "applyforge"
+
+
+DATA_HOME = _data_home()
+
 # ─── LLM ─────────────────────────────────────────────────────────────────────
 OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 DEEPSEEK_API_KEY: str = os.getenv("DEEPSEEK_API_KEY", "")
@@ -31,9 +51,11 @@ AUTO_APPLY: bool = os.getenv("AUTO_APPLY", "false").lower() == "true"
 CV_OWNER_SLUG: str = os.getenv("CV_OWNER_SLUG", "cv-owner")
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
+# Personal data → vault; template code stays in the repo.
+DATA_DIR = DATA_HOME / "data"
+TEMPLATES_SHARED = DATA_HOME / "shared"          # personal_data.tex/json (personal)
 TEMPLATES_LATO = REPO_ROOT / "templates" / "lato"
 TEMPLATES_ALTACV = REPO_ROOT / "templates" / "altacv"
-TEMPLATES_SHARED = REPO_ROOT / "templates" / "shared"
 COVER_LETTERS_DIR = REPO_ROOT / "cover_letters"
 OUTPUT_DIR = REPO_ROOT / "output"
 JOB_APPLY_DIR = Path(os.getenv("JOB_APPLY_DIR", str(REPO_ROOT / "Applied")))
