@@ -1,0 +1,114 @@
+# ApplyForge — Roles Registry (single source of truth for CV tracks)
+#
+# ⚠️  PRIVACY: this file IS committed to git. NEVER write personal data here
+#     (names, emails, phone numbers, local paths). Personal data belongs only
+#     in templates/shared/personal_data.* (which is gitignored).
+#
+# Every role map in the codebase derives from THIS file. Do not re-hardcode
+# roles elsewhere. Consumers:
+#   - role_classifier   → valid set + LLM prompt descriptions
+#   - resume_loader     → role → label (profile filename) map
+#   - service           → label map + cover-letter variant + preview default
+#   - latex_builder     → CV template + spontaneous template + label maps
+#   - altacv_renderer   → skill-category ordering per role
+#
+# Canonical keys are the ONLY accepted role identifiers — there are no aliases.
+# Add a new role by adding an entry under `roles:` (or via
+# src.core.roles.scaffold_role). The spontaneous "-en"/"-fr" language suffix is
+# parsed by callers, not stored here.
+#
+# Template filenames follow CV_<Label>_<lang>.tex, matching the profile JSON
+# convention (…-CV_<Label>_source.json). build_spontaneous prefers the
+# per-language file CV_<Label>_<lang>.tex when it exists, else `cv.file`.
+
+default_role: python           # fallback when classification is unparseable
+
+roles:
+  python:
+    label: Python
+    # Placeholder: shares Polyvalent layout until a dedicated CV_Python baseline
+    # lands in Phase 2 (renderer). CV_Python_fr.tex is currently a copy.
+    description: >-
+      Generalist Python developer profile — scripting, software and automation
+      roles that do not fit a more specialised track.
+    lang: fr
+    skill_order: [ai_ml, mlops_devops, networks_support, data]
+    cv:          {folder: altacv, file: CV_Python_fr.tex}
+    lato:        {file: CV_AI_en.tex, stem: AI}
+    spontaneous: {folder: altacv, file: CV_Python_fr.tex, lang: fr}
+    variant:     {fr: it, en: python}
+
+  polyvalent:
+    label: Polyvalent
+    # Hand-optimised template — kept as its own track for reuse by others.
+    description: >-
+      Polyvalent / interim multi-skill profile spanning support, development
+      and automation — broad coverage rather than a single specialty.
+    lang: fr
+    skill_order: [ai_ml, mlops_devops, networks_support, data]
+    cv:          {folder: altacv, file: CV_Polyvalent_fr.tex}
+    lato:        {file: CV_AI_en.tex, stem: AI}
+    spontaneous: {folder: altacv, file: CV_Polyvalent_fr.tex, lang: fr}
+    variant:     {fr: it, en: python}
+
+  ai:
+    label: AI
+    description: >-
+      AI Engineer, Data Scientist, Data Analyst, Machine Learning, NLP, LLM,
+      Backend Developer, MLOps.
+    lang: fr
+    skill_order: [ai_ml, mlops_devops, networks_support, data]
+    cv:          {folder: altacv, file: CV_AI_fr.tex}
+    lato:        {file: CV_AI_en.tex, stem: AI}
+    spontaneous: {folder: altacv, file: CV_AI_fr.tex, lang: fr}
+    variant:     {fr: ai, en: ai}
+
+  devops:
+    label: DevOps
+    # Placeholder: shares the alternance layout until a dedicated CV_DevOps
+    # baseline lands in Phase 2 (renderer).
+    description: >-
+      DevOps / SRE / Cloud / CI-CD / infrastructure-as-code / platform
+      engineering (permanent contract — not alternance).
+    lang: fr
+    skill_order: [mlops_devops, networks_support, ai_ml, data]
+    cv:          {folder: altacv, file: CV_DevOpsAlternance_fr.tex}
+    lato:        {file: CV_Support_fr.tex, stem: Support}
+    spontaneous: {folder: altacv, file: CV_DevOpsAlternance_fr.tex, lang: fr}
+    variant:     {fr: it, en: python}
+
+  devops_alternance:
+    label: DevOpsAlternance
+    description: >-
+      DevOps / Cloud roles offered as alternance / apprentissage
+      (work-study contract).
+    lang: fr
+    skill_order: [mlops_devops, networks_support, ai_ml, data]
+    cv:          {folder: altacv, file: CV_DevOpsAlternance_fr.tex}
+    lato:        {file: CV_Support_fr.tex, stem: Support}
+    spontaneous: {folder: altacv, file: CV_DevOpsAlternance_fr.tex, lang: fr}
+    variant:     {fr: it, en: python}
+
+  phd:
+    label: PhD
+    description: >-
+      PhD, Postdoc, Research Fellow, Academic, University position,
+      grant-funded research.
+    lang: en
+    skill_order: [ai_ml, mlops_devops, networks_support, data]
+    cv:          {folder: lato, file: CV_PhD_en.tex}
+    lato:        {file: CV_PhD_Lato.tex, stem: PhD}
+    spontaneous: {folder: lato, file: CV_PhD_en.tex, lang: en}
+    variant:     {fr: it, en: python}
+
+  support:
+    label: Support
+    description: >-
+      IT Support, Helpdesk, Network Technician, SysAdmin, Infrastructure,
+      VOIP, Cisco, Windows/Linux administration (technicien réseau & support).
+    lang: fr
+    skill_order: [networks_support, mlops_devops, ai_ml, data]
+    cv:          {folder: lato, file: CV_Support_fr.tex}
+    lato:        {file: CV_Support_fr.tex, stem: Support}
+    spontaneous: {folder: lato, file: CV_Support_fr.tex, lang: fr}
+    variant:     {fr: it, en: python}

@@ -545,20 +545,12 @@ def _section_skills(
             "data": "Data",
         }
 
-    if role == "it":
-        categories = [
-            ("networks_support", labels["networks_support"]),
-            ("mlops_devops", labels["mlops_devops"]),
-            ("ai_ml", labels["ai_ml"]),
-            ("data", labels["data"]),
-        ]
-    else:
-        categories = [
-            ("ai_ml", labels["ai_ml"]),
-            ("mlops_devops", labels["mlops_devops"]),
-            ("networks_support", labels["networks_support"]),
-            ("data", labels["data"]),
-        ]
+    # Skill-category ordering per role comes from the Roles Registry.
+    from src.core import roles as roles_registry
+    order = roles_registry.skill_order(
+        role, ["ai_ml", "mlops_devops", "networks_support", "data"]
+    )
+    categories = [(key, labels[key]) for key in order if key in labels]
 
     for key, label in categories:
         cat_skills = skills_dict.get(key, [])

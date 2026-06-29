@@ -9,7 +9,8 @@ Modes:
     uv run main.py init-profile [--cv path]   → Parse LaTeX CV into resume_profile.json
     uv run main.py test                       → Sanity-check settings
 
-Spontaneous roles: ai, ai-en, mlops, mlops-en, devops, devops-alternance, phd, polyvalent
+Spontaneous roles: python, ai, ai-en, devops, devops_alternance, phd, support, polyvalent
+                   (append -en/-fr to override language, e.g. ai-en)
 
     1. cp .env.example .env  (fill in OPENAI_API_KEY)
     2. uv run main.py init-profile
@@ -110,7 +111,7 @@ def cmd_spontaneous(
 
 def cmd_preview(
     template: str = "altacv",
-    role: str = "it",
+    role: str = "support",
     color: str = "",
     output_language: str = "fr",
     localize_preview: bool = True,
@@ -139,7 +140,7 @@ def cmd_init_profile(cv_path: str | None = None) -> None:
     creating or updating your CV templates.
 
     Optional:
-        --cv  path/to/CV.tex|.pdf|.jpg   (default: templates/lato/CV_AI_Data_Lato.tex)
+        --cv  path/to/CV.tex|.pdf|.jpg   (default: templates/lato/CV_AI_en.tex)
                 Supported: .tex, .pdf, .jpg, .jpeg, .png, .webp
     """
     from pathlib import Path
@@ -272,7 +273,7 @@ def main() -> None:
             if idx + 1 < len(args):
                 template = args[idx + 1]
         
-        role = "it"
+        role = "support"
         if "--role" in args:
             idx = args.index("--role")
             if idx + 1 < len(args):

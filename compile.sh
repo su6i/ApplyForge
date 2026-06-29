@@ -4,9 +4,9 @@
 #
 # Usage (from repo root):
 #   ./compile.sh                        # build ALL CV_*.tex across all template folders
-#   ./compile.sh ai                     # shortcut → CV_AI_Data_Lato  (templates/lato/)
-#   ./compile.sh it                     # shortcut → CV_IT_Infra_Lato (templates/lato/)
-#   ./compile.sh phd                    # shortcut → CV_PhD_Lato      (templates/lato/)
+#   ./compile.sh ai                     # shortcut → CV_AI_en      (templates/lato/)
+#   ./compile.sh support                # shortcut → CV_Support_fr (templates/lato/)
+#   ./compile.sh phd                    # shortcut → CV_PhD_en     (templates/lato/)
 #   ./compile.sh CV_Banking             # any CV_ filename (auto-finds the folder)
 #
 # To add a new template style: create templates/<style>/ with CV_*.tex inside.
@@ -62,9 +62,9 @@ compile_all() {
 
 # Shortcuts
 case "${1:-all}" in
-  ai)  compile CV_AI_Data_Lato ;;
-  it)  compile CV_IT_Infra_Lato ;;
-  phd) compile CV_PhD_Lato ;;
+  ai)      compile CV_AI_en ;;
+  support) compile CV_Support_fr ;;
+  phd)     compile CV_PhD_en ;;
   all) compile_all ;;
   *)   compile "$1" ;;
 esac
