@@ -22,7 +22,7 @@ from pathlib import Path
 from src.core import roles as roles_registry
 from src.core.logger import logger
 from src.core.llm_factory import get_llm
-from src.core.settings import CV_OWNER_SLUG, REPO_ROOT
+from src.core.settings import CV_OWNER_SLUG, DATA_DIR
 from src.pipeline.content_tailor import TailoredContent, tailor
 from src.pipeline.job_scraper import JobPosting, scrape
 from src.pipeline.latex_builder import ApplicationBundle, build
@@ -32,7 +32,7 @@ from src.pipeline import technicien_adapter
 
 # Default: warn (but don't abort) when match score is below this threshold.
 DEFAULT_MIN_MATCH = 40
-GENERATED_PROFILES_DIR = REPO_ROOT / "data"
+GENERATED_PROFILES_DIR = DATA_DIR
 
 
 class ApplicationService:
@@ -300,7 +300,7 @@ class ApplicationService:
         Generate a spontaneous application CV (candidature spontanée).
 
         Uses the pre-written static template for the given role — no LLM tailoring.
-        Personal data is injected via templates/shared/personal_data.tex at compile time.
+        Personal data is injected via the vault's shared/personal_data.tex at compile time.
 
         Parameters
         ----------
