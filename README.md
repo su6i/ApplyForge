@@ -25,7 +25,7 @@ uv sync
 **Step 2 — Create your personal profile**
 
 ```bash
-cp master_cv.example.json master_cv.json
+cp examples/master_cv.example.json master_cv.json
 ```
 
 Edit `master_cv.json` with your real name, contact info, work history, and skills.

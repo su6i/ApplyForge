@@ -56,7 +56,7 @@ safe file types are explicitly un-ignored.
 | `.py` `.mjs` | Python and Node.js scripts |
 | `.env.example` | Config template — placeholders only, no real secrets |
 | `.gitignore` | This file |
-| `master_cv.example.json` | Anonymised profile structure — safe to commit |
+| `examples/master_cv.example.json` | Anonymised profile structure — safe to commit |
 
 **Always ignored (never commit):**
 
