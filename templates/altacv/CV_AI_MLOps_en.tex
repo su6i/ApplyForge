@@ -1,0 +1,184 @@
+\documentclass[7pt,a4paper,withhyper]{altacv}
+
+\geometry{left=0.9cm,right=0.9cm,top=0.7cm,bottom=0.7cm,columnsep=0.3cm}
+\usepackage{paracol}
+\usepackage[default]{lato}
+\usepackage{ragged2e}
+\linespread{0.95}
+
+\definecolor{VividPurple}{HTML}{1A5276}
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{555555}
+
+\colorlet{name}{black}
+\colorlet{tagline}{VividPurple}
+\colorlet{heading}{VividPurple}
+\colorlet{headingrule}{VividPurple}
+\colorlet{subheading}{VividPurple}
+\colorlet{accent}{VividPurple}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+\renewcommand{\itemmarker}{{\small\textbullet}}
+\renewcommand{\ratingmarker}{\faCircle}
+\renewcommand{\taglinefont}{\Large\bfseries}
+
+\renewcommand{\cvevent}[4]{%
+  {\large\color{emphasis}\raggedright #1\par}
+  \smallskip\normalsize
+  \ifstrequal{#2}{}{}{%
+    \textbf{\color{accent}#2}%
+  }%
+  \ifstrequal{#4}{}{}{%
+    \ifstrequal{#2}{}{}{\hspace{1.5em}}%
+    {\small\cvLocationMarker~#4}%
+  }%
+  \ifstrequal{#3}{}{}{%
+    \hfill{\small\cvDateMarker~#3}%
+  }\par
+}
+
+% ── Personal data placeholders (overridden by ../shared/personal_data.tex) ────
+\providecommand{\cvname}{Firstname LASTNAME}
+\providecommand{\cvemail}{user@example.com}
+\providecommand{\cvphone}{+XX X XX XX XX XX}
+\providecommand{\cvlocation}{City, Country}
+\providecommand{\cvgithub}{github-username}
+\providecommand{\cvlinkedin}{linkedin-username}
+\providecommand{\cvwebsite}{website-url}
+\input{../shared/personal_data}
+
+\begin{document}
+\enlargethispage{5cm}
+
+\name{\cvname}
+\tagline{AI Engineer — LLM · RAG · Multi-Agent}
+\personalinfo{}
+\makecvheader
+
+\cvsection{Profile}
+{\small\justifying
+Master's in Computer Science (University of Montpellier) with a strong background in network infrastructure and hands-on experience building production LLM pipelines. At toHero, I designed an AI system that cut 88 hours of manual document processing to under 2 hours — replacing human workflows with automated LLM pipelines, vector embeddings, and multi-agent orchestration. I build systems that run on real infrastructure and solve real problems. Available remotely.\par}
+
+\columnratio{0.35}
+\vspace{0.1em}
+\backgroundcolor{c[0]}[HTML]{EBF5FB}
+\vspace{0.1em}
+\begin{paracol}{2}
+\vspace{-0.5em}
+
+% ---- LEFT COLUMN ----
+
+\cvsection{Contact}
+\smallskip
+\textcolor{accent}{\faAt} \hspace{0.5em} \href{mailto:\cvemail}{\cvemail}\\\vspace{0.1em}
+\textcolor{accent}{\faPhone} \hspace{0.5em} \cvphone\\\vspace{0.1em}
+\textcolor{accent}{\cvLocationMarker} \hspace{0.5em} \cvlocation\\\vspace{0.1em}
+\textcolor{accent}{\faLinkedin} \hspace{0.5em} \href{https://linkedin.com/in/\cvlinkedin}{linkedin.com/in/\cvlinkedin}\\\vspace{0.1em}
+\textcolor{accent}{\faGithub} \hspace{0.5em} \href{https://github.com/\cvgithub}{github.com/\cvgithub}\\\vspace{0.1em}
+\textcolor{accent}{\faGlobe} \hspace{0.5em} \href{https://\cvwebsite}{\cvwebsite}\par
+
+\vspace{0.2em}
+\cvsection{Skills}
+
+\cvachievement{\faRobot}{LLM \& Agents}{Python, LangChain, CrewAI, OpenAI / Gemini / DeepSeek APIs, Prompt Engineering, Multi-Agent Orchestration}\par
+\vspace{0.2em}
+\cvachievement{\faDatabase}{RAG \& Retrieval}{ChromaDB, LiteLLM, FlashRank, NetworkX (GraphRAG), Vector Embeddings, Ragas (evaluation)}\par
+\vspace{0.2em}
+\cvachievement{\faCloud}{Backend \& MLOps}{FastAPI, Docker, Git, CI/CD, Linux/Bash, Hetzner VPS, AWS}\par
+\vspace{0.2em}
+\cvachievement{\faChartLine}{Data \& Analysis}{Pandas, NumPy, SQL (PostgreSQL), MongoDB, Scikit-Learn, TensorFlow, Streamlit}\par
+\vspace{0.2em}
+\cvachievement{\faNetworkWired}{Infrastructure}{Cisco IOS, SNMP, TCP/IP, VLAN, VoIP, SolarWinds}\par
+
+\vspace{0.2em}
+\cvsection{Certifications}
+\smallskip
+\noindent\textbf{Anthropic / DeepLearning.ai}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~MCP: Build Rich-Context AI Apps\par
+\vspace{0.2em}
+\noindent\textbf{CrewAI / DeepLearning.ai}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~Multi-Agent Systems with CrewAI\par
+\vspace{0.2em}
+\noindent\textbf{DeepLearning.ai}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~Prompt Engineering for Developers\par
+\vspace{0.2em}
+\noindent\textbf{Univ. of Tehran / OnAcademy}\par
+\hspace{1em}\raisebox{0.15ex}{\textcolor{accent}{\scriptsize\faStar}}~ML Specialist Bootcamp (125h)\par
+\hspace{1em}{Python ML · Neural Networks · CV}\par
+
+\vspace{0.2em}
+\cvsection{Languages}
+\textbf{French} (Advanced)\\\vspace{0.1em}
+\textbf{English} (Professional)\\\vspace{0.1em}\par
+
+\vspace{0.2em}
+\cvsection{Interests}
+\cvtag{Open Source} \cvtag{Cycling}\\[-0.15em]
+\cvtag{Hiking} \cvtag{Chess}\par
+
+% ---- RIGHT COLUMN ----
+\switchcolumn
+\vspace{-0.5em}
+
+\cvsection{Experience}
+
+\cvevent{AI Engineer Intern — LLM Pipelines \& Multi-Agent Systems}{toHero}{Jan – Jun 2025}{Montpellier, France}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Built an end-to-end document analysis pipeline for an insurance client: \textbf{18,000+ Excel rows and 1,772 PDF pages} processed automatically via OpenAI API + vector embeddings — cutting processing time from 88 hours to under 2 hours (\textbf{$-$99\% cost, $+$500\% speed})
+
+\item \justifying Built a \textbf{multi-agent testing pipeline} (CrewAI) that autonomously generated \textbf{476 functional test scenarios} for an e-commerce platform
+\item \justifying Applied NLP techniques: document chunking, semantic embeddings, structured output parsing, prompt engineering; deployed via Docker with CI/CD
+\end{itemize}
+\smallskip\noindent\textit{Stack: Python, OpenAI API, CrewAI, LangChain, FastAPI, Docker, CI/CD, Vector Embeddings}\par
+
+\vspace{0.25em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.25em}
+
+\cvevent{Network \& Automation Engineer}{Semahal Co.}{2021 – 2024}{}
+\smallskip
+\begin{itemize}[leftmargin=1.25em, itemsep=0pt, parsep=0pt]
+\item \justifying Built \textbf{Python/SNMP automation} for remote management of Cisco infrastructure — \textbf{reducing on-site interventions by 70\%} and diagnostic time by 40\%
+\item \justifying Deployed SolarWinds/SNMP dashboards enabling \textbf{proactive detection of 30\% of incidents}; maintained \textbf{99.9\% SLA uptime} for critical infrastructure
+\item \justifying Developed Power BI dashboards transforming raw network telemetry into actionable insights for \textbf{1,500+ users}
+\end{itemize}
+\smallskip\noindent\textit{Stack: Python, Bash, SNMP, SolarWinds, Cisco IOS, Linux, Power BI, SQL}\par
+
+\vspace{-0.5ex}
+\cvsection{Projects}
+
+{\large\color{emphasis}\raggedright\href{https://github.com/\cvgithub/cisco-manager}{\textbf{Cisco Manager} — Full-Stack Network Dashboard} {\small\color{LightGrey}· 2021–2025}\par}
+\vspace{0.1em}
+\begin{itemize}[leftmargin=1.25em, nosep]
+\item \justifying Real-time monitoring of Cisco switches with SNMP/Syslog telemetry, PostGIS geolocation, automated Telegram alerting, and one-click admin commands
+\item \justifying Stack: FastAPI + Next.js + PostgreSQL/PostGIS + Docker
+\end{itemize}\par
+\vspace{0.1em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.1em}
+
+{\large\color{emphasis}\raggedright\href{https://github.com/\cvgithub/su6i-yar}{\textbf{Su6i-Yar} — Multimodal AI System (Production VPS)} {\small\color{LightGrey}· 2025}\par}
+\vspace{0.1em}
+\begin{itemize}[leftmargin=1.25em, nosep]
+\item \justifying Production Telegram bot with \textbf{8-layer LLM fallback} (Gemini $\to$ DeepSeek $\to$ Grok), TTS/STT voice pipeline, real-time fact-checking, and 4-language support (FA/EN/FR/KO)
+\end{itemize}
+\noindent\textit{\small Stack: LangChain, Gemini/DeepSeek APIs, Pyrogram, Faster-Whisper, Docker}\par
+\vspace{0.1em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.1em}
+
+{\large\color{emphasis}\raggedright\href{https://github.com/\cvgithub/LinguaFlash}{\textbf{LinguaFlash} — Chrome Extension (Chrome Web Store)} {\small\color{LightGrey}· 2025}\par}
+\vspace{0.1em}
+\begin{itemize}[leftmargin=1.25em, nosep]
+\item \justifying Spaced repetition language learning extension with TTS auto-pronunciation; 1,600+ CEFR-aligned items across 10 languages; published on Chrome Web Store
+\end{itemize}\par
+
+\vspace{-0.5ex}
+\cvsection{Education}
+
+\cvevent{University Diploma — Big Data, Data Science \& Risk Analysis}{University of Montpellier}{2025 – 2026}{}
+\textit{Econometrics, fraud detection, NLP, ML on 922,000+ insurance records}\par
+
+\vspace{0.1em}\noindent{\color{black!30}\leavevmode\cleaders\hbox to 0.9em{\hss--\hss}\hfill\kern0pt}\par\vspace{0.1em}
+
+\cvevent{Master's Degree in Computer Science (M2, Bac+5)}{University of Montpellier}{2024 – 2025}{}
+\textit{Advanced Networks: \textbf{16.33/20 (1\textsuperscript{st}/13)} · Advanced Web: \textbf{17.15/20 (2\textsuperscript{nd}/17)} · Systems: \textbf{16.5/20 (3\textsuperscript{rd}/64)}}\par
+
+\end{paracol}
+\end{document}
