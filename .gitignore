@@ -48,9 +48,6 @@ templates/shared/personal_data.json
 # ── Old/legacy template folders — have hardcoded personal data ─
 templates/experimental/
 
-# ── Private reference documents ───────────────────────────────
-.agents/references/
-
 # ── Job applications — private (names, letters, rejections) ───
 Applied/
 recommendation_letter/
