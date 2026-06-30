@@ -6,8 +6,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # ─── Repo root (one level above src/) ────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -30,6 +28,9 @@ def _data_home() -> Path:
 
 
 DATA_HOME = _data_home()
+
+# Secrets (.env) live in the vault's secrets/, never in the repo.
+load_dotenv(DATA_HOME / "secrets" / ".env")
 
 # ─── LLM ─────────────────────────────────────────────────────────────────────
 OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")

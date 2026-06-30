@@ -16,29 +16,32 @@ writes a personalised cover letter, and delivers two ready-to-send PDFs.
 
 ## First-Time Setup
 
-**Step 1 — Install dependencies** *(run once)*
+**Step 1 — Run the installer** *(zero-touch, run once)*
 
 ```bash
-uv sync
+./install.sh
 ```
 
-**Step 2 — Create your personal profile**
+This detects your OS, installs `uv` + LaTeX (+ optional tesseract OCR), runs
+`uv sync`, links the shared agent constitution (a central clone — **not** a
+submodule), registers its skills into `~/.claude/skills/`, and creates your
+personal-data **vault** at `~/.local/share/agent-projects/applyforge/` with a
+seeded `secrets/.env`. Personal data never lives in the repo.
+
+**Step 2 — Create your personal profile** *(in the vault)*
 
 ```bash
-cp examples/master_cv.example.json master_cv.json
+cp examples/master_cv.example.json \
+   ~/.local/share/agent-projects/applyforge/data/master_cv.json
 ```
 
-Edit `master_cv.json` with your real name, contact info, work history, and skills.
-This file is private and gitignored — it never gets committed.
-`CLAUDE.md` (AI agent instructions) is also gitignored as it may contain personal workflow details.
+Edit it with your real name, contact info, work history, and skills. It lives in
+the vault, outside the repo — it can never be committed.
 
-**Step 3 — Add your API keys**
+**Step 3 — Add your API keys** *(in the vault)*
 
-```bash
-cp .env.example .env
-```
-
-Open `.env` and fill in:
+The installer already seeded `~/.local/share/agent-projects/applyforge/secrets/.env`
+from `.env.example`. Open it and fill in:
 - `CV_OWNER_SLUG` — your name slug used in all output filenames (e.g. `Firstname_LASTNAME`)
 - `LLM_MODEL` — LLM model identifier (e.g. `deepseek-v4-flash` for DeepSeek, or `gpt-4o` for OpenAI)
 - `OPENAI_API_KEY` or `DEEPSEEK_API_KEY` — depending on your chosen LLM provider

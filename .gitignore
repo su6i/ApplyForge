@@ -136,3 +136,6 @@ TODO.md
 
 # ── Registry contract tests (override the test_*.py ignore above) ──
 !tests/test_roles.py
+
+# constitution is symlinked by install.sh (single source of truth, never a submodule)
+.agent/constitution

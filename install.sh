@@ -1,269 +1,146 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# =============================================================================
+# ApplyForge — Zero-Touch Installer
+# Fresh clone → working project, no user intervention.
+# Implements the `bootstrap-installer` skill (agent-constitution).
+#   curl -fsSL .../install.sh | bash   OR   ./install.sh
+# =============================================================================
+set -euo pipefail
 
-# ==============================================================================
-# CV Automation Pipeline Installer
-# ==============================================================================
+# ─── 0. Preamble ─────────────────────────────────────────────────────────────
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; BLUE='\033[0;34m'; NC='\033[0m'
+success() { printf "${GREEN}✅ %s${NC}\n" "$1"; }
+warn()    { printf "${YELLOW}⚠️  %s${NC}\n" "$1"; }
+error()   { printf "${RED}❌ %s${NC}\n" "$1" >&2; exit 1; }
+section() { printf "\n${BLUE}── %s ──${NC}\n" "$1"; }
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VENV_DIR="$PROJECT_DIR/.venv"
+cd "$PROJECT_DIR"
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Helper Functions
-# ─────────────────────────────────────────────────────────────────────────────
-
-check_dep() {
-    command -v "$1" &> /dev/null
-}
-
-print_status() {
-    echo "├─ $1"
-}
-
-print_success() {
-    echo "✅ $1"
-}
-
-print_error() {
-    echo "❌ $1"
-}
-
-print_warning() {
-    echo "⚠️  $1"
-}
-
-print_section() {
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "  $1"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 0. Ensure `uv` is installed (Package manager preference)
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "STEP 1: Package Manager Setup"
-
-if ! check_dep uv; then
-    print_status "🔁 'uv' not found — Installing uv (rust-based package manager)..."
-    if check_dep curl; then
-        curl -LsSf https://astral.sh/uv/install.sh | sh 2>/dev/null || {
-            print_warning "uv standalone installation failed. Trying system package manager..."
-            case "$OSTYPE" in
-                darwin*) 
-                    if check_dep brew; then
-                        brew install uv >/dev/null 2>&1
-                    else
-                        print_error "Homebrew not found. Please install uv manually: https://github.com/astral-sh/uv"
-                        exit 1
-                    fi
-                    ;;
-                linux-gnu*)
-                    if check_dep apt; then
-                        sudo apt update -qq && sudo apt install -y uv >/dev/null 2>&1
-                    elif check_dep yum; then
-                        sudo yum install -y uv >/dev/null 2>&1
-                    else
-                        print_error "Could not install uv. Please install manually: https://github.com/astral-sh/uv"
-                        exit 1
-                    fi
-                    ;;
-                *)
-                    print_error "Could not auto-install uv on this OS. Please install manually: https://github.com/astral-sh/uv"
-                    exit 1
-                    ;;
-            esac
-        }
-        
-        # Ensure uv is in PATH
-        [[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin:$PATH"
-        [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
-    else
-        print_error "'curl' not found. Please install 'curl' or 'uv' manually."
-        exit 1
-    fi
-fi
-
-if check_dep uv; then
-    print_success "'uv' is installed and ready."
-else
-    print_error "Failed to verify 'uv' installation."
-    exit 1
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. Check System Dependencies (LaTeX, PDF tools)
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "STEP 2: System Dependencies"
-
-MISSING_DEPS=()
-
-if ! check_dep pdflatex; then
-    MISSING_DEPS+=("pdflatex (LaTeX distribution)")
-fi
-
-if ! check_dep xelatex; then
-    MISSING_DEPS+=("xelatex (LaTeX Unicode support)")
-fi
-
-if [[ ${#MISSING_DEPS[@]} -gt 0 ]]; then
-    print_warning "Found ${#MISSING_DEPS[@]} missing system dependencies:"
-    for dep in "${MISSING_DEPS[@]}"; do
-        print_warning "  - $dep"
-    done
-    
-    print_status "Installing LaTeX (TexLive)..."
-    case "$OSTYPE" in
-        darwin*)
-            if check_dep brew; then
-                print_status "Installing via Homebrew..."
-                brew install --cask mactex-no-gui >/dev/null 2>&1 || \
-                brew install basictex >/dev/null 2>&1 || \
-                print_warning "LaTeX installation may need manual setup. Visit: https://www.tug.org/mactex/"
-            else
-                print_warning "Please install MacTeX or BasicTeX manually: https://www.tug.org/mactex/"
-            fi
-            ;;
-        linux-gnu*)
-            if check_dep apt; then
-                sudo apt-get update -qq && sudo apt-get install -y texlive-xetex texlive-latex-extra texlive-fonts-recommended >/dev/null 2>&1
-            elif check_dep yum; then
-                sudo yum install -y texlive-xetex texlive-latex texlive-fonts >/dev/null 2>&1
-            elif check_dep dnf; then
-                sudo dnf install -y texlive-xetex texlive-latex texlive-fonts >/dev/null 2>&1
-            else
-                print_warning "Please install TexLive manually for your Linux distribution."
-            fi
-            ;;
-        *)
-            print_warning "Please install TexLive/LaTeX manually for your OS."
-            ;;
-    esac
-else
-    print_success "All system dependencies present."
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 2. Create Virtual Environment
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "STEP 3: Python Virtual Environment"
-
-if [[ -d "$VENV_DIR" ]]; then
-    print_status "Virtual environment already exists at $VENV_DIR"
-else
-    print_status "Creating virtual environment..."
-    uv venv "$VENV_DIR" --python 3.11 >/dev/null 2>&1
-    if [[ $? -eq 0 ]]; then
-        print_success "Virtual environment created."
-    else
-        print_error "Failed to create virtual environment."
-        exit 1
-    fi
-fi
-
-# Activate virtual environment
-source "$VENV_DIR/bin/activate" 2>/dev/null || {
-    print_error "Failed to activate virtual environment."
-    exit 1
-}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 3. Install Python Dependencies
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "STEP 4: Python Dependencies"
-
-if [[ ! -f "$PROJECT_DIR/requirements.txt" ]]; then
-    print_error "requirements.txt not found at $PROJECT_DIR/requirements.txt"
-    exit 1
-fi
-
-print_status "Installing Python packages (this may take a minute)..."
-uv pip install -r "$PROJECT_DIR/requirements.txt" >/dev/null 2>&1
-
-if [[ $? -eq 0 ]]; then
-    print_success "All Python packages installed."
-else
-    print_error "Failed to install Python packages. Try manually with:"
-    echo "    source $VENV_DIR/bin/activate"
-    echo "    pip install -r $PROJECT_DIR/requirements.txt"
-    exit 1
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. Configuration (Environment Variables)
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "STEP 5: Configuration"
-
-ENV_FILE="$PROJECT_DIR/.env"
-if [[ ! -f "$ENV_FILE" ]]; then
-    if [[ -f "$PROJECT_DIR/.env.example" ]]; then
-        print_status "Copying .env.example to .env..."
-        cp "$PROJECT_DIR/.env.example" "$ENV_FILE"
-        print_success ".env created. You may need to add API keys manually."
-    fi
-else
-    print_status ".env file already exists."
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 5. Verify Installation
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "STEP 6: Verification"
-
-# Check if main dependencies are importable
-python -c "import langchain_openai; import loguru; import requests; print('✅ Core imports successful')" 2>/dev/null
-if [[ $? -ne 0 ]]; then
-    print_warning "Some imports failed. This might be OK if you're not using all features."
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 6. Usage Instructions
-# ─────────────────────────────────────────────────────────────────────────────
-
-print_section "INSTALLATION COMPLETE ✨"
-
-echo ""
-echo "Next steps:"
-echo ""
-echo "  1. Activate the virtual environment:"
-echo "     source $VENV_DIR/bin/activate"
-echo ""
-echo "  2. Verify installation:"
-echo "     python main.py --help"
-echo ""
-echo "  3. Try a preview:"
-echo "     python main.py preview --role it --lang fr"
-echo ""
-echo "  4. Or apply to a job posting:"
-echo "     python main.py apply --url <job_url> --lang auto"
-echo ""
-
-# Suggest adding to shell config
-ACTIVE_SHELL=$(basename "$SHELL")
-case "$ACTIVE_SHELL" in
-    zsh)
-        SHELL_RC="$HOME/.zshrc"
-        ;;
-    bash)
-        SHELL_RC="$HOME/.bashrc"
-        ;;
-    *)
-        SHELL_RC=""
-        ;;
+# ─── 1. OS detection ─────────────────────────────────────────────────────────
+section "OS"
+case "$(uname -s)" in
+  Darwin) OS=mac ;  PKG="brew install" ;;
+  Linux)  OS=linux; PKG="sudo apt-get install -y" ;;
+  *) error "Unsupported OS: $(uname -s)" ;;
 esac
+success "$OS"
 
-if [[ -n "$SHELL_RC" ]] && ! grep -q "CV.*venv.*activate" "$SHELL_RC" 2>/dev/null; then
-    echo ""
-    echo "💡 Tip: Add this to $SHELL_RC to auto-activate on new terminals:"
-    echo "   # Auto-activate CV venv"
-    echo "   if [[ -d '$VENV_DIR' ]]; then"
-    echo "       source '$VENV_DIR/bin/activate'"
-    echo "   fi"
+# ─── 2. uv (mandatory; never pip) ────────────────────────────────────────────
+section "uv"
+if ! command -v uv >/dev/null 2>&1; then
+  warn "uv not found — installing"
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+command -v uv >/dev/null 2>&1 || error "uv install failed — see https://docs.astral.sh/uv/"
+uv self update >/dev/null 2>&1 || true
+success "uv $(uv --version 2>/dev/null | awk '{print $2}')"
+
+# ─── 3. System deps (idempotent; optional = warn only) ───────────────────────
+section "System dependencies"
+have() { command -v "$1" >/dev/null 2>&1; }
+
+if have pdflatex && have xelatex; then
+  success "LaTeX present"
+else
+  warn "LaTeX missing — installing TeX (required for CV compilation)"
+  if [ "$OS" = mac ]; then
+    have brew || error "Homebrew required: https://brew.sh"
+    brew install --cask mactex-no-gui 2>/dev/null || brew install basictex 2>/dev/null \
+      || warn "install MacTeX manually: https://www.tug.org/mactex/"
+  else
+    sudo apt-get update -qq
+    sudo apt-get install -y texlive-xetex texlive-latex-extra texlive-fonts-recommended \
+      || warn "install TeX Live manually"
+  fi
 fi
 
-echo ""
+if have tesseract; then
+  success "tesseract present"
+else
+  warn "tesseract missing (optional — OCR for image CVs); installing"
+  $PKG tesseract ${OS:+} 2>/dev/null || $PKG tesseract-ocr 2>/dev/null \
+    || warn "OCR disabled — install tesseract to enable image parsing"
+fi
+
+# ─── 4. Python environment ───────────────────────────────────────────────────
+section "Python environment"
+uv sync
+success "dependencies synced (uv.lock)"
+
+# ─── 5. Constitution bootstrap (single source of truth — NO submodule) ───────
+section "Agent constitution"
+CENTRAL="${AGENT_CONSTITUTION_DIR:-$HOME/@-github/agent-constitution}"
+REMOTE="git@github.com:su6i/agent-constitution.git"
+if [ -d "$CENTRAL/.git" ]; then
+  git -C "$CENTRAL" pull --ff-only >/dev/null 2>&1 && success "constitution updated" \
+    || warn "could not fast-forward $CENTRAL (local changes?) — using current state"
+else
+  warn "cloning constitution → $CENTRAL"
+  mkdir -p "$(dirname "$CENTRAL")"
+  git clone "$REMOTE" "$CENTRAL" || error "failed to clone constitution"
+fi
+mkdir -p .agent
+if [ -e .agent/constitution ] && [ ! -L .agent/constitution ]; then
+  error ".agent/constitution exists and is not a symlink — remove it first (old submodule?)"
+fi
+ln -sfn "$CENTRAL" .agent/constitution
+success "linked .agent/constitution → $CENTRAL"
+
+# ─── 6. Register skills into ~/.claude/skills (so /skills sees them) ─────────
+# Version-safe: skills from the single central source are symlinked (idempotent).
+# If another project already registered a skill from a DIFFERENT source, only
+# overwrite when our version is strictly newer — never clobber a newer skill.
+section "Skills registration"
+SKILLS_SRC="$CENTRAL/skills"
+SKILLS_DST="$HOME/.claude/skills"
+skill_version() { grep -m1 '^version:' "$1" 2>/dev/null | sed 's/^version:[[:space:]]*//' | tr -d '"' || true; }
+is_newer() { [ "$1" != "$2" ] && [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1)" = "$1" ]; }
+if [ -d "$SKILLS_SRC" ]; then
+  mkdir -p "$SKILLS_DST"
+  reg=0; upd=0; kept=0
+  for f in "$SKILLS_SRC"/*.md; do
+    [ -e "$f" ] || continue
+    name="$(basename "$f" .md)"; dst="$SKILLS_DST/$name/SKILL.md"
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$f" ]; then
+      ln -sfn "$f" "$dst"; reg=$((reg+1)); continue          # same source → idempotent
+    fi
+    if [ -e "$dst" ]; then                                    # registered from a DIFFERENT source
+      vnew="$(skill_version "$f")"; vold="$(skill_version "$dst")"
+      vnew="${vnew:-0.0.0}"; vold="${vold:-0.0.0}"
+      if is_newer "$vnew" "$vold"; then
+        mkdir -p "$SKILLS_DST/$name"; ln -sfn "$f" "$dst"; upd=$((upd+1))
+      else
+        warn "kept $name (registered v$vold ≥ our v$vnew)"; kept=$((kept+1))
+      fi
+    else
+      mkdir -p "$SKILLS_DST/$name"; ln -sfn "$f" "$dst"; reg=$((reg+1))
+    fi
+  done
+  success "skills: $reg linked, $upd updated (newer), $kept kept (existing newer) → $SKILLS_DST"
+  printf "   run /skills to view (restart Claude Code if absent)\n"
+else
+  warn "no skills dir at $SKILLS_SRC"
+fi
+
+# ─── 7. Config / secrets (vault — never in the repo) ─────────────────────────
+section "Configuration"
+VAULT="${APPLYFORGE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/agent-projects/applyforge}"
+mkdir -p "$VAULT"/{data,shared,references,secrets,workspace}
+ENV="$VAULT/secrets/.env"
+if [ -f "$ENV" ]; then
+  success ".env present (vault) — left untouched"
+else
+  cp .env.example "$ENV"
+  warn "seeded $ENV from .env.example — add your provider keys (DEEPSEEK/OPENAI/GEMINI, TELEGRAM)"
+fi
+
+# ─── 8. Verify ───────────────────────────────────────────────────────────────
+section "Verify"
+if uv run python -c "import src.core.settings" >/dev/null 2>&1; then
+  success "import OK"
+else
+  error "verification failed — settings did not import"
+fi
+printf "\n${GREEN}ApplyForge ready.${NC}  Try:  uv run python main.py spontaneous ai-en\n"
