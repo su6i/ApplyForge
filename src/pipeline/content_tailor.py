@@ -263,10 +263,14 @@ def _parse_json(raw: str) -> dict:
 
 
 def _strip_metrics_in_summary(text: str) -> str:
-    """Remove numeric performance metrics from profile summary paragraph."""
+    """Remove numeric performance metrics from profile summary paragraph.
+
+    A metric prefixed with '~' (e.g. "~80%") is a real, source-profile figure
+    meant to be kept verbatim — only bare/fabricated metrics are stripped.
+    """
     if not text:
         return text
-    cleaned = re.sub(r"[+-]?\d+[\.,]?\d*\s*%", "", text)
+    cleaned = re.sub(r"(?<!~)\b[+-]?\d+[\.,]?\d*\s*%", "", text)
     cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
     return cleaned
 
@@ -286,9 +290,8 @@ def _strip_years_and_metrics(text: str | list[str]) -> str | list[str]:
     )
     cleaned = re.sub(r"\b(plus de |more than |over )?\d+\+?\s+years?\b[^,.]*",
                      "", cleaned, flags=re.IGNORECASE)
-    # Remove numeric % metrics
-    cleaned = re.sub(r"[+-]?\d+[\.,]?\d*\s*%", "", cleaned)
-    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+    # Remove fabricated % metrics — but keep '~'-prefixed ones (real, sourced figures).
+    cleaned = _strip_metrics_in_summary(cleaned)
     # Remove leftover sentence fragments starting with comma/and
     cleaned = re.sub(r"^[,\s]+", "", cleaned)
     return cleaned
