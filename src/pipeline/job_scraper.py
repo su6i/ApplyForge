@@ -9,6 +9,7 @@ Returns a JobPosting dataclass with url, title (best-effort), and body text.
 """
 from __future__ import annotations
 
+import io
 import re
 import time
 from dataclasses import dataclass, field
@@ -20,8 +21,15 @@ from bs4 import BeautifulSoup
 from src.core.logger import logger
 
 
+class JobScrapeError(Exception):
+    """Raised when a job posting cannot be turned into usable text — abort before any LLM call."""
+
+
 # Minimum meaningful character count before we suspect the page is JS-rendered.
 _MIN_BODY_LENGTH = 300
+
+# Minimum extracted-text length before we trust a PDF was parsed correctly.
+_MIN_PDF_TEXT_LENGTH = 30
 
 # Tags whose text is never useful (navigation, scripts, styles, …)
 _NOISE_TAGS = {"script", "style", "noscript", "header", "footer", "nav", "aside"}
@@ -89,7 +97,49 @@ def _scrape_with_requests(url: str) -> JobPosting:
         logger.error(f"requests failed for {url}: {exc}")
         return JobPosting(url=url)
 
+    if _looks_like_pdf(resp):
+        return _parse_pdf(url, resp.content)
+
     return _parse_html(url, resp.text)
+
+
+# ─── PDF parsing ───────────────────────────────────────────────────────────────
+
+def _looks_like_pdf(resp: requests.Response) -> bool:
+    """Detect a PDF response by Content-Type header or magic bytes (%PDF-)."""
+    content_type = resp.headers.get("Content-Type", "").lower()
+    if "application/pdf" in content_type:
+        return True
+    return resp.content[:5] == b"%PDF-"
+
+
+def _parse_pdf(url: str, content: bytes) -> JobPosting:
+    """Extract text from a PDF job posting via pdfminer.six.
+
+    Raises JobScrapeError if extraction fails or yields no usable text —
+    the caller must abort before any LLM call rather than proceed with garbage.
+    """
+    try:
+        from pdfminer.high_level import extract_text as _pdf_extract
+    except ImportError as exc:
+        raise JobScrapeError(
+            "pdfminer.six is required for PDF job postings: uv add pdfminer-six"
+        ) from exc
+
+    try:
+        text = _pdf_extract(io.BytesIO(content)) or ""
+    except Exception as exc:
+        raise JobScrapeError(f"Could not extract text from PDF job posting {url!r}: {exc}") from exc
+
+    body = _clean_text(text)
+    if len(body) < _MIN_PDF_TEXT_LENGTH:
+        raise JobScrapeError(
+            f"PDF job posting {url!r} yielded no usable text ({len(body)} chars) — aborting."
+        )
+
+    title = next((line.strip() for line in body.splitlines() if line.strip()), "")
+    logger.info(f"Extracted {len(body)} chars from PDF job posting: {url!r}")
+    return JobPosting(url=url, title=title, body=body)
 
 
 # ─── Playwright fallback ──────────────────────────────────────────────────────
