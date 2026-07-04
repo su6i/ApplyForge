@@ -138,6 +138,7 @@ TODO.md
 !tests/test_roles.py
 !tests/test_content_tailor.py
 !tests/test_job_scraper.py
+!tests/test_main_diagnostics.py
 
 # constitution is symlinked by install.sh (single source of truth, never a submodule)
 .agent/constitution

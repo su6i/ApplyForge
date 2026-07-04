@@ -156,28 +156,69 @@ def cmd_init_profile(cv_path: str | None = None) -> None:
     print(f"   Proj  : {len(profile.get('projects', []))} projects\n")
 
 
+def _llm_status(model: str, deepseek_key: str, openai_key: str, gemini_key: str) -> dict:
+    """Resolve which LLM provider will actually be used, mirroring src/core/llm_factory.py
+    (DeepSeek wins if its key is set, regardless of LLM_MODEL string; else OpenAI; Gemini is
+    an independent fallback)."""
+    if deepseek_key:
+        provider, key_ok = "DeepSeek", True
+    elif openai_key:
+        provider, key_ok = "OpenAI", True
+    else:
+        provider, key_ok = "none", False
+    return {
+        "provider": provider,
+        "model": model,
+        "key_ok": key_ok,
+        "fallback_ok": bool(gemini_key),
+    }
+
+
+def _profile_status(lang: str = "en", roles: list[str] | None = None, path_fn=None) -> dict[str, bool]:
+    """Check the vault's role source profiles ({slug}-CV_<Role>_source.json), not the
+    legacy data/resume_profile.json path."""
+    from src.core import roles as roles_registry
+    from src.pipeline.resume_loader import get_profile_path
+
+    roles = roles if roles is not None else roles_registry.canonical_keys()
+    path_fn = path_fn or get_profile_path
+    return {role: path_fn(role, lang=lang).exists() for role in roles}
+
+
 def cmd_test() -> None:
     """Print current configuration and check dependencies."""
     from src.core.settings import (
         COVER_LETTERS_DIR,
+        DATA_DIR,
+        DEEPSEEK_API_KEY,
+        GEMINI_API_KEY,
         LLM_MODEL,
         OPENAI_API_KEY,
         TELEGRAM_BOT_TOKEN,
         TEMPLATES_LATO,
         TEMPLATES_SHARED,
-        REPO_ROOT,
     )
 
-    profile_path = REPO_ROOT / "data" / "resume_profile.json"
+    llm = _llm_status(LLM_MODEL, DEEPSEEK_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY)
+    profiles = _profile_status()
+    found = sum(profiles.values())
 
-    print("\n── Settings ────────────────────────────────────────────────")
-    print(f"  LLM model         : {LLM_MODEL}")
-    print(f"  OpenAI key set    : {'yes' if OPENAI_API_KEY else 'NO — set OPENAI_API_KEY in .env'}")
+    print("\n── Settings ──────────────────────────────────────")
+    print(f"  LLM model         : {llm['model']}")
+    if llm["key_ok"]:
+        print(f"  LLM provider key  : yes ({llm['provider']})")
+    else:
+        print("  LLM provider key  : NO — set DEEPSEEK_API_KEY or OPENAI_API_KEY in the vault .env")
+    print(f"  Gemini fallback   : {'yes' if llm['fallback_ok'] else 'no (optional)'}")
     print(f"  Telegram token set: {'yes' if TELEGRAM_BOT_TOKEN else 'NO — set TELEGRAM_BOT_TOKEN in .env'}")
     print(f"  templates/lato    : {'\u2713' if TEMPLATES_LATO.exists() else '\u2717  NOT FOUND'} ({TEMPLATES_LATO})")
     print(f"  templates/shared  : {'\u2713' if TEMPLATES_SHARED.exists() else '\u2717  NOT FOUND'} ({TEMPLATES_SHARED})")
     print(f"  cover_letters/    : {'\u2713' if COVER_LETTERS_DIR.exists() else '\u2717  NOT FOUND'} ({COVER_LETTERS_DIR})")
-    print(f"  resume_profile    : {'\u2713' if profile_path.exists() else '\u2717  NOT FOUND — run: python main.py init-profile'} ({profile_path})")
+    print(f"  role source profiles: {found}/{len(profiles)} found in {DATA_DIR}")
+    if not found:
+        print("    NOT FOUND — run: uv run main.py init-profile")
+    for role, exists in sorted(profiles.items()):
+        print(f"    {'\u2713' if exists else '\u2717'} {role}")
 
     try:
         import subprocess
