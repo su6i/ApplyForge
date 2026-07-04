@@ -520,6 +520,14 @@ def _section_projects(projects: list[dict], language: str) -> str:
         res = res[:-len(sep)]
     return res + "\n\n"
 
+_SKILL_CATEGORY_ICONS = {
+    "ai_ml": r"\faRobot",
+    "mlops_devops": r"\faCloud",
+    "networks_support": r"\faNetworkWired",
+    "data": r"\faChartLine",
+}
+
+
 def _section_skills(
     skills_dict: dict,
     tailored_skills: list[str],
@@ -556,7 +564,8 @@ def _section_skills(
         cat_skills = skills_dict.get(key, [])
         filtered = [s for s in cat_skills if s not in already_shown]
         if filtered:
-            items.append(f"\\cvachievement{{\\faCode}}{{{label}}}{{{latex_escape(', '.join(filtered[:6]))}}}\\par")
+            icon = _SKILL_CATEGORY_ICONS.get(key, r"\faCode")
+            items.append(f"\\cvachievement{{{icon}}}{{{label}}}{{{latex_escape(', '.join(filtered[:6]))}}}\\par")
             items.append(SKILLS_CATEGORY_VERTICAL_SPACING)
 
     return "\n".join(items) + "\n\n"
