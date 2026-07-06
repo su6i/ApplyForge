@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, patch
 # Allow running directly (python tests/test_job_scraper.py) from anywhere.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.pipeline.job_scraper import JobScrapeError, _scrape_with_requests
+from src.pipeline.job_scraper import JobScrapeError, _parse_html, _scrape_with_requests, _strip_trailing_noise
 
 
 def _make_minimal_pdf(text: str) -> bytes:
@@ -92,6 +92,40 @@ def test_pdf_extraction_failure_aborts_before_llm_call():
             assert "pdf" in str(exc).lower()
         else:
             raise AssertionError("expected JobScrapeError for unparseable PDF")
+
+
+def test_strip_trailing_noise_cuts_france_travail_related_offers():
+    # Regression: a France Travail "related offers" sidebar once contained an
+    # unrelated "Technicien système (H/F)" listing, which falsely triggered
+    # technicien_adapter.is_technicien_tier() on an unrelated Cadre-tier
+    # DevOps posting because the keyword scan saw the whole scraped body.
+    body = (
+        "Descriptif du poste: Ingénieur DevOps, CDI, Cadre.\n"
+        "D'autres offres peuvent vous intéresser :\n"
+        "Technicien système (H/F)\nARTEMYS\n"
+    )
+    cleaned = _strip_trailing_noise(body)
+    assert "Technicien" not in cleaned
+    assert "Ingénieur DevOps" in cleaned
+
+
+def test_strip_trailing_noise_leaves_clean_text_untouched():
+    body = "Descriptif du poste: Ingénieur DevOps, CDI, Cadre."
+    assert _strip_trailing_noise(body) == body
+
+
+def test_parse_html_excludes_related_offers_from_body():
+    html = (
+        "<html><head><title>Offre</title></head><body>"
+        "<h1>Offre</h1>"
+        "<p>Descriptif du poste: Ingénieur DevOps, CDI, Cadre.</p>"
+        "<p>D'autres offres peuvent vous intéresser :</p>"
+        "<p>Technicien système (H/F) — ARTEMYS</p>"
+        "</body></html>"
+    )
+    posting = _parse_html("https://candidat.francetravail.fr/offres/x", html)
+    assert "Technicien" not in posting.body
+    assert "Ingénieur DevOps" in posting.body
 
 
 def _run_all() -> int:

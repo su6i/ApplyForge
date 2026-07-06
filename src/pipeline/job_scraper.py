@@ -268,8 +268,10 @@ def _parse_html(url: str, html: str) -> JobPosting:
     if h1:
         title = h1.get_text(separator=" ", strip=True)
 
-    # Body text: join all visible text, collapse whitespace
+    # Body text: join all visible text, strip trailing "related offers"/help
+    # noise, collapse whitespace
     raw_text = soup.get_text(separator="\n", strip=True)
+    raw_text = _strip_trailing_noise(raw_text)
     body = _clean_text(raw_text)
     apply_url = _extract_apply_url(url, soup)
 
@@ -299,3 +301,29 @@ def _clean_text(text: str) -> str:
     # Collapse horizontal whitespace
     text = re.sub(r"[ \t]{2,}", " ", text)
     return text.strip()
+
+
+# Boilerplate markers where job boards start listing unrelated "similar/related
+# offers" or generic site help text — never part of the actual posting. Left
+# in, this noise can (a) inflate token cost / dilute the LLM's tailoring
+# context, and (b) spuriously trigger keyword-based heuristics downstream —
+# e.g. a France Travail "D'autres offres..." sidebar once contained an
+# unrelated "Technicien" job title, which falsely triggered
+# technicien_adapter.is_technicien_tier() on an unrelated Cadre-tier posting.
+_TRAILING_NOISE_MARKERS: tuple[str, ...] = (
+    "D'autres offres peuvent vous intéresser",  # France Travail
+    "Offres similaires",                          # generic FR job boards
+    "Vous pourriez également être intéressé",     # generic FR job boards
+)
+
+
+def _strip_trailing_noise(text: str) -> str:
+    """Cut the body at the first known 'related offers'/help-boilerplate
+    marker, if present. These markers reliably sit after the real posting
+    content, so truncating there is safe."""
+    cut_at = len(text)
+    for marker in _TRAILING_NOISE_MARKERS:
+        idx = text.find(marker)
+        if idx != -1:
+            cut_at = min(cut_at, idx)
+    return text[:cut_at].rstrip()
