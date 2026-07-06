@@ -1,6 +1,6 @@
 <div align="center">
   <img src="assets/project_logo.jpg" width="350" alt="ApplyForge Logo">
-  <h1>ApplyForge - Automated CV &amp; Cover Letter Crafter</h1>
+  <h1>ApplyForge - Apply Pipeline: Discover, Tailor, Apply, Track</h1>
 
   <br>
 
@@ -10,7 +10,9 @@
 </div>
 
 **What it does:** You send a job posting link — the system reads it, picks the right CV,
-writes a personalised cover letter, and delivers two ready-to-send PDFs.
+writes a personalised cover letter, and delivers two ready-to-send PDFs. It also tracks
+every PhD/job application end-to-end: Gmail sync, a terminal TUI, and a local web
+dashboard, all backed by a SQLite tracker (see [Application Tracker](#application-tracker)).
 
 ---
 
@@ -309,6 +311,39 @@ Key ROME codes for data jobs:
 
 **Note:** France Travail uses non-breaking spaces as thousands separators (`"3 830"`).
 The scraper strips all non-digit characters before parsing numbers.
+
+---
+
+## Application Tracker
+
+`src/apply_tracker/` tracks every PhD/job application from first sighting to reply,
+in a SQLite DB (`tracker.db`) mirrored to per-track `tracking.json` files. It's
+CLI-agnostic — the same `src/apply_tracker/service.py` business layer backs three
+interfaces, invoked here directly with `uv run python -m`:
+
+```bash
+# Web dashboard (localhost:8765, auto-reload)
+uv run python -m src.apply_tracker.web ~/@-Amir/Apply/2026-2027 8765
+
+# Terminal TUI (arrow-key navigation)
+uv run python -m src.apply_tracker.tui ~/@-Amir/Apply/2026-2027 phd
+
+# Gmail sync — pulls [AMIR-SYNC] tagged position emails into the tracker
+uv run python -c "
+from pathlib import Path
+from src.apply_tracker.gmail_sync import fetch_and_process
+print(fetch_and_process(Path.home() / '@-Amir/Apply/2026-2027'))
+"
+
+# Quick stats
+uv run python -m src.apply_tracker.stats_cli ~/@-Amir/Apply/2026-2027
+```
+
+The `amir` CLI (separate repo, `amir-cli`) wraps these as `amir apply web|tui|sync|stats|alert`
+and `amir phd`/`amir job` — same wrap pattern as `amir apply <url>` forwarding to
+`main.py apply` in this repo. The application data itself (tracking.json, tracker.db,
+found/applied position files) lives outside this repo, in the personal-data vault
+(`~/@-Amir/Apply/2026-2027` by default, override with `APPLY_BASE_DIR`) — never committed.
 
 ---
 

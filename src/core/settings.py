@@ -44,6 +44,9 @@ FALLBACK_MODEL: str = os.getenv("FALLBACK_MODEL", "gemini-1.5-flash")
 TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
 
+# ─── Apply Tracker ────────────────────────────────────────────────────────────
+ALERT_TO_EMAIL: str = os.getenv("ALERT_TO_EMAIL", "")
+
 # ─── Behaviour ────────────────────────────────────────────────────────────────
 # When True: applications are archived immediately without asking for approval.
 AUTO_APPLY: bool = os.getenv("AUTO_APPLY", "false").lower() == "true"

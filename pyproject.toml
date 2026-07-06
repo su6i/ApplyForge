@@ -6,6 +6,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "beautifulsoup4>=4.12",
+    "fastapi>=0.136.3",  # apply_tracker web UI
+    "google-api-python-client>=2.169.0",  # apply_tracker gmail_sync
+    "google-auth-httplib2>=0.2.0",  # apply_tracker gmail_sync
+    "google-auth-oauthlib>=1.2.0",  # apply_tracker gmail_sync
     "langchain-core>=0.2",
     "langchain-google-genai>=4.2.1",
     "langchain-openai>=0.1",
@@ -16,10 +20,13 @@ dependencies = [
     "playwright>=1.60.0",
     "pytesseract>=0.3",
     "python-dotenv>=1.0",
+    "python-multipart>=0.0.30",  # apply_tracker web UI (fastapi Form)
     "python-telegram-bot>=21.0",
     "pyyaml>=6.0",  # Roles Registry (config/roles.yaml)
     "requests>=2.32",
     "selenium>=4.9",
+    "textual>=8.2.7",  # apply_tracker tui
+    "uvicorn[standard]>=0.48.0",  # apply_tracker web UI
     "webdriver-manager>=4.0",
 ]
 
