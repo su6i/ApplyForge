@@ -13,9 +13,19 @@ from __future__ import annotations
 import re
 from copy import deepcopy
 
-# Keywords in job posting body that identify technicien-tier roles
-_TECHNICIEN_SIGNALS = [
-    "technicien", "technicienne",
+# "technicien"/"technicienne" in the job TITLE is a strong, direct signal.
+# In the BODY it is not: France Travail postings carry a structured
+# "Qualification : Technicien" administrative/collective-bargaining pay-grade
+# field that has nothing to do with the job's actual required education level
+# (a "DevOps Junior" role can be pay-graded "Technicien" while still doing
+# real Ansible/Terraform/Docker engineering work) — and the same bare keyword
+# also matched an unrelated "Technicien système (H/F)" title that leaked in
+# from a scraped "related offers" sidebar on a different, Cadre-graded
+# posting. Both false positives were found live (2026-07-06). Body-wide
+# matching now requires a signal that actually describes the required level,
+# not an HR pay-grade label or scraper noise.
+_TECHNICIEN_TITLE_SIGNALS = ["technicien", "technicienne"]
+_TECHNICIEN_BODY_SIGNALS = [
     "catégorie b", "cat. b", "catégorie b ",
     "bac+2", "bac+3", "bac + 2", "bac + 3",
     "assistant informatique", "aide-technicien",
@@ -50,8 +60,10 @@ def is_technicien_tier(body: str, title: str = "") -> bool:
     title_lower = title.lower()
     if any(kw in title_lower for kw in ["ingénieur", "architecte", "développeur", "developer", "engineer"]):
         return False
+    if any(sig in title_lower for sig in _TECHNICIEN_TITLE_SIGNALS):
+        return True
     body_lower = body.lower()
-    return any(sig in body_lower for sig in _TECHNICIEN_SIGNALS)
+    return any(sig in body_lower for sig in _TECHNICIEN_BODY_SIGNALS)
 
 
 def apply(profile: dict, content) -> tuple[dict, object]:

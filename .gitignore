@@ -101,7 +101,7 @@ log/
 *.tmp
 scratch*.py
 test_*.tex
-test_*.py
+/test_*.py
 *_mock.py
 run_mock.py
 *_draft.*
