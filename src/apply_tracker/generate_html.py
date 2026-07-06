@@ -5,6 +5,8 @@ import json
 from datetime import date, datetime
 from pathlib import Path
 
+from src.core.settings import OWNER_DISPLAY_NAME
+
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -258,7 +260,7 @@ def generate_html(search_dir: Path, track: str) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suivi Candidatures PhD — {track_label} — Amir SHIRALI POUR</title>
+<title>Suivi Candidatures PhD — {track_label} — {OWNER_DISPLAY_NAME}</title>
 <style>{CSS}</style>
 </head>
 <body>
@@ -266,7 +268,7 @@ def generate_html(search_dir: Path, track: str) -> str:
 <header>
   <div>
     <h1>🤖 Suivi Candidatures PhD — {track_label}</h1>
-    <div class="meta">Amir SHIRALI POUR — LLMs · Multi-Agent Systems · RAG · NLP Track</div>
+    <div class="meta">{OWNER_DISPLAY_NAME} — LLMs · Multi-Agent Systems · RAG · NLP Track</div>
   </div>
   <div class="date">
     Dernière mise à jour<br><strong>{today_str}</strong>
@@ -313,7 +315,7 @@ def generate_html(search_dir: Path, track: str) -> str:
 
 </div>
 
-<footer>Amir SHIRALI POUR · Candidatures PhD {track_label} 2026–2027 · Mis à jour le {today_str}</footer>
+<footer>{OWNER_DISPLAY_NAME} · Candidatures PhD {track_label} 2026–2027 · Mis à jour le {today_str}</footer>
 </body>
 </html>"""
 
@@ -433,7 +435,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suivi Candidatures Job — {track_label} — Amir SHIRALI POUR</title>
+<title>Suivi Candidatures Job — {track_label} — {OWNER_DISPLAY_NAME}</title>
 <style>{CSS}</style>
 </head>
 <body>
@@ -441,7 +443,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
 <header>
   <div>
     <h1>💼 Suivi Candidatures Job — {track_label}</h1>
-    <div class="meta">Amir SHIRALI POUR — Python · DevOps · AI/ML · France</div>
+    <div class="meta">{OWNER_DISPLAY_NAME} — Python · DevOps · AI/ML · France</div>
   </div>
   <div class="date">
     Dernière mise à jour<br><strong>{today_str}</strong>
@@ -488,7 +490,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
 
 </div>
 
-<footer>Amir SHIRALI POUR · Candidatures Job {track_label} 2026–2027 · Mis à jour le {today_str}</footer>
+<footer>{OWNER_DISPLAY_NAME} · Candidatures Job {track_label} 2026–2027 · Mis à jour le {today_str}</footer>
 </body>
 </html>"""
 

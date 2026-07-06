@@ -53,6 +53,7 @@ AUTO_APPLY: bool = os.getenv("AUTO_APPLY", "false").lower() == "true"
 
 # ─── Owner identity (used for generated filenames — keep generic for public repo)
 CV_OWNER_SLUG: str = os.getenv("CV_OWNER_SLUG", "cv-owner")
+OWNER_DISPLAY_NAME: str = os.getenv("OWNER_DISPLAY_NAME") or CV_OWNER_SLUG.replace("_", " ").replace("-", " ")
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 # Personal data → vault; template code stays in the repo.

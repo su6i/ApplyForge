@@ -13,6 +13,7 @@ from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 import uvicorn
 
+from src.core.settings import OWNER_DISPLAY_NAME
 from src.apply_tracker.service import (
     get_positions, get_stats, get_countries,
     mark_sent, mark_status,
@@ -199,7 +200,7 @@ def _page(content: str, active: str = "phd", flash: str = "", flash_type: str = 
   </nav>
 </header>
 <div class="container">{flash_html}{content}</div>
-<footer>Amir SHIRALI POUR · Apply Tracker · {today}</footer>
+<footer>{OWNER_DISPLAY_NAME} · Apply Tracker · {today}</footer>
 <script>
 const fi=document.getElementById('lf');
 if(fi) fi.addEventListener('input',()=>{{
