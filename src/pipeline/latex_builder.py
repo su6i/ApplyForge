@@ -93,8 +93,8 @@ def build(
     output_dir = _create_output_dir(content, role)
     logger.info(f"Application output dir: {output_dir}")
 
-    cv_pdf = _build_cv(role, content, output_dir, profile, template)
-    cl_pdf = _build_cover_letter(role, content, output_dir)
+    cv_pdf = _build_cv(role, content, output_dir, profile, template, job_url)
+    cl_pdf = _build_cover_letter(role, content, output_dir, job_url)
     cl_short_txt = _write_short_cover_letter(role, content, output_dir)
 
     if job_posting and job_url:
@@ -205,7 +205,7 @@ def build_spontaneous(
 
 # ─── CV compilation ───────────────────────────────────────────────────────────
 
-def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profile: dict | None, template: str = "altacv") -> Path:
+def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profile: dict | None, template: str = "altacv", job_url: str = "") -> Path:
     """
     Generate a tailored CV .tex via cv_renderer (or copy template if no profile),
     then compile with pdflatex. Returns path to the generated PDF.
@@ -227,6 +227,20 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
             from src.pipeline import cv_renderer
             cv_tex_content = cv_renderer.render(profile, content)
         else:
+            # altacv's header prints a literal \location{...} from
+            # identity.location at render time — it never reads the
+            # \cvlocation macro, so the location override below (which only
+            # patches that macro) is a no-op for this template. Override a
+            # copy of the profile's identity here so the header actually
+            # reflects the job-aware city (France Travail source/Occitanie →
+            # Montpellier, else REDACTED-CITY).
+            from src.core.location_utils import select_cv_city
+            city = select_cv_city(
+                getattr(content, "job_location", "") or "",
+                str(getattr(content, "language", "fr") or "fr"),
+                job_url,
+            )
+            profile = {**profile, "identity": {**profile.get("identity", {}), "location": city}}
             from src.pipeline import altacv_renderer
             cv_tex_content = altacv_renderer.render(profile, content)
         cv_tex_path.write_text(cv_tex_content, encoding="utf-8")
@@ -238,8 +252,8 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
              raise FileNotFoundError(f"CV template not found: {src_tex}")
         shutil.copy2(src_tex, cv_tex_path)
 
-    # Inject \cvlocation override based on job location (Occitanie → Montpellier, else REDACTED-CITY)
-    _inject_cv_location(cv_tex_path, content)
+    # Inject \cvlocation override (France Travail/Occitanie → Montpellier, else REDACTED-CITY)
+    _inject_cv_location(cv_tex_path, content, job_url)
 
     # Quality check before burning compile time
     verify_tex_files(cv_tex_path)
@@ -286,13 +300,14 @@ def _strip_providecommands(tex_path: Path) -> None:
     tex_path.write_text(tex, encoding="utf-8")
 
 
-def _inject_location_override(tex_path: Path, job_location: str, language: str) -> None:
+def _inject_location_override(tex_path: Path, job_location: str, language: str, job_url: str = "") -> None:
     """
     Inject \\renewcommand{\\cvlocation}{...} right after \\begin{document}.
-    Occitanie region → Montpellier, everywhere else → REDACTED-CITY.
+    France Travail source → Montpellier, Occitanie region → Montpellier,
+    everywhere else → REDACTED-CITY.
     """
     from src.core.location_utils import select_cv_city
-    city = select_cv_city(job_location, language)
+    city = select_cv_city(job_location, language, job_url)
     override = (
         f"\\providecommand{{\\cvlocation}}{{}}\n"
         f"\\renewcommand{{\\cvlocation}}{{{city}}}  % auto: {job_location or 'unknown'}\n"
@@ -302,14 +317,15 @@ def _inject_location_override(tex_path: Path, job_location: str, language: str) 
         return
     tex = tex.replace("\\begin{document}", "\\begin{document}\n" + override, 1)
     tex_path.write_text(tex, encoding="utf-8")
-    logger.debug(f"CV location set to {city!r} (job_location={job_location!r})")
+    logger.debug(f"Location set to {city!r} (job_location={job_location!r}, job_url={job_url!r})")
 
 
-def _inject_cv_location(tex_path: Path, content: TailoredContent) -> None:
+def _inject_cv_location(tex_path: Path, content: TailoredContent, job_url: str = "") -> None:
     _inject_location_override(
         tex_path,
         job_location=getattr(content, "job_location", "") or "",
         language=str(getattr(content, "language", "fr") or "fr"),
+        job_url=job_url,
     )
 
 
@@ -345,7 +361,7 @@ def _copy_deps(output_dir: Path, template: str = "altacv") -> None:
 
 # ─── Cover letter compilation ─────────────────────────────────────────────────
 
-def _build_cover_letter(role: RoleType, content: TailoredContent, output_dir: Path) -> Path:
+def _build_cover_letter(role: RoleType, content: TailoredContent, output_dir: Path, job_url: str = "") -> Path:
     """
     Instantiate the cover letter template (fill in \newcommand values),
     write it to output_dir, compile with xelatex.
@@ -365,6 +381,16 @@ def _build_cover_letter(role: RoleType, content: TailoredContent, output_dir: Pa
     cl_tex_name = f"{CV_OWNER_SLUG}-{cl_label}_{role_label}_{lang_tag}.tex"
     cl_tex_path = output_dir / cl_tex_name
     cl_tex_path.write_text(filled_text, encoding="utf-8")
+
+    # Cover letter previously always used personal_data.tex's static \cvlocation
+    # default (never varied per job). Apply the same override as the CV
+    # (France Travail source / Occitanie → Montpellier, else REDACTED-CITY).
+    _inject_location_override(
+        cl_tex_path,
+        job_location=getattr(content, "job_location", "") or "",
+        language=str(getattr(content, "language", "fr") or "fr"),
+        job_url=job_url,
+    )
 
     # Quality check: verify filled cover letter before compilation
     verify_tex_files(cl_tex_path)

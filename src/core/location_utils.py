@@ -2,10 +2,19 @@
 location_utils.py — Detect job location region and select the matching CV city.
 
 Rule:
-  Occitanie region → Montpellier
-  Anywhere else    → REDACTED-CITY
+  Job posted on France Travail → Montpellier (owner's registered jobseeker
+                                  domicile there — must stay consistent
+                                  regardless of the job's own city)
+  Occitanie region              → Montpellier
+  Anywhere else                 → REDACTED-CITY
 """
 from __future__ import annotations
+
+# Job-board domains where the owner is registered under a specific commune —
+# that registration must win over the job's own location.
+_FRANCE_TRAVAIL_DOMAINS: frozenset[str] = frozenset({
+    "francetravail.fr", "pole-emploi.fr",
+})
 
 # Occitanie departments (INSEE codes) and their main cities
 _OCCITANIE_CITIES: frozenset[str] = frozenset({
@@ -64,13 +73,24 @@ def is_occitanie(job_location: str) -> bool:
     return False
 
 
-def select_cv_city(job_location: str, language: str = "fr") -> str:
+def is_france_travail(job_url: str) -> bool:
+    """Return True if the job posting comes from France Travail / Pôle Emploi."""
+    if not job_url:
+        return False
+    from urllib.parse import urlparse
+    netloc = urlparse(job_url.lower()).netloc
+    return any(domain in netloc for domain in _FRANCE_TRAVAIL_DOMAINS)
+
+
+def select_cv_city(job_location: str, language: str = "fr", job_url: str = "") -> str:
     """
     Return the city string to use in \\cvlocation based on job location.
 
-    Occitanie → Montpellier
-    Elsewhere  → REDACTED-CITY
+    France Travail source → Montpellier (owner's registered domicile there,
+                             must stay consistent regardless of job city)
+    Occitanie region       → Montpellier
+    Elsewhere              → REDACTED-CITY
     """
-    if is_occitanie(job_location):
+    if is_france_travail(job_url) or is_occitanie(job_location):
         return "Montpellier, mobile en France" if language == "fr" else "Montpellier, France"
     return "REDACTED-CITY, mobile en France" if language == "fr" else "REDACTED-CITY, France"
