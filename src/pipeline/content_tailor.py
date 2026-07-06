@@ -108,6 +108,12 @@ EXACTLY these keys (no extras, no markdown fences):
 }}
 
 Selection rules:
+- Company name consistency (STRICT): pick ONE company/employer name for `company_name`
+  and reuse that EXACT same name every time you refer to the employer in `cl_intro` and
+  `why_this_company`. If the posting mentions two names (e.g. a legal entity and a
+  trading/brand name, or a staffing agency and its end client), pick the one that
+  appears to be the actual recruiting/signing employer and use it consistently —
+  never switch names mid-letter.
 - selected_experience: You MUST include ALL jobs from the `experience` list. Do NOT drop any job.
   Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.
   * Adjust highlights to focus heavily on aspects relevant to this specific job.
@@ -218,20 +224,21 @@ def tailor(
     logger.debug(f"Raw LLM output: {raw}")
 
     data = _parse_json(raw)
+    known_metrics = _extract_known_metrics(resume_profile)
     content = TailoredContent(
         company_name=data.get("company_name", "Unknown Company"),
         position_title=data.get("position_title", "Unknown Position"),
         language=data.get("language", "fr"),        # type: ignore[arg-type]
         variant=data.get("variant", role),
-        why_this_company=_strip_years_and_metrics(data.get("why_this_company", "")),
+        why_this_company=_strip_years_and_metrics(data.get("why_this_company", ""), known_metrics),
         match_score=int(data.get("match_score", 0)),
         tailored_skills=data.get("tailored_skills", []),
-        cv_summary=_strip_years_and_metrics(data.get("cv_summary", "")),
+        cv_summary=_strip_years_and_metrics(data.get("cv_summary", ""), known_metrics),
         selected_experience=data.get("selected_experience", []),
         selected_projects=data.get("selected_projects", []),
         job_location=data.get("job_location", ""),
-        cl_intro=_strip_years_and_metrics(data.get("cl_intro", "")),
-        cl_body=_strip_years_and_metrics(data.get("cl_body", "")),
+        cl_intro=_strip_years_and_metrics(data.get("cl_intro", ""), known_metrics),
+        cl_body=_strip_years_and_metrics(data.get("cl_body", ""), known_metrics),
         extra_education=data.get("extra_education", []),
         selected_education=data.get("selected_education", []),
         cv_tagline=data.get("cv_tagline", ""),
@@ -262,23 +269,47 @@ def _parse_json(raw: str) -> dict:
         return {}
 
 
-def _strip_metrics_in_summary(text: str) -> str:
-    """Remove numeric performance metrics from profile summary paragraph.
+def _extract_known_metrics(source_text: str) -> set[str]:
+    """Collect every sourced percentage figure (bare digits) from the candidate
+    profile text, so real numbers survive stripping even if the LLM drops the
+    '~' marker while paraphrasing (e.g. rewriting "~80%" as plain "80%")."""
+    if not source_text:
+        return set()
+    return set(re.findall(r"\d+[\.,]?\d*(?=\s*%)", source_text))
 
-    A metric prefixed with '~' (e.g. "~80%") is a real, source-profile figure
-    meant to be kept verbatim — only bare/fabricated metrics are stripped.
+
+def _strip_metrics_in_summary(text: str, known_metrics: set[str] | None = None) -> str:
+    """Remove fabricated numeric performance metrics from generated text.
+
+    A metric is kept if its digits match a genuine figure from the source
+    profile (``known_metrics``) — regardless of whether the LLM reproduced the
+    '~' marker — or, failing that, if it's still tilde-prefixed in the output.
+    Anything else is treated as fabricated and stripped.
     """
     if not text:
         return text
-    cleaned = re.sub(r"(?<!~)\b[+-]?\d+[\.,]?\d*\s*%", "", text)
+    known_metrics = known_metrics or set()
+
+    def _replace(match: re.Match) -> str:
+        if match.group("tilde") or match.group("digits") in known_metrics:
+            return match.group(0)
+        return ""
+
+    cleaned = re.sub(
+        r"(?P<tilde>~)?\b[+-]?(?P<digits>\d+[\.,]?\d*)\s*%",
+        _replace,
+        text,
+    )
     cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
     return cleaned
 
 
-def _strip_years_and_metrics(text: str | list[str]) -> str | list[str]:
-    """Remove years-of-experience mentions and numeric metrics."""
+def _strip_years_and_metrics(
+    text: str | list[str], known_metrics: set[str] | None = None
+) -> str | list[str]:
+    """Remove years-of-experience mentions and fabricated numeric metrics."""
     if isinstance(text, list):
-        return [_strip_years_and_metrics(t) for t in text] # type: ignore
+        return [_strip_years_and_metrics(t, known_metrics) for t in text]  # type: ignore
     if not text:
         return text
     # Remove patterns like "7 ans d'expérience", "plus de 7 ans", "7+ years", "more than 7 years"
@@ -290,8 +321,8 @@ def _strip_years_and_metrics(text: str | list[str]) -> str | list[str]:
     )
     cleaned = re.sub(r"\b(plus de |more than |over )?\d+\+?\s+years?\b[^,.]*",
                      "", cleaned, flags=re.IGNORECASE)
-    # Remove fabricated % metrics — but keep '~'-prefixed ones (real, sourced figures).
-    cleaned = _strip_metrics_in_summary(cleaned)
+    # Remove fabricated % metrics — real, sourced figures are kept (see above).
+    cleaned = _strip_metrics_in_summary(cleaned, known_metrics)
     # Remove leftover sentence fragments starting with comma/and
     cleaned = re.sub(r"^[,\s]+", "", cleaned)
     return cleaned
