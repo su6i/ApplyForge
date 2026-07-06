@@ -229,11 +229,12 @@ class ApplicationService:
 
         logger.info(
             f"Application generated:\n"
-            f"  CV          : {bundle.cv_pdf}\n"
-            f"  Cover letter: {bundle.cl_pdf}\n"
-            f"  Folder      : {bundle.output_dir}\n"
-            f"  Match score : {content.match_score}/100\n"
-            f"  Top skills  : {', '.join(content.tailored_skills[:5])}"
+            f"  CV                : {bundle.cv_pdf}\n"
+            f"  Cover letter      : {bundle.cl_pdf}\n"
+            f"  Short letter (txt): {bundle.cl_short_txt}\n"
+            f"  Folder            : {bundle.output_dir}\n"
+            f"  Match score       : {content.match_score}/100\n"
+            f"  Top skills        : {', '.join(content.tailored_skills[:5])}"
         )
         return bundle
 

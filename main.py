@@ -82,9 +82,10 @@ def cmd_apply(
     # Success
     status = "(fallback: offline dictionary)" if used_fallback else "(LLM)"
     print(f"\n✅  Application bundle generated {status}:")
-    print(f"   CV          : {bundle.cv_pdf}")
-    print(f"   Cover letter: {bundle.cl_pdf}")
-    print(f"   Folder      : {bundle.output_dir}\n")
+    print(f"   CV                : {bundle.cv_pdf}")
+    print(f"   Cover letter      : {bundle.cl_pdf}")
+    print(f"   Short letter (txt): {bundle.cl_short_txt}")
+    print(f"   Folder            : {bundle.output_dir}\n")
 
 
 def cmd_spontaneous(

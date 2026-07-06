@@ -26,6 +26,10 @@ from src.pipeline.role_classifier import RoleType
 
 Language = Literal["fr", "en"]
 
+# Character-limited application portals (e.g. France Travail's "Lettre de
+# motivation" text box) cap pasted-in text at 1500 characters.
+SHORT_LETTER_CHAR_LIMIT = 1500
+
 
 @dataclass
 class TailoredContent:
@@ -44,6 +48,7 @@ class TailoredContent:
     job_location: str = ""   # City/region extracted from posting (drives \cvlocation selection)
     cl_intro: str = ""        # LLM-generated CL intro paragraph (diplôme + candidature + hook)
     cl_body: list[str] | str = "" # LLM-generated CL body paragraph(s) (key achievement relevant to THIS job)
+    cl_short: str = ""        # Standalone plain-text short letter for char-limited portals (e.g. France Travail ≤1500 chars)
     extra_education: list[dict] = field(default_factory=list)  # conditional education entries to add to CV
     selected_education: list[dict] = field(default_factory=list)  # profile education with optional trimmed honors
 
@@ -104,7 +109,8 @@ EXACTLY these keys (no extras, no markdown fences):
                 State the candidature for \\PositionTitle at \\CompanyName. \
                 Highlight the SPECIFIC skills/background that match THIS job — \
                 do NOT use a generic IT or AI paragraph; adapt to the actual job.>",
-  "cl_body": ["<First paragraph: Detail the 'Company Name' RAG and document analysis project.>", "<Second paragraph: Detail the multi-agent architecture projects ('ApplyForge', 'Su6i-Yar', or custom elevator project). Adapt the descriptions to match the required skills of THIS job.>"]
+  "cl_body": ["<First paragraph: Detail the 'Company Name' RAG and document analysis project.>", "<Second paragraph: Detail the multi-agent architecture projects ('ApplyForge', 'Su6i-Yar', or custom elevator project). Adapt the descriptions to match the required skills of THIS job.>"],
+  "cl_short": "<STANDALONE short cover letter, PLAIN TEXT (no LaTeX commands, no markdown, no line-break escapes) for pasting directly into an online application form's character-limited text box (e.g. France Travail caps this at 1500 characters INCLUDING spaces and the greeting/sign-off). Self-contained: opening greeting, one sentence on diploma/candidature for \\PositionTitle at \\CompanyName, ONE concrete relevant achievement (reuse a real sourced figure if one fits, never invent a new one), one short sentence on motivation for THIS company, and a polite closing + your name. STRICT HARD LIMIT: the entire text must be under 1500 characters — write concisely from the start, do not write a long version and expect it to be trimmed.>"
 }}
 
 Selection rules:
@@ -239,6 +245,9 @@ def tailor(
         job_location=data.get("job_location", ""),
         cl_intro=_strip_years_and_metrics(data.get("cl_intro", ""), known_metrics),
         cl_body=_strip_years_and_metrics(data.get("cl_body", ""), known_metrics),
+        cl_short=_enforce_char_limit(
+            _strip_years_and_metrics(data.get("cl_short", ""), known_metrics)
+        ),
         extra_education=data.get("extra_education", []),
         selected_education=data.get("selected_education", []),
         cv_tagline=data.get("cv_tagline", ""),
@@ -302,6 +311,21 @@ def _strip_metrics_in_summary(text: str, known_metrics: set[str] | None = None) 
     )
     cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
     return cleaned
+
+
+def _enforce_char_limit(text: str, limit: int = SHORT_LETTER_CHAR_LIMIT) -> str:
+    """Hard safety net for portals with a strict character cap: the prompt asks
+    the LLM to stay under `limit`, but don't trust it blindly. If it overruns,
+    cut at the last sentence boundary before the limit (falling back to a hard
+    cut if no boundary is found early enough) rather than truncating mid-word.
+    """
+    if not text or len(text) <= limit:
+        return text
+    truncated = text[:limit]
+    boundary = max(truncated.rfind(". "), truncated.rfind(".\n"), truncated.rfind("! "), truncated.rfind("? "))
+    if boundary > limit * 0.6:
+        truncated = truncated[: boundary + 1]
+    return truncated.rstrip()
 
 
 def _strip_years_and_metrics(

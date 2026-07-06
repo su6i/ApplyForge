@@ -163,6 +163,7 @@ The slug is set via `CV_OWNER_SLUG` in your `.env` file. Examples:
 - `Firstname_LASTNAME-CV_IT_fr.pdf` — IT infrastructure CV (French)
 - `Firstname_LASTNAME-LettreMotivation_AI_fr.pdf` — AI cover letter (French)
 - `Firstname_LASTNAME-CV_PhD_en.pdf` — PhD application CV (English)
+- `Firstname_LASTNAME-LettreMotivation_Courte_AI_fr.txt` — plain-text short cover letter (≤1500 chars), generated alongside every PDF letter for pasting into character-limited application portals (e.g. France Travail)
 
 This naming convention makes it easy to identify document type and role at a glance.
 
