@@ -55,8 +55,10 @@ def cmd_apply(
         include_licence=include_licence,
     )
 
-    # If LLM failed but fallback not enabled, try asking user interactively
-    if bundle is None and error_msg and enable_fallback is False:
+    # If LLM failed but fallback not enabled, try asking user interactively.
+    # Never offer this for --licence: the offline path doesn't support it at
+    # all, so a "yes" here would silently produce a licence-less CV anyway.
+    if bundle is None and error_msg and enable_fallback is False and not include_licence:
         print(f"\n⚠️  LLM-based generation failed: {error_msg}\n")
         print("Would you like to try offline dictionary-based generation? [y/N]")
         try:

@@ -35,6 +35,29 @@ DEFAULT_MIN_MATCH = 40
 GENERATED_PROFILES_DIR = DATA_DIR
 
 
+class LicenceProfileMissingError(RuntimeError):
+    """--licence was passed but the role profile has no conditional_education
+    to inject — the flag would silently have no effect. No Silent Errors."""
+
+
+def _resolve_licence_education(profile_dict: dict, role: str) -> list[dict]:
+    """Return the conditional_education entries to inject for --licence.
+
+    Raises LicenceProfileMissingError if the profile has none, instead of
+    silently generating a CV that's missing the degree the caller explicitly
+    asked to include.
+    """
+    cond_edu = profile_dict.get("conditional_education") or []
+    if not cond_edu:
+        raise LicenceProfileMissingError(
+            f"--licence was passed but the {role!r} role profile has no "
+            "'conditional_education' field — the flag would have had no "
+            "effect. Add conditional_education to this role's source "
+            "profile, or omit --licence for this role."
+        )
+    return list(cond_edu)
+
+
 class ApplicationService:
     """
     Orchestrates the full pipeline:
@@ -169,10 +192,8 @@ class ApplicationService:
 
         # --licence flag: explicitly inject the conditional Bachelor's degree.
         if include_licence:
-            cond_edu = profile_dict.get("conditional_education") or []
-            if cond_edu:
-                content.extra_education = list(cond_edu)
-                logger.info(f"--licence: injecting {len(cond_edu)} conditional education entries")
+            content.extra_education = _resolve_licence_education(profile_dict, role)
+            logger.info(f"--licence: injecting {len(content.extra_education)} conditional education entries")
 
         # Optional hard override from CLI/API: force output language.
         forced_lang = output_language.strip().lower()
@@ -357,13 +378,20 @@ class ApplicationService:
                 include_licence=include_licence,
             )
             return bundle, "", False  # Success, no error, no fallback
+        except LicenceProfileMissingError as exc:
+            # Never silently fall through to the offline path: it doesn't
+            # support --licence at all, so retrying there would silently
+            # produce the exact licence-less CV this error exists to prevent.
+            error_msg = str(exc)
+            logger.error(f"--licence cannot be honored: {error_msg}")
+            return None, error_msg, False
         except Exception as exc:
             error_msg = str(exc)
             logger.error(f"LLM-based generation failed: {error_msg}")
-            
+
             if not enable_fallback:
                 return None, error_msg, False
-            
+
             logger.info("Attempting offline dictionary-based fallback...")
             try:
                 bundle = self._generate_with_offline_translation(
