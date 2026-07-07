@@ -79,6 +79,25 @@ def _resolve_master_cv_path(lang: str = "en") -> Path:
     )
 
 
+def _carry_over_conditional_education(parsed: dict, master_json_text: str) -> dict:
+    """Force-copy conditional_education from the master CV into the generated
+    role profile, regardless of what the LLM's output included.
+
+    This exists on top of the prompt instruction, not instead of it: a prompt
+    can silently drift (a rule gets edited away, the model just doesn't
+    comply) without anyone noticing until --licence quietly does nothing for
+    some role. Enforcing it here in code means that can't happen again.
+    """
+    try:
+        master_data = json.loads(master_json_text)
+    except json.JSONDecodeError:
+        return parsed
+    cond_edu = master_data.get("conditional_education")
+    if cond_edu:
+        parsed["conditional_education"] = cond_edu
+    return parsed
+
+
 def generate_role_profile(role: str, lang: str = "en") -> Path:
     """
     Generate a tailored JSON profile from master_cv_<lang>.json using the LLM.
@@ -133,6 +152,7 @@ IMPORTANT: The output JSON MUST follow this FLAT schema (different from the Mast
     }}
   ],
   "education": [...],
+  "conditional_education": [...],
   "languages": {{}},
   "hobbies": [],
   "certifications": []
@@ -148,7 +168,8 @@ Rules:
     + 500% de vitesse). A réserver pour les expériences professionnelles."
     So do NOT include percentages or quantified uplift/reduction metrics in profile_summary.
 6. Filter `certifications` to keep ONLY those highly relevant to "{role}". Drop outdated or irrelevant certifications (e.g., do not include electronics/PLC for AI roles).
-7. Start immediately with {{. Return ONLY valid JSON."""
+7. If the Master CV has a `conditional_education` array, copy it VERBATIM (unchanged) into the output — do not translate, reword, filter, or drop it. It's only ever surfaced later via an explicit --licence flag, never shown by default.
+8. Start immediately with {{. Return ONLY valid JSON."""
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
@@ -170,7 +191,9 @@ Rules:
     except json.JSONDecodeError as exc:
         logger.error(f"Failed to parse LLM JSON for role '{role}':\n{clean_json}")
         raise ValueError(f"LLM returned invalid JSON for the '{role}' profile.") from exc
-        
+
+    parsed = _carry_over_conditional_education(parsed, master_json_text)
+
     out_path = get_profile_path(role, lang=lang)
     with out_path.open("w", encoding="utf-8") as fh:
         json.dump(parsed, fh, indent=2, ensure_ascii=False)
