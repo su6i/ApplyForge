@@ -17,22 +17,11 @@ Always use the macros: `\cvname`, `\cvemail`, `\cvphone`, `\cvlocation`, `\cvlin
 
 ---
 
-## R2 — No Persian / Non-Latin Characters in FR/EN CVs
+## R2 — Single target language in generated documents
 
-Any `.tex` file destined for the French or English market **MUST NOT** contain Persian (Farsi) or non-Latin Unicode characters **except** in the `Languages` section where the language name itself may appear.
-
-Common dangerous substitutions that slip in:
-- و → et / and
-- برای → pour / for
-- با → avec / with
-- در → dans / in
-
-**Verify before every commit:**
-```bash
-./verify.py
-# or manual grep:
-perl -ne 'print "$ARGV:$.: $_" if /[^\x00-\x7f]/' templates/lato/*.tex
-```
+Single source of truth: `.agent/local-rules/quality_guard.md`. A generated CV/letter
+must contain only its target language (no other language mixed in); verify before every
+commit with the non-Latin scan documented there.
 
 ---
 

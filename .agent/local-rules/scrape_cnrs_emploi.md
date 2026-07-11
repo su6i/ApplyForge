@@ -1,18 +1,19 @@
 # Skill: Scrape emploi.cnrs.fr
 
-## خلاصه
+## Summary
 
-پورتال آگهی‌های شغلی CNRS در `emploi.cnrs.fr`. نتایج با JavaScript بارگذاری می‌شوند — فقط با **Playwright** قابل دسترسی است.
+The CNRS job-posting portal is at `emploi.cnrs.fr`. Results are loaded with JavaScript —
+they are only accessible via **Playwright**.
 
 ---
 
-## ساختار URL
+## URL structure
 
 ```
-# صفحه جستجو
+# search page
 https://emploi.cnrs.fr/Offres/Recherche.aspx
 
-# جزئیات یک آگهی
+# a single posting's detail
 https://emploi.cnrs.fr/Offres/CDD/<REF>/Default.aspx
 https://emploi.cnrs.fr/Offres/PASS/<REF>/Default.aspx   # apprentissage
 https://emploi.cnrs.fr/Offres/Doctorant/<REF>/Default.aspx
@@ -20,15 +21,15 @@ https://emploi.cnrs.fr/Offres/Doctorant/<REF>/Default.aspx
 
 ---
 
-## کد جستجو با keyword
+## Keyword search code
 
 ```python
 from playwright.sync_api import sync_playwright
 
 def scrape_cnrs_jobs(keywords: list[str]) -> list[dict]:
     """
-    جستجوی آگهی‌های CNRS با کلمات کلیدی.
-    برمی‌گرداند: list of {title, url}
+    Search CNRS postings by keyword.
+    Returns: list of {title, url}
     """
     results = []
     seen = set()
@@ -42,7 +43,7 @@ def scrape_cnrs_jobs(keywords: list[str]) -> list[dict]:
                     wait_until='networkidle', timeout=30000)
             pg.wait_for_timeout(1500)
 
-            # پر کردن فیلد جستجو با ID صحیح
+            # fill the search field with the correct ID
             pg.fill('#InputSearchBy', kw)
             pg.wait_for_timeout(300)
             pg.keyboard.press('Enter')
@@ -67,7 +68,7 @@ def scrape_cnrs_jobs(keywords: list[str]) -> list[dict]:
 
 ---
 
-## کلمات کلیدی پیشنهادی برای پروفایل IT/réseau
+## Suggested keywords for an IT / network profile
 
 ```python
 IT_KEYWORDS = ['informatique', 'réseau', 'système', 'développeur', 'python',
@@ -76,10 +77,10 @@ IT_KEYWORDS = ['informatique', 'réseau', 'système', 'développeur', 'python',
 
 ---
 
-## فیلتر آگهی‌های نامرتبط
+## Filtering out unrelated postings
 
 ```python
-# حذف bioinformatique، doctorant، apprentissage، chercheur
+# drop bioinformatique, doctorant, apprentissage, chercheur
 SKIP_TITLES = ['bioinformatique', 'doctorant', 'postdoc', 'postdoctoral',
                'apprenti', 'chercheur', 'doctorale', 'thèse', 'chimie',
                'biologie', 'physique', 'écologie']
@@ -96,25 +97,26 @@ def filter_it_jobs(jobs: list[dict]) -> list[dict]:
 
 ---
 
-## معیارهای حذفی — قبل از تولید CV بررسی کن
+## Eligibility criteria — check before generating a CV
 
-قبل از هر candidature، فایل `eligibility_screening.md` را بخوان و تمام معیارهای بلاک‌کننده را از متن آگهی استخراج کن.
-
----
-
-## نکات مهم
-
-1. **Input field ID:** `#InputSearchBy` — فیلد متنی اصلی جستجو
-2. **فیلترهای URL کار نمی‌کنند** — پارامترهای GET مثل `?brancheActivite=BAI` نادیده گرفته می‌شوند
-3. **Submit:** با `pg.keyboard.press('Enter')` ارسال کن — دکمه Submit گاهی hidden است
-4. **Apprentissage/PASS:** مسیر `/Offres/PASS/` = قراردادهای apprentissage → معمولاً نامرتبط
-5. **Apply link:** هر آگهی یک دکمه "Postuler sur le site employeur" یا فرم داخلی دارد
-6. **Availability check:** `"L'offre demandée n'est plus disponible"` = آگهی بسته شده
+Before any application, read `eligibility_screening.md` and extract every blocking
+criterion from the job text.
 
 ---
 
-## روش apply در CNRS
+## Notes
 
-- معمولاً از طریق فرم آنلاین داخل سایت emploi.cnrs.fr
-- نیاز به ایجاد حساب کاربری در پورتال
-- بعد از login → "Postuler" → آپلود CV + lettre de motivation
+1. **Input field ID:** `#InputSearchBy` — the main search text field.
+2. **URL filters do not work** — GET parameters such as `?brancheActivite=BAI` are ignored.
+3. **Submit:** send with `pg.keyboard.press('Enter')` — the Submit button is sometimes hidden.
+4. **Apprentissage/PASS:** the `/Offres/PASS/` path = apprenticeship contracts → usually irrelevant.
+5. **Apply link:** each posting has a "Postuler sur le site employeur" button or an internal form.
+6. **Availability check:** `"L'offre demandée n'est plus disponible"` = the posting is closed.
+
+---
+
+## How to apply on CNRS
+
+- Usually via an online form inside emploi.cnrs.fr.
+- Requires creating an account on the portal.
+- After login → "Postuler" → upload CV + cover letter.

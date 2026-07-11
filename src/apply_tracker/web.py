@@ -669,27 +669,27 @@ async def auth_gmail_setup():
     <div style="background:white;border-radius:12px;padding:24px 28px;
                 box-shadow:0 2px 8px rgba(0,0,0,.06);max-width:680px">
       <p style="margin-bottom:16px;color:#555;line-height:1.6">
-        برای Sync خودکار، یک‌بار باید OAuth credentials از Google Cloud بسازی.
-        فقط ۵ دقیقه وقت می‌برد.
+        To enable automatic sync, you need to create OAuth credentials in Google Cloud once.
+        It only takes 5 minutes.
       </p>
       <ol style="line-height:2.2;color:#333;padding-left:20px">
-        <li>به <a href="https://console.cloud.google.com/apis/credentials"
-            target="_blank" style="color:#145a45">console.cloud.google.com/apis/credentials</a> برو</li>
-        <li>یک پروژه انتخاب یا بساز</li>
-        <li>در منوی بالا: <strong>+ CREATE CREDENTIALS → OAuth client ID</strong></li>
+        <li>Go to <a href="https://console.cloud.google.com/apis/credentials"
+            target="_blank" style="color:#145a45">console.cloud.google.com/apis/credentials</a></li>
+        <li>Select or create a project</li>
+        <li>In the top menu: <strong>+ CREATE CREDENTIALS → OAuth client ID</strong></li>
         <li>Application type: <strong>Desktop app</strong></li>
-        <li>Name: هر چیزی (مثلاً <em>amir-apply-tracker</em>)</li>
-        <li>Download JSON → فایل را اینجا ذخیره کن:<br>
+        <li>Name: anything (e.g. <em>amir-apply-tracker</em>)</li>
+        <li>Download JSON → save the file here:<br>
             <code style="background:#f5f5f5;padding:3px 8px;border-radius:4px;font-size:.85rem">
             {creds_path}</code></li>
-        <li>مطمئن شو <strong>Gmail API</strong> فعال است در
+        <li>Make sure the <strong>Gmail API</strong> is enabled in
             <a href="https://console.cloud.google.com/apis/library/gmail.googleapis.com"
             target="_blank" style="color:#145a45">APIs &amp; Services → Library</a></li>
       </ol>
       <div style="margin-top:20px">
         <a href="/auth/gmail/setup">
           <button class="ab open" style="padding:8px 20px;font-size:.85rem">
-            🔄 Refresh (بعد از ذخیره فایل)
+            🔄 Refresh (after saving the file)
           </button>
         </a>
       </div>
@@ -708,7 +708,7 @@ async def auth_gmail(request: Request):
         return RedirectResponse(auth_url)
     except Exception as e:
         content = (f'<div class="flash err">OAuth error: {e}<br>'
-                   f'بررسی کن که فایل credentials درست است.</div>')
+                   'Check that the credentials file is correct.</div>')
         return HTMLResponse(_page(content, ""))
 
 

@@ -1,30 +1,30 @@
 # Skill: Scrape choisirleservicepublic.gouv.fr
 
-## خلاصه
+## Summary
 
-سایت `choisirleservicepublic.gouv.fr` پورتال رسمی آگهی‌های شغلی بخش عمومی فرانسه است.
-نتایج با JavaScript بارگذاری می‌شوند — فقط با **Playwright** قابل دسترسی است.
+`choisirleservicepublic.gouv.fr` is the official French public-sector job-posting portal.
+Results are loaded with JavaScript — they are only accessible via **Playwright**.
 
 ---
 
-## ساختار URL
+## URL structure
 
 ```
-# همه آگهی‌ها
+# all postings
 https://choisirleservicepublic.gouv.fr/nos-offres/
 
-# فیلتر دامنه (Numérique = 3522)
+# domain filter (Numérique = 3522)
 https://choisirleservicepublic.gouv.fr/nos-offres/filtres/domaine/3522/
 
-# صفحه‌بندی
+# pagination
 https://choisirleservicepublic.gouv.fr/nos-offres/filtres/domaine/3522/page/2/
 
-# جزئیات یک آگهی
+# a single posting's detail
 https://choisirleservicepublic.gouv.fr/offre-emploi/[slug]-reference-[ref]/
 ```
 
-### دامنه‌های مهم
-| ID | دامنه |
+### Key domains
+| ID | Domain |
 |---|---|
 | 3522 | Numérique (IT/Digital) |
 | 3503 | Achats |
@@ -32,7 +32,7 @@ https://choisirleservicepublic.gouv.fr/offre-emploi/[slug]-reference-[ref]/
 
 ---
 
-## کد استخراج لیست آگهی‌ها
+## Listing-extraction code
 
 ```python
 from playwright.sync_api import sync_playwright
@@ -40,8 +40,8 @@ import re
 
 def scrape_servicepublic_listings(domain_id=3522, max_pages=5):
     """
-    استخراج لیست آگهی‌های شغلی از choisirleservicepublic.gouv.fr
-    برمی‌گرداند: list of {title, location, employer, url}
+    Extract job listings from choisirleservicepublic.gouv.fr
+    Returns: list of {title, location, employer, url}
     """
     results = []
 
@@ -58,7 +58,7 @@ def scrape_servicepublic_listings(domain_id=3522, max_pages=5):
             pg.goto(url, wait_until='networkidle', timeout=30000)
             pg.wait_for_timeout(3000)
 
-            # استخراج لینک‌ها و عناوین
+            # extract links and titles
             links = pg.query_selector_all('a[href*="offre-emploi"]')
             for l in links:
                 title = l.text_content().strip()
@@ -66,7 +66,7 @@ def scrape_servicepublic_listings(domain_id=3522, max_pages=5):
                 if title and href and 'offre-emploi' in href:
                     results.append({'title': title, 'url': href, 'location': '', 'employer': ''})
 
-            # استخراج location/employer از متن صفحه
+            # extract location/employer from the page text
             body_lines = [ln.strip() for ln in pg.inner_text('body').split('\n') if ln.strip()]
             i = 0
             while i < len(body_lines):
@@ -79,7 +79,7 @@ def scrape_servicepublic_listings(domain_id=3522, max_pages=5):
                             location = body_lines[j]
                         if j > 0 and body_lines[j-1] == 'Employeur :':
                             employer = body_lines[j]
-                    # به‌روزرسانی آخرین آیتم اضافه‌شده
+                    # update the last item added
                     for r in reversed(results):
                         if r['title'] == line:
                             r['location'] = location
@@ -91,7 +91,7 @@ def scrape_servicepublic_listings(domain_id=3522, max_pages=5):
 
         browser.close()
 
-    # حذف تکراری‌ها
+    # de-duplicate
     seen = set()
     unique = []
     for r in results:
@@ -105,13 +105,13 @@ def scrape_servicepublic_listings(domain_id=3522, max_pages=5):
 
 ---
 
-## کد استخراج جزئیات یک آگهی
+## Single-posting detail-extraction code
 
 ```python
 def scrape_servicepublic_job(url: str) -> dict:
     """
-    استخراج جزئیات کامل یک آگهی شغلی
-    برمی‌گرداند: {experience, category, contract, missions, profile}
+    Extract the full detail of a single posting.
+    Returns: {experience, category, contract, missions, profile}
     """
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -140,31 +140,32 @@ def scrape_servicepublic_job(url: str) -> dict:
 
 ---
 
-## معیارهای حذفی — قبل از تولید CV بررسی کن
+## Eligibility criteria — check before generating a CV
 
-قبل از هر candidature، فایل `eligibility_screening.md` را بخوان و تمام معیارهای بلاک‌کننده را از متن آگهی استخراج کن.
+Before any application, read `eligibility_screening.md` and extract every blocking
+criterion from the job text.
 
 ---
 
-## نکات مهم
+## Notes
 
-1. **JavaScript-rendered**: هیچ scraper ساده‌ای (requests, curl) کار نمی‌کند — فقط Playwright
-2. **فیلترها interactive هستند**: کلیک روی فیلترها در Playwright نیاز به `wait_until='networkidle'` دارد
-3. **ملیت**: پست‌های Police/Gendarmerie/XPN معمولاً نیاز به ملیت فرانسوی دارند
-4. **دسته‌بندی**:
-   - Cat. A = cadre (مدیریتی، معمولاً Bac+5)
-   - Cat. B = profession intermédiaire (تکنیسین)
-   - Cat. C = employé (پایه)
-5. **"Confirmé"** = تجربه قبلی الزامی — برای پروفایل junior مناسب نیست
-6. **"Non renseigné"** = نامشخص، می‌تواند junior-friendly باشد
+1. **JavaScript-rendered**: no simple scraper (requests, curl) works — Playwright only.
+2. **Filters are interactive**: clicking filters in Playwright needs `wait_until='networkidle'`.
+3. **Nationality**: Police/Gendarmerie/XPN posts usually require French nationality.
+4. **Categories**:
+   - Cat. A = cadre (management, usually Bac+5)
+   - Cat. B = intermediate profession (technician)
+   - Cat. C = base-level employee
+5. **"Confirmé"** = prior experience mandatory — not suitable for a junior profile.
+6. **"Non renseigné"** = unspecified, may be junior-friendly.
 7. **Playwright install**: `uv run playwright install chromium`
 
 ---
 
-## جستجوی پیشنهادی برای پروفایل IT junior
+## Suggested search for a junior IT profile
 
 ```python
-# فیلتر: Numérique + جستجو در title برای عناوین junior-friendly
+# filter: Numérique + search titles for junior-friendly roles
 JUNIOR_TITLES = ['technicien', 'assistant', 'chargé', 'développeur', 'administrateur']
 SENIOR_TITLES = ['responsable', 'chef', 'directeur', 'expert', 'lead', 'adjoint']
 
