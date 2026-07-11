@@ -1,86 +1,94 @@
-# Règle : Critères d'éligibilité — Vérification obligatoire avant toute candidature
+# Rule: Eligibility criteria — mandatory check before any application
 
-Avant de générer un CV, **extraire ces critères** et vérifier les bloquants.
-
----
-
-## 1. Critères BLOQUANTS (arrêt immédiat, aucun CV généré)
-
-| Critère | Signaux dans le texte | Raison |
-|---|---|---|
-| **Permis B obligatoire** | "permis b obligatoire", "permis b exigé", "permis b requis", "permis b indispensable", "permis de conduire obligatoire", "driving license required" | Candidat sans permis |
-| **Fonctionnaire/titulaire requis** | "être fonctionnaire", "titulaire de la fonction publique", "réservé aux agents titulaires", "fonctionnaire de catégorie", "mutation", "détachement uniquement" | Candidat non-fonctionnaire |
-| **Nationalité française obligatoire** | "nationalité française obligatoire", "réservé aux ressortissants français", "nationalité française exigée", "être de nationalité française" | Candidat de nationalité [redacted] |
-| **Habilitation Secret/Confidentiel Défense** | "habilitation secret défense", "habilitation confidentiel défense", "secret-défense", "accès à des informations classifiées SECRET" | Nécessite la nationalité française |
-| **Expérience > 3 ans exigée** | "X ans d'expérience minimum" avec X > 3, "expérience confirmée de X ans exigée" | Candidat : [redacted] |
-
-**Note :** "souhaité", "apprécié", "un plus" = PAS bloquant, continuer.
+Before generating a CV, **extract these criteria** from the job text and check the blockers.
 
 ---
 
-## 2. Critères À EXTRAIRE et AFFICHER (informationnel, pas bloquant)
+## 1. BLOCKING criteria (stop immediately, no CV generated)
 
-Le pipeline doit toujours extraire et afficher ces champs pour que l'utilisateur puisse décider :
+> The *why* (the candidate's personal profile) lives in the vault (rule 035),
+> machine-readable: `~/.local/share/agent-projects/applyforge/data/candidate.yaml`
+> (committable template: `config/candidate.example.yaml`). Never write it here.
 
-| Champ | Ce qu'on extrait |
+The signal phrases below stay in French **on purpose** — they are matched verbatim
+against French-language job postings (they are data, not prose).
+
+| Criterion | Signals in the text |
 |---|---|
-| **Niveau de français** | Niveau exigé (B1, B2, C1, C2, bilingue, natif) |
-| **Niveau d'anglais** | Niveau exigé |
-| **Autre langue** | Langue + niveau si mentionné |
-| **Niveau d'études** | Bac+2 / Bac+3 / Bac+5 / Doctorat |
-| **Expérience** | Nombre d'années souhaitées ou exigées |
-| **Type de contrat** | CDI / CDD / Stage / Alternance + durée |
-| **Rémunération** | Grille indiciaire, salaire brut ou fourchette si mentionné |
-| **Télétravail** | Oui / Non / Partiel (X jours/semaine) |
-| **Déplacements** | Fréquents / Occasionnels / Non mentionné |
-| **Astreintes / horaires décalés** | Nuit, week-end, horaires atypiques — **signal positif** : moins de concurrence française |
-| **Temps de travail** | 100% / 80% / 50% etc. |
-| **Date de clôture** | Date limite de candidature |
-| **Habilitation souhaitée** | "souhaitée" ou "en mesure d'obtenir" (pas bloquant) |
-| **Aptitude médicale spéciale** | Police, SNCF, pompiers — visite médicale imposée |
-| **Technologies imposées** | Si l'offre exige une techno absente du profil (SAP, COBOL, etc.) |
+| **Driving licence B required** | "permis b obligatoire", "permis b exigé", "permis b requis", "permis b indispensable", "permis de conduire obligatoire", "driving license required" |
+| **Civil-servant / tenure required** | "être fonctionnaire", "titulaire de la fonction publique", "réservé aux agents titulaires", "fonctionnaire de catégorie", "mutation", "détachement uniquement" |
+| **French nationality required** | "nationalité française obligatoire", "réservé aux ressortissants français", "nationalité française exigée", "être de nationalité française" |
+| **Secret/Confidential Defence clearance** | "habilitation secret défense", "habilitation confidentiel défense", "secret-défense", "accès à des informations classifiées SECRET" |
+| **Experience > 3 years required** | "X ans d'expérience minimum" with X > 3, "expérience confirmée de X ans exigée" |
+
+**Note:** "souhaité", "apprécié", "un plus" = NOT blocking, continue.
 
 ---
 
-## 3. Format de sortie attendu du scraper
+## 2. Criteria to EXTRACT and DISPLAY (informational, not blocking)
 
-Pour chaque offre, afficher un bloc de synthèse **avant** de lancer la génération du CV :
+The pipeline must always extract and show these fields so the user can decide:
+
+| Field | What we extract |
+|---|---|
+| **French level** | Required level (B1, B2, C1, C2, bilingual, native) |
+| **English level** | Required level |
+| **Other language** | Language + level if mentioned |
+| **Education level** | Bac+2 / Bac+3 / Bac+5 / Doctorate |
+| **Experience** | Years desired or required |
+| **Contract type** | CDI / CDD / Internship / Apprenticeship + duration |
+| **Salary** | Index grid, gross salary, or range if mentioned |
+| **Remote work** | Yes / No / Partial (X days/week) |
+| **Travel** | Frequent / Occasional / Not mentioned |
+| **On-call / shifted hours** | Night, weekend, atypical hours — **positive signal**: less French competition |
+| **Working time** | 100% / 80% / 50% etc. |
+| **Closing date** | Application deadline |
+| **Clearance desired** | "souhaitée" or "able to obtain" (not blocking) |
+| **Special medical fitness** | Police, SNCF, firefighters — mandatory medical exam |
+| **Imposed technologies** | If the offer requires a tech absent from the profile (SAP, COBOL, etc.) |
+
+---
+
+## 3. Expected scraper output format
+
+For each offer, show a synthesis block **before** starting CV generation:
 
 ```
 ══════════════════════════════════════════
-VÉRIFICATION ÉLIGIBILITÉ
+ELIGIBILITY CHECK
 ══════════════════════════════════════════
-🚫 Permis B          : [obligatoire ← BLOQUANT | souhaité | non mentionné]
-🚫 Fonctionnaire     : [titulaire requis ← BLOQUANT | contractuel OK | non mentionné]
-🚫 Nationalité       : [française obligatoire ← BLOQUANT | toutes | non mentionné]
-🚫 Habilitation      : [Secret Défense ← BLOQUANT | souhaitée | non mentionnée]
-⚠️  Expérience        : [X ans exigés | X ans souhaités | non mentionnée]
+🚫 Driving licence B : [required ← BLOCKING | desired | not mentioned]
+🚫 Civil servant     : [tenure required ← BLOCKING | contractual OK | not mentioned]
+🚫 Nationality       : [French required ← BLOCKING | any | not mentioned]
+🚫 Clearance         : [Secret Defence ← BLOCKING | desired | not mentioned]
+⚠️  Experience        : [X years required | X years desired | not mentioned]
 ──────────────────────────────────────────
-ℹ️  Contrat           : [CDI | CDD X mois | Stage | Alternance]
-ℹ️  Temps de travail  : [100% | 80% | 50%]
-ℹ️  Rémunération      : [grille X | fourchette X–Y€ | non mentionnée]
-ℹ️  Télétravail       : [X jours/sem | non | non mentionné]
-✅  Astreintes/nuit   : [mentionnées = signal positif (moins de concurrence) | non mentionnées]
-ℹ️  Déplacements      : [fréquents | occasionnels | non mentionnés]
-ℹ️  Niveau FR         : [B2 | C1 | bilingue | non mentionné]
-ℹ️  Niveau EN         : [B2 | C1 | non mentionné]
-ℹ️  Études min.       : [Bac+2 | Bac+5 | non mentionné]
-ℹ️  Date clôture      : [JJ/MM/AAAA | non mentionnée]
-ℹ️  Technologies imp. : [liste | aucune imposée]
+ℹ️  Contract          : [CDI | CDD X months | Internship | Apprenticeship]
+ℹ️  Working time      : [100% | 80% | 50%]
+ℹ️  Salary            : [grid X | range X–Y€ | not mentioned]
+ℹ️  Remote            : [X days/week | no | not mentioned]
+✅  On-call/night     : [mentioned = positive signal (less competition) | not mentioned]
+ℹ️  Travel            : [frequent | occasional | not mentioned]
+ℹ️  French level      : [B2 | C1 | bilingual | not mentioned]
+ℹ️  English level     : [B2 | C1 | not mentioned]
+ℹ️  Min. education    : [Bac+2 | Bac+5 | not mentioned]
+ℹ️  Closing date      : [DD/MM/YYYY | not mentioned]
+ℹ️  Imposed tech      : [list | none imposed]
 ──────────────────────────────────────────
 🎯 FIT SCORE          : XX/100
-   [≥70 → générer CV | 50-69 → décision utilisateur | <50 → déconseillé]
+   [≥70 → generate CV | 50-69 → user decision | <50 → not advised]
 ══════════════════════════════════════════
 ```
 
-Si un critère 🚫 est BLOQUANT → arrêter et ne pas générer le CV.
-Le fit score (`match_score`) est calculé par le LLM dans `content_tailor.py`.
-Idéalement calculé avant la génération complète pour que l'utilisateur décide sans perdre de temps.
+If a 🚫 criterion is BLOCKING → stop and do not generate the CV.
+The fit score (`match_score`) is computed by the LLM in `content_tailor.py`.
+Ideally computed before full generation so the user decides without wasting time.
 
 ---
 
-## 4. Intégration dans le pipeline
+## 4. Pipeline integration
 
-Ce check est implémenté dans `src/pipeline/service.py` (after scraping, before tailor).
-Les signaux Permis B et habilitation Secret Défense sont déjà codés.
-Les autres critères bloquants (fonctionnaire, nationalité) sont à ajouter.
+This check is implemented in `src/pipeline/service.py` (after scraping, before tailor).
+Which requirement is disqualifying depends on the candidate profile, read at runtime from
+`candidate.yaml` in the vault (rule 035; template `config/candidate.example.yaml`) — never
+hardcode the candidate's attributes in code.

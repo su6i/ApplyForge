@@ -133,6 +133,8 @@ TODO.md
 # committed. NEVER put names / emails / phones / local paths in roles.yaml —
 # personal data belongs only in templates/shared/personal_data.* (gitignored).
 !config/roles.yaml
+# Committable example only; the REAL config/candidate.yaml never exists in-repo (rule 035 → vault).
+!config/candidate.example.yaml
 
 # ── Registry contract tests (override the test_*.py ignore above) ──
 !tests/test_roles.py
@@ -143,3 +145,8 @@ TODO.md
 
 # constitution is symlinked by install.sh (single source of truth, never a submodule)
 .agent/constitution
+
+# Personal CV facts / candidate-specific data — moved to the private apply vault
+# outside this repo. Never track in this PUBLIC repo.
+.agent/local-rules/cv_layout_tuning.md
+.agent/local-rules/no_driving_license.md

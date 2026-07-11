@@ -1,0 +1,13 @@
+# EXAMPLE — copy to the project vault and fill with real values:
+#   ~/.local/share/agent-projects/applyforge/data/candidate.yaml
+# Rule 035: the REAL file lives in the vault, NEVER in this repo.
+# Read at runtime by the eligibility screening (data-driven — no hardcoding).
+candidate:
+  nationality: french           # a value that is NOT "french" enables the nationality blocker
+  eu_citizen: true
+  driving_licence_b: true       # false -> offers requiring "permis B" are blocked
+  civil_servant: false          # false -> offers reserved to civil servants are blocked
+  experience_years: 0           # years of professional experience
+  residence_permit:
+    type: none                  # e.g. RECE, salarie, talent, none
+    valid_until: "YYYY-MM-DD"

@@ -14,7 +14,7 @@ This is a **personal CV repository**. It contains:
 - Cover letter templates (`cover_letters/`)
 
 **Primary language:** French (CVs) and English (CVs + this codebase)  
-**Never output Persian characters in `.tex` files** (→ Rule R2 in `.agents/rules.md`)
+**Generated documents must contain only their target language** — single source of truth: `.agent/local-rules/quality_guard.md`.
 
 ---
 
@@ -101,26 +101,10 @@ Official diplomas and transcripts are stored in `data/` (gitignored) and optiona
 
 ## Content Accuracy Constraints
 
-The following facts are verified and must not be changed without user confirmation:
-
-| Fact | Value |
-|---|---|
-| Company Name internship speed gain | +500% |
-| Company Name cost reduction | -99% |
-| Company Name Excel rows processed | 18,000+ |
-| Company Name PDF pages processed | 1,772 |
-| Company Name test scenarios | 476 |
-| REDACTED-EMPLOYER manual work reduction | -70% |
-| REDACTED-EMPLOYER switch count | 70 Cisco 2960 |
-| REDACTED-EMPLOYER site visit reduction | -70% |
-| Master's Réseaux Avancés grade | 16.33/20 (1st/13) |
-| Master's Web Avancé grade | 17.15/20 (2nd/17) |
-| Master's Système grade | 16.5/20 |
-| VPS provider | Hetzner |
-| Image gen API | fal.ai (Flux Schnell) |
-| LLM fallback layers | 8 (Gemini/DeepSeek/Grok) |
-| Embeddings model | BGE-M3 |
-| Vector DB | ChromaDB |
+The candidate's verified CV facts (metrics, grades, employer figures) are **personal data**
+and MUST NOT live in this public repo. They are kept in the private apply vault, outside this
+repo (`context/cv-rules/candidate_facts.md`). Read them from there; never hardcode or commit
+them here, and never change them without the owner's confirmation.
 
 ---
 

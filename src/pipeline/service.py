@@ -23,6 +23,7 @@ from src.core import roles as roles_registry
 from src.core.logger import logger
 from src.core.llm_factory import get_llm
 from src.core.settings import CV_OWNER_SLUG, DATA_DIR
+from src.core.candidate import eligibility_blockers, load_candidate
 from src.pipeline.content_tailor import TailoredContent, tailor
 from src.pipeline.job_scraper import JobPosting, scrape
 from src.pipeline.latex_builder import ApplicationBundle, build
@@ -137,32 +138,9 @@ class ApplicationService:
             except Exception as exc:
                 logger.warning(f"Could not verify apply URL {posting.apply_url}: {exc}")
 
-        # Eligibility guards — hard blockers for this candidate profile.
-        _BLOCKERS: list[tuple[list[str], str]] = [
-            (
-                ["permis b obligatoire", "permis de conduire obligatoire",
-                 "permis b exigé", "permis b requis", "permis b indispensable",
-                 "driving license required", "driver's license required"],
-                "⛔  Permis B obligatoire — profil non éligible.",
-            ),
-            (
-                ["être fonctionnaire", "titulaire de la fonction publique",
-                 "réservé aux agents titulaires", "fonctionnaire de catégorie",
-                 "mutation interne", "détachement uniquement"],
-                "⛔  Poste réservé aux fonctionnaires titulaires — candidat non-fonctionnaire.",
-            ),
-            (
-                ["nationalité française obligatoire", "réservé aux ressortissants français",
-                 "nationalité française exigée", "être de nationalité française"],
-                "⛔  Nationalité française obligatoire — candidat de nationalité [redacted].",
-            ),
-            (
-                ["habilitation secret défense", "habilitation confidentiel défense",
-                 "secret-défense", "accès à des informations classifiées secret"],
-                "⛔  Habilitation Secret/Confidentiel Défense requise — nécessite la nationalité française.",
-            ),
-        ]
-        for signals, message in _BLOCKERS:
+        # Eligibility guards — hard blockers derived from the candidate profile
+        # (read from the vault, rule 035; never hardcode the candidate's attributes).
+        for signals, message in eligibility_blockers(load_candidate()):
             if any(sig in body_lower for sig in signals):
                 raise RuntimeError(f"{message} Aucun CV généré.")
 
@@ -431,11 +409,9 @@ class ApplicationService:
 
         # Load profile dynamically
         try:
-            resume_profile_str: str = format_for_prompt(role)
             profile_dict: dict = load_profile(role)
         except Exception as exc:
             logger.warning(f"Could not load profile: {exc}")
-            resume_profile_str = ""
             profile_dict = {}
 
         # 3 — Use offline dictionary to tailor instead of LLM
