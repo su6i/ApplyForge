@@ -48,6 +48,10 @@ templates/shared/personal_data.json
 # ── Old/legacy template folders — have hardcoded personal data ─
 templates/experimental/
 
+# ── tina template family — FILLED personal CVs (name/employer/grades) ─
+# Never track. Purged from history 2026-07-12; real files live on disk only.
+templates/tina/
+
 # ── Job applications — private (names, letters, rejections) ───
 Applied/
 recommendation_letter/
