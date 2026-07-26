@@ -1,12 +1,7 @@
 """
 location_utils.py — Detect job location region and select the matching CV city.
 
-Rule:
-  Job posted on France Travail → Montpellier (owner's registered jobseeker
-                                  domicile there — must stay consistent
-                                  regardless of the job's own city)
-  Occitanie region              → Montpellier
-  Anywhere else                 → REDACTED-CITY
+The CV city selection is data-driven via the candidate configuration.
 """
 from __future__ import annotations
 
@@ -84,13 +79,30 @@ def is_france_travail(job_url: str) -> bool:
 
 def select_cv_city(job_location: str, language: str = "fr", job_url: str = "") -> str:
     """
-    Return the city string to use in \\cvlocation based on job location.
-
-    France Travail source → Montpellier (owner's registered domicile there,
-                             must stay consistent regardless of job city)
-    Occitanie region       → Montpellier
-    Elsewhere              → REDACTED-CITY
+    Return the city string to use in \\cvlocation.
     """
-    if is_france_travail(job_url) or is_occitanie(job_location):
-        return "Montpellier, mobile en France" if language == "fr" else "Montpellier, France"
-    return "REDACTED-CITY, mobile en France" if language == "fr" else "REDACTED-CITY, France"
+    from src.core.candidate import load_candidate
+    
+    candidate = load_candidate()
+    loc_cfg = candidate.get("cv_location", {})
+    cfg_city = loc_cfg.get("city")
+    always_use = loc_cfg.get("always_use", False)
+    mobility_fr = loc_cfg.get("mobility_fr")
+    country = loc_cfg.get("country")
+
+    selected = job_location.strip()
+    if cfg_city:
+        if always_use or is_occitanie(job_location) or is_france_travail(job_url):
+            selected = cfg_city
+            
+    if not selected:
+        return ""
+
+    if language == "fr":
+        if mobility_fr:
+            return f"{selected}, {mobility_fr}"
+        return selected
+    else:
+        if country:
+            return f"{selected}, {country}"
+        return selected

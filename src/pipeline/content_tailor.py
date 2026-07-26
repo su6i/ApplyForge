@@ -30,6 +30,10 @@ Language = Literal["fr", "en"]
 # motivation" text box) cap pasted-in text at 1500 characters.
 SHORT_LETTER_CHAR_LIMIT = 1500
 
+class TailoringError(ValueError):
+    """Raised when the LLM output cannot be parsed as valid JSON."""
+    pass
+
 
 @dataclass
 class TailoredContent:
@@ -65,7 +69,7 @@ EXACTLY these keys (no extras, no markdown fences):
 {{
   "company_name": "<exact company name from the posting>",
   "position_title": "<exact job title from the posting>",
-  "cv_tagline": "<short professional title for CV header, 3-5 words max, representing the CANDIDATE's identity adapted to this role — NOT a copy of the job title. E.g. 'Ingénieur Informatique & Réseaux', 'Technicien Systèmes & Automatisation', 'Développeur Python & Infrastructure'>",
+  "cv_tagline": "<short professional title for CV header, 3-5 words max, representing the CANDIDATE's identity adapted to this role — NOT a copy of the job title. E.g. 'Ingénieur Informatique & Réseaux', 'Administrateur Systèmes & Réseaux', 'Développeur Python & Infrastructure'>",
   "language": "<fr or en — the language the posting is written in>",
   "variant": "<see variant rules below>",
   "job_location": "<city or region where the job is located, e.g. 'Montpellier', 'Paris', 'Lyon'. Use 'remote' or 'télétravail' if fully remote. Use 'France' if no specific city is mentioned.>",
@@ -109,7 +113,7 @@ EXACTLY these keys (no extras, no markdown fences):
                 State the candidature for \\PositionTitle at \\CompanyName. \
                 Highlight the SPECIFIC skills/background that match THIS job — \
                 do NOT use a generic IT or AI paragraph; adapt to the actual job.>",
-  "cl_body": ["<First paragraph: Detail the 'Company Name' RAG and document analysis project.>", "<Second paragraph: Detail the multi-agent architecture projects ('ApplyForge', 'Su6i-Yar', or custom elevator project). Adapt the descriptions to match the required skills of THIS job.>"],
+  "cl_body": ["<First paragraph: pick the SINGLE most relevant project or professional achievement from the CANDIDATE PROFILE for THIS job and detail it concretely — what was built, which technologies, what measurable outcome. Use only real sourced figures.>", "<Second paragraph: pick a DIFFERENT project or experience from the profile that demonstrates a second skill the posting asks for. Never name a project that is not in the CANDIDATE PROFILE. If the job is not software/AI (e.g. network administration, industrial or railway technician), choose the infrastructure/network/automation items instead — do NOT default to AI or RAG projects.>"],
   "cl_short": "<STANDALONE short cover letter, PLAIN TEXT (no LaTeX commands, no markdown, no line-break escapes) for pasting directly into an online application form's character-limited text box (e.g. France Travail caps this at 1500 characters INCLUDING spaces and the greeting/sign-off). Self-contained: opening greeting, one sentence on diploma/candidature for \\PositionTitle at \\CompanyName, ONE concrete relevant achievement (reuse a real sourced figure if one fits, never invent a new one), one short sentence on motivation for THIS company, and a polite closing + your name. STRICT HARD LIMIT: the entire text must be under 1500 characters — write concisely from the start, do not write a long version and expect it to be trimmed.>"
 }}
 
@@ -120,9 +124,7 @@ Selection rules:
   trading/brand name, or a staffing agency and its end client), pick the one that
   appears to be the actual recruiting/signing employer and use it consistently —
   never switch names mid-letter.
-- selected_experience: You MUST include ALL jobs from the `experience` list. Do NOT drop any job.
-  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.
-  * Adjust highlights to focus heavily on aspects relevant to this specific job.
+{positioning_bullets}
 - `selected_projects`: Select only the most relevant projects. Include 2 projects minimum.
   Translate `title` and `description` to the target language. Rank by relevance to this job.
 - cv_summary: MUST follow the requested output language (or posting language if auto).
@@ -138,10 +140,12 @@ Selection rules:
   +500% de vitesse). À réserver pour les expériences professionnelles."
   Therefore, `cv_summary` must NOT contain percentages or uplift/reduction metrics.
 - Years of experience rule (STRICT):
-  * DEFAULT: NEVER mention a specific number of years. Describe depth/nature instead.
-  * EXCEPTION: IF the job posting explicitly requires N years (e.g. "3 ans d'expérience
-    minimum"), AND the candidate has at least N relevant years in that domain,
-    THEN you MAY write exactly N years (not more) in `cl_intro` or `cv_summary`.
+  * DEFAULT: Do not mention years unless the exact figure is present in the CANDIDATE PROFILE,
+    in which case it may be stated — never invent or inflate a number.
+  * EXCEPTION (retained for backward compatibility): IF the job posting explicitly requires
+    N years (e.g. "3 ans d'expérience minimum"), AND the candidate has at least N relevant
+    years in that domain as shown in the CANDIDATE PROFILE, THEN you MAY write exactly
+    N years (not more) in `cl_intro` or `cv_summary`.
   * Never invent years not requested. Never exceed the number asked.
 - `selected_education`: Always include ALL degrees from the profile's `education` list.
   For `honors`, keep only the 3 most relevant grade items for THIS job — always trim to max 3 items.
@@ -150,7 +154,7 @@ Selection rules:
 - `cv_tagline` MUST be a short professional identity (3-5 words), NOT a copy of the job title.
   It represents WHO the candidate is, not the job they're applying for.
   Bad: "Assistant-e ingénieur informatique instrumentale au sein du Pôle Technologique en Métrologie"
-  Good: "Ingénieur Informatique & Réseaux" or "Technicien Systèmes & Automatisation"
+  Good: "Ingénieur Informatique & Réseaux" or "Administrateur Systèmes & Réseaux"
 - `cv_summary` MUST NOT start with "Ingénieur X avec un Master en X" or any formulation
   that repeats the same concept twice (e.g. "Ingénieur informatique avec un Master en informatique").
   Prefer: "Diplômé d'un Master en informatique, spécialisé en..." or start directly with the specialization.
@@ -215,6 +219,34 @@ def tailor(
             "more than will fit on a one-page CV.\nHowever, since this is a PhD application, ignore the 1-page limit and include ALL relevant academic, research, and professional experiences to build a comprehensive multi-page CV."
         )
 
+    from src.core.candidate import load_candidate
+    candidate = load_candidate()
+    pos_cfg = candidate.get("positioning", {})
+    bullets = []
+    
+    max_exp = pos_cfg.get("max_experience_entries", 0)
+    if max_exp > 0:
+        bullets.append(f"- selected_experience: include ONLY the candidate's {max_exp} most recent professional position(s). Do NOT list older jobs. (EXCEPTION: for a PhD application include the full history — see the PhD note above.)\n  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.\n  * Adjust highlights to focus heavily on aspects relevant to this specific job.")
+    else:
+        bullets.append("- selected_experience: include the relevant positions from the profile.\n  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.\n  * Adjust highlights to focus heavily on aspects relevant to this specific job.")
+
+    avoid_titles = pos_cfg.get("avoid_titles", [])
+    if avoid_titles:
+        bullets.append(f"- NEVER use any of these words in `cv_tagline`: {', '.join(avoid_titles)}. Prefer a title one level above them.")
+
+    avoid_labels = pos_cfg.get("avoid_labels", [])
+    if avoid_labels:
+        bullets.append(f"- NEVER describe the candidate using any of these terms: {', '.join(avoid_labels)}.")
+
+    framing = pos_cfg.get("framing", "")
+    if framing:
+        bullets.append(f"- Preferred framing for the candidate: {framing}.")
+
+    if pos_cfg.get("allow_stating_years", False):
+        bullets.append("- You MAY state the candidate's real total years of professional experience exactly as given in the CANDIDATE PROFILE. Never inflate it and never invent a figure absent from the profile.")
+
+    bullets_str = "\n".join(bullets)
+
     prompt = ChatPromptTemplate.from_messages(
         [("system", system_prompt), ("human", _HUMAN)]
     )
@@ -225,7 +257,8 @@ def tailor(
         "job_text": truncated,
         "role": role,
         "candidate_profile": resume_profile,
-      "preferred_language": preferred_language or "auto",
+        "preferred_language": preferred_language or "auto",
+        "positioning_bullets": bullets_str,
     })
     logger.debug(f"Raw LLM output: {raw}")
 
@@ -274,8 +307,9 @@ def _parse_json(raw: str) -> dict:
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError as exc:
-        logger.error(f"JSON parse error: {exc}\nRaw text:\n{raw}")
-        return {}
+        snippet = raw[:300]
+        logger.error(f"JSON parse error: {exc}. Raw text (truncated): {snippet}")
+        raise TailoringError(f"Failed to parse LLM output as JSON: {exc}. Snippet: {snippet}") from exc
 
 
 def _extract_known_metrics(source_text: str) -> set[str]:
@@ -293,24 +327,29 @@ def _strip_metrics_in_summary(text: str, known_metrics: set[str] | None = None) 
     A metric is kept if its digits match a genuine figure from the source
     profile (``known_metrics``) — regardless of whether the LLM reproduced the
     '~' marker — or, failing that, if it's still tilde-prefixed in the output.
-    Anything else is treated as fabricated and stripped.
+    Anything else is treated as fabricated and stripped. When stripping, also
+    consume an immediately preceding French/English connector (de, d', à, by,
+    of) to keep the sentence grammatical.
     """
     if not text:
         return text
     known_metrics = known_metrics or set()
 
+    # Pattern: optional connector, optional tilde, optional sign, digits, optional decimal, optional % sign
+    # The connector group (de/d'/à/by/of) is captured so we can drop it with the metric.
+    pattern = r"(?P<connector>(?:de\s+|d['\u2019]|à\s+|by\s+|of\s+))?(?P<tilde>~)?\b[+-]?(?P<digits>\d+[\.,]?\d*)\s*%"
+
     def _replace(match: re.Match) -> str:
         if match.group("tilde") or match.group("digits") in known_metrics:
-            return match.group(0)
-        return ""
+            return match.group(0)  # keep entire match including connector
+        return ""  # remove metric and connector
 
-    cleaned = re.sub(
-        r"(?P<tilde>~)?\b[+-]?(?P<digits>\d+[\.,]?\d*)\s*%",
-        _replace,
-        text,
-    )
-    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
-    return cleaned
+    cleaned = re.sub(pattern, _replace, text, flags=re.IGNORECASE)
+    # Clean up resulting whitespace and punctuation artifacts
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+    cleaned = re.sub(r"\s+([,;.!?])", r"\1", cleaned)  # remove space before punctuation
+    cleaned = re.sub(r",\s*,", ",", cleaned)  # remove double commas
+    return cleaned.strip()
 
 
 def _enforce_char_limit(text: str, limit: int = SHORT_LETTER_CHAR_LIMIT) -> str:
@@ -331,22 +370,31 @@ def _enforce_char_limit(text: str, limit: int = SHORT_LETTER_CHAR_LIMIT) -> str:
 def _strip_years_and_metrics(
     text: str | list[str], known_metrics: set[str] | None = None
 ) -> str | list[str]:
-    """Remove years-of-experience mentions and fabricated numeric metrics."""
+    """Remove years-of-experience mentions and fabricated numeric metrics.
+    Logs a warning when any modification is made.
+    """
     if isinstance(text, list):
         return [_strip_years_and_metrics(t, known_metrics) for t in text]  # type: ignore
     if not text:
         return text
-    # Remove patterns like "7 ans d'expérience", "plus de 7 ans", "7+ years", "more than 7 years"
-    cleaned = re.sub(
-        r"\b(plus de |more than |over )?\d+\+?\s+an[ns]?\b[^,.]*(d['']expérience|d'exp\.?)?",
-        "",
-        text,
-        flags=re.IGNORECASE,
-    )
-    cleaned = re.sub(r"\b(plus de |more than |over )?\d+\+?\s+years?\b[^,.]*",
-                     "", cleaned, flags=re.IGNORECASE)
-    # Remove fabricated % metrics — real, sourced figures are kept (see above).
+    original = text
+    # French year patterns: remove only the quantified phrase
+    # Matches optional leading connector (avec/plus de/environ/près de), then digits, optional +, "an" or "ans", optional rest like " d'expérience"
+    # Consume the phrase entirely, including any following space or period boundary.
+    fr_pattern = r"(?:plus de\s+|environ\s+|près de\s+|avec\s+)?\d+\s*\+?\s*ans?(?:\s+d['\u2019](?:expérience|exp\.?))?"
+    cleaned = re.sub(fr_pattern, "", text, flags=re.IGNORECASE)
+    # English year patterns
+    en_pattern = r"(?:more than\s+|over\s+|about\s+|with\s+)?\d+\s*\+?\s*years?(?:\s+of\s+experience|\s+experience)?"
+    cleaned = re.sub(en_pattern, "", cleaned, flags=re.IGNORECASE)
+    # Remove fabricated % metrics — real, sourced figures survive (handled below).
     cleaned = _strip_metrics_in_summary(cleaned, known_metrics)
-    # Remove leftover sentence fragments starting with comma/and
-    cleaned = re.sub(r"^[,\s]+", "", cleaned)
+    # Clean up whitespace and punctuation
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+    cleaned = re.sub(r"\s+([,;.!?])", r"\1", cleaned)
+    cleaned = re.sub(r",\s*,", ",", cleaned)
+    cleaned = cleaned.strip()
+    # Remove leading commas/connectors
+    cleaned = re.sub(r"^[,\s]+", "", cleaned).strip()
+    if cleaned != original and original != "":
+        logger.warning(f"_strip_years_and_metrics modified text:\n  BEFORE: {original!r}\n  AFTER:  {cleaned!r}")
     return cleaned

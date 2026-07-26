@@ -11,3 +11,16 @@ candidate:
   residence_permit:
     type: none                  # e.g. RECE, salarie, talent, none
     valid_until: "YYYY-MM-DD"
+
+  cv_location:
+    city: "City Name"           # The city to display on the CV (empty = derive from job posting)
+    always_use: false           # If true, always use this city regardless of the job's location
+    mobility_fr: "mobile en France"
+    country: "France"
+
+  positioning:
+    max_experience_entries: 0   # 0 means "no rule" (include relevant positions). >0 limits history
+    avoid_titles: []            # e.g. ["Technicien"] - never use these as the CV tagline
+    avoid_labels: []            # e.g. ["jeune diplômé", "junior", "débutant"]
+    framing: ""                 # e.g. "profil expérimenté en transition"
+    allow_stating_years: false  # If true, allows the LLM to state exact years of experience from the profile
