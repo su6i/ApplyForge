@@ -127,7 +127,7 @@ def build_spontaneous(
                "phd", "polyvalent"). An optional "-en"/"-fr" suffix overrides
                the output language (e.g. "ai-en", "mlops-en").
     city     : Job location hint for city selection (e.g., "montpellier", "grenoble").
-               Empty string → defaults to REDACTED-CITY.
+               Empty string → defaults to the posting's city.
     language : Override output language. Empty → use template's default language.
     """
     # Parse an optional language suffix (ai-en / mlops_fr) before resolving role.
@@ -233,7 +233,7 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
             # patches that macro) is a no-op for this template. Override a
             # copy of the profile's identity here so the header actually
             # reflects the job-aware city (France Travail source/Occitanie →
-            # Montpellier, else REDACTED-CITY).
+            # Montpellier, else the posting's city).
             from src.core.location_utils import select_cv_city
             city = select_cv_city(
                 getattr(content, "job_location", "") or "",
@@ -252,7 +252,7 @@ def _build_cv(role: RoleType, content: TailoredContent, output_dir: Path, profil
              raise FileNotFoundError(f"CV template not found: {src_tex}")
         shutil.copy2(src_tex, cv_tex_path)
 
-    # Inject \cvlocation override (France Travail/Occitanie → Montpellier, else REDACTED-CITY)
+    # Inject \cvlocation override (France Travail/Occitanie → Montpellier, else the posting's city)
     _inject_cv_location(cv_tex_path, content, job_url)
 
     # Quality check before burning compile time
@@ -304,7 +304,7 @@ def _inject_location_override(tex_path: Path, job_location: str, language: str, 
     """
     Inject \\renewcommand{\\cvlocation}{...} right after \\begin{document}.
     France Travail source → Montpellier, Occitanie region → Montpellier,
-    everywhere else → REDACTED-CITY.
+    everywhere else → the posting's city.
     """
     from src.core.location_utils import select_cv_city
     city = select_cv_city(job_location, language, job_url)
@@ -384,7 +384,7 @@ def _build_cover_letter(role: RoleType, content: TailoredContent, output_dir: Pa
 
     # Cover letter previously always used personal_data.tex's static \cvlocation
     # default (never varied per job). Apply the same override as the CV
-    # (France Travail source / Occitanie → Montpellier, else REDACTED-CITY).
+    # (France Travail source / Occitanie → Montpellier, else the posting's city).
     _inject_location_override(
         cl_tex_path,
         job_location=getattr(content, "job_location", "") or "",

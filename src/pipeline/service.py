@@ -307,7 +307,7 @@ class ApplicationService:
         role     : Role key (e.g., "ai", "ai-en", "phd", "devops-alternance", "polyvalent").
                    Run with role="?" to see available keys.
         city     : Location hint — pass "montpellier" or any Occitanie city to get
-                   "Montpellier, mobile en France"; leave empty for REDACTED-CITY (default).
+                   "Montpellier, mobile en France"; leave empty for the posting's city (default).
         language : Override output language ("fr" or "en"). Empty → template default.
         """
         from src.pipeline.latex_builder import build_spontaneous
@@ -720,8 +720,6 @@ _FR_PHRASE_REPLACEMENTS: list[tuple[str, str]] = [
     ("Master's in CS at Montpellier", "Master en informatique a Montpellier"),
     ("a Master en informatique", "un Master en informatique"),
     ("Recemment diplome un Master", "Recemment diplome d'un Master"),
-    ("with 7+ years", "avec 7+ annees"),
-    (" at REDACTED-EMPLOYER", " chez REDACTED-EMPLOYER"),
     ("I leverage", "J'exploite"),
     ("Recently completed", "Recemment diplome"),
     ("University Diploma", "Diplome Universitaire"),

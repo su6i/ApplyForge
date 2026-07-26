@@ -51,6 +51,23 @@ roles:
     spontaneous: {folder: altacv, file: CV_Polyvalent_fr.tex, lang: fr}
     variant:     {fr: it, en: python}
 
+  technicien:
+    label: Technicien
+    # Intérim / technicien-tier track. Distinct from `support` on purpose: the
+    # baseline content is ALREADY down-levelled (no DU, no academic honours, no
+    # "Ingénieur"), because the spontaneous path has no job posting for
+    # technicien_adapter to detect a tier from — so the adapter never fires there.
+    description: >-
+      Technicien réseaux & systèmes for intérim agencies and technicien-tier
+      postings — NOC, supervision, exploitation, support N2, hotline. Sédentaire
+      roles only (no driving licence). AI/LLM deliberately de-emphasised.
+    lang: fr
+    skill_order: [networks_support, mlops_devops, data, ai_ml]
+    cv:          {folder: lato, file: CV_Technicien_fr.tex}
+    lato:        {file: CV_Technicien_fr.tex, stem: Technicien}
+    spontaneous: {folder: lato, file: CV_Technicien_fr.tex, lang: fr}
+    variant:     {fr: it, en: python}
+
   ai:
     label: AI
     description: >-

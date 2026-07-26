@@ -9,7 +9,7 @@ Modes:
     uv run main.py init-profile [--cv path]   → Parse LaTeX CV into resume_profile.json
     uv run main.py test                       → Sanity-check settings
 
-Spontaneous roles: python, ai, ai-en, devops, devops_alternance, phd, support, polyvalent
+Spontaneous roles: python, ai, ai-en, devops, devops_alternance, phd, support, polyvalent, technicien
                    (append -en/-fr to override language, e.g. ai-en)
 
     1. cp .env.example .env  (fill in OPENAI_API_KEY)

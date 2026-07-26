@@ -16,7 +16,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.core import roles as r
 
-CANONICAL = ["python", "polyvalent", "ai", "devops", "devops_alternance", "phd", "support"]
+CANONICAL = ["python", "polyvalent",
+    "technicien", "ai", "devops", "devops_alternance", "phd", "support"]
 
 
 def test_canonical_keys():
@@ -160,6 +161,51 @@ def test_scaffold_role_isolated():
         assert data["roles"]["cloud"]["label"] == "Cloud"
         stub = data["roles"]["cloud"]["cv"]["file"]
         assert (tmp_path / "templates" / "altacv" / stub).exists()
+
+
+def test_technicien_track_is_downlevelled_for_interim():
+    """The intérim track must ship a baseline that is ALREADY technicien-tier.
+
+    The spontaneous path has no job posting, so technicien_adapter never fires
+    there — the template itself has to carry the down-levelling.
+    """
+    from src.core import roles as R
+    from src.core.settings import REPO_ROOT
+
+    assert R.resolve("Technicien") == "technicien"
+    assert R.label("technicien") == "Technicien"
+    # Networks/support must outrank AI in this track.
+    order = R.skill_order("technicien")
+    assert order.index("networks_support") < order.index("ai_ml")
+
+    folder, filename = R.cv_template("technicien")
+    tex = (REPO_ROOT / "templates" / folder / filename).read_text(encoding="utf-8")
+    assert "Technicien" in tex
+    assert "Ingénieur" not in tex.split("\\cvsection{Compétences}")[0], \
+        "the header/profil block must not call the candidate Ingénieur"
+    assert "DU Big Data" not in tex, "the DU is a liability in the intérim channel"
+    assert "sans permis B" in tex, "sédentaire-only must be stated explicitly"
+
+
+def test_no_template_states_a_year_count():
+    """No committed template may assert a years-of-experience figure.
+
+    Naming a number self-rejects against every "N ans minimum" posting, and the
+    figures that used to be hardcoded here (7 ans) were not even accurate.
+    """
+    import re
+    from src.core.settings import REPO_ROOT
+
+    pattern = re.compile(
+        r"\d+\s*\+?\s*(ans|années|years)\s+(d['’]|of\s)(?!personal)", re.I
+    )
+    offenders = [
+        tex.relative_to(REPO_ROOT).as_posix()
+        for tex in (REPO_ROOT / "templates").rglob("*.tex")
+        if "tina" not in tex.parts  # third party's gitignored CV, not ours
+        if pattern.search(tex.read_text(encoding="utf-8"))
+    ]
+    assert not offenders, f"templates state a year count: {offenders}"
 
 
 def _run_all() -> int:

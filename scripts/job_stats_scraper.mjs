@@ -31,7 +31,7 @@ const depts = [
     { code: '51', name: 'Reims (51)', type: 'DEP' },
     { code: '83', name: 'Toulon (83)', type: 'DEP' },
     { code: '42', name: 'Saint-Étienne (42)', type: 'DEP' },
-    { code: '38', name: 'REDACTED-CITY (38)', type: 'DEP' }
+    { code: '38', name: 'Isère (38)', type: 'DEP' }
 ];
 
 // Helper to wait

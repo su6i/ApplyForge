@@ -204,6 +204,7 @@ Filenames follow `CV_<Label>_<lang>.tex`, matching the role labels in
 |---|---|---|
 | `CV_AI_en.tex` | `ai` | AI / Data Science / Python roles (English) |
 | `CV_Support_fr.tex` | `support` | IT Support / Network technicien (French) |
+| `CV_Technicien_fr.tex` | `technicien` | Intérim / technicien-tier — pre-down-levelled (French) |
 | `CV_PhD_en.tex` | `phd` | PhD / Research applications (English) |
 
 **`templates/classic/`** — ModernCV banking style (pdflatex), 16 role variants.
@@ -232,8 +233,9 @@ uv run main.py spontaneous devops_alternance     # DevOps alternance / work-stud
 uv run main.py spontaneous support               # Network / support technicien (French)
 uv run main.py spontaneous phd                   # PhD / Research (English)
 uv run main.py spontaneous polyvalent            # Polyvalent / interim (French)
+uv run main.py spontaneous technicien            # Intérim technicien-tier, no DU/honours (French)
 
-# Add --city to select Montpellier vs REDACTED-CITY automatically:
+# Add --city to select Montpellier vs City Name automatically:
 uv run main.py spontaneous ai --city montpellier
 ```
 

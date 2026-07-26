@@ -57,14 +57,14 @@ def test_parse_position_md_extracts_table_fields(tmp_path):
         "# Great AI Position\n\n"
         "| **Deadline** | 07/06/2026 |\n"
         "| **Fit** | 8/10 |\n"
-        "| **Institution** | Inria REDACTED-CITY |\n"
+        "| **Institution** | Inria the posting's city |\n"
         "| **Pays** | France |\n"
     )
     info = tracker.parse_position_md(md)
     assert info["title"] == "Great AI Position"
     assert info["deadline"] == "2026-06-07"
     assert info["fit"] == "8/10"
-    assert info["institution"] == "Inria REDACTED-CITY"
+    assert info["institution"] == "Inria the posting's city"
     assert info["country"] == "France"
 
 
@@ -94,7 +94,7 @@ def test_init_tracking_scans_found_dir(tmp_path):
 
 def test_upsert_and_query_roundtrip(tmp_path):
     conn = db.get_db(tmp_path)
-    db.upsert(conn, {"id": "pos1", "title": "AI Engineer", "institution": "Inria REDACTED-CITY",
+    db.upsert(conn, {"id": "pos1", "title": "AI Engineer", "institution": "Inria the posting's city",
                       "deadline": "2026-08-01", "fit": "8/10", "track": "ai_general"}, "phd")
     rows = db.query(conn, kind="phd")
     assert len(rows) == 1
