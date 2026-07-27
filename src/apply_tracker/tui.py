@@ -13,12 +13,20 @@ from textual.containers import Vertical
 from textual import on
 
 from src.apply_tracker.service import (
-    get_positions, get_stats, mark_sent, mark_status,
+    get_positions, mark_sent, mark_status,
     SORT_CHOICES,
 )
-from src.apply_tracker.tracker import days_left
 
 # ── Rich markup helpers ───────────────────────────────────────────────────────
+
+def _format_inst(r: dict) -> str:
+    inst = str(r.get("institution") or r.get("id") or "")
+    emp_type = r.get("employer_type")
+    via = r.get("posting_via")
+    if emp_type and emp_type not in ("direct", "unknown") and via:
+        return f"[bold]{inst}[/] [dim](via {via})[/]"
+    return f"[bold]{inst}[/]"
+
 
 def _deadline_cell(dl_str: str | None, d_left: int | None) -> str:
     if not dl_str:
@@ -152,7 +160,7 @@ class ApplyTrackerTUI(App):
         )
         for r in self._rows:
             table.add_row(
-                r.get("institution") or r["id"],
+                _format_inst(r),
                 _deadline_cell(r.get("deadline"), r["days_left"]),
                 _days_cell(r["days_left"]),
                 _fit_cell(r.get("fit")),
@@ -242,7 +250,7 @@ class ApplyTrackerTUI(App):
             self.notify("No URL for this position", severity="warning")
             return
         subprocess.Popen(["open", row["link"]])
-        self.notify(f"Opening browser…")
+        self.notify("Opening browser…")
 
 
 def run_tui(base_dir: Path, kind: str = "phd") -> None:

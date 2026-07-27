@@ -7,7 +7,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from src.apply_tracker.tracker import load_tracking, save_tracking, _parse_deadline
+from src.apply_tracker.tracker import _parse_deadline
 
 TRACK_MAP = {
     "ai_ml":               ("job",  "ai_ml"),
@@ -126,12 +126,29 @@ def apply_positions(positions: list[dict], base_dir: Path) -> tuple[int, int]:
             skipped += 1
             continue
 
+        institution_text = pos.get("institution", "")
+        employer_type = pos.get("employer_type")
+        posting_via = pos.get("posting_via")
+        
+        if not employer_type:
+            from src.pipeline.employer_extractor import extract_employer_info
+            title = pos.get("title", pos_id)
+            emp_info = extract_employer_info(title + " " + institution_text, institution_text)
+            institution_text = emp_info["real_employer"]
+            employer_type = emp_info["employer_type"]
+            posting_via = emp_info["posting_via"]
+
+            # Also update pos for db insertion
+            pos["institution"] = institution_text
+            pos["employer_type"] = employer_type
+            pos["posting_via"] = posting_via
+
         # Create .md file
         track_label = track_name.replace("_", " ").title()
         content = POSITION_MD_TEMPLATE.format(
             track_label=track_label,
             title=pos.get("title", pos_id),
-            institution=pos.get("institution", ""),
+            institution=institution_text,
             location=pos.get("location", ""),
             deadline=pos.get("deadline", ""),
             link=pos.get("link", ""),
@@ -155,6 +172,8 @@ def apply_positions(positions: list[dict], base_dir: Path) -> tuple[int, int]:
                 "experience": pos.get("experience", ""),
                 "title": pos.get("title", pos_id),
                 "institution": pos.get("institution", ""),
+                "employer_type": pos.get("employer_type", "unknown"),
+                "posting_via": pos.get("posting_via", ""),
                 "location": pos.get("location", ""),
                 "link": pos.get("link", ""),
                 "contact": pos.get("contact", ""),

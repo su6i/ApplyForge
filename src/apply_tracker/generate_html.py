@@ -73,7 +73,6 @@ _COUNTRY_FLAGS = {
     "finland": "🇫🇮", "tampere": "🇫🇮",
     "switzerland": "🇨🇭", "eth": "🇨🇭",
     "austria": "🇦🇹", "linz": "🇦🇹", "graz": "🇦🇹",
-    "germany": "🇩🇪",
     "greece": "🇬🇷", "athens": "🇬🇷",
 }
 
@@ -88,6 +87,15 @@ def _flag(institution: str) -> str:
 
 def _esc(s: str) -> str:
     return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _format_institution(e: dict, default: str = "") -> str:
+    inst = _esc(e.get("institution") or default)
+    emp_type = e.get("employer_type", "unknown")
+    via = e.get("posting_via", "")
+    if emp_type not in ("direct", "unknown") and via:
+        return f"<strong>{inst}</strong> <em>(via {_esc(via)})</em>"
+    return f"<strong>{inst}</strong>"
 
 
 # ── main generator ────────────────────────────────────────────────────────────
@@ -193,7 +201,7 @@ def generate_html(search_dir: Path, track: str) -> str:
             prio = "🟡"
 
         title = _esc(e.get("title", pos_id))
-        institution = _esc(e.get("institution", ""))
+        institution_html = _format_institution(e, "")
         deadline = e.get("deadline", "")
         dl_text = f"⏰ Deadline : {deadline}" + (f" — dans {dl} jours" if dl and dl > 0 else " — AUJOURD'HUI" if dl == 0 else " — PASSÉE" if dl and dl < 0 else "")
         notes = _esc(e.get("notes", ""))
@@ -202,7 +210,7 @@ def generate_html(search_dir: Path, track: str) -> str:
     <div class="action-item">
       <div class="action-prio">{prio}</div>
       <div class="action-text">
-        <strong>{institution} — {title}</strong>
+        {institution_html} — <strong>{title}</strong>
         <span class="deadline">{dl_text}</span>
         {f'<span class="detail">{notes}</span>' if notes else ''}
       </div>
@@ -216,7 +224,7 @@ def generate_html(search_dir: Path, track: str) -> str:
     for pos_id, e in sorted(all_pos, key=lambda x: (_days_left(x[1].get("deadline")) or 9999)):
         if e.get("status") in ("rejected", "bounced"):
             continue
-        institution = _esc(e.get("institution", pos_id))
+        institution_html = _format_institution(e, pos_id)
         title = _esc(e.get("title", ""))
         flag = _flag(e.get("institution", "") + " " + e.get("location", ""))
         deadline = _deadline_badge(e.get("deadline"))
@@ -224,7 +232,7 @@ def generate_html(search_dir: Path, track: str) -> str:
         status = _status_badge(e.get("status", "found"))
         pipeline_rows.append(f"""
         <tr>
-          <td><strong>{institution}</strong></td>
+          <td>{institution_html}</td>
           <td>{flag}</td>
           <td>{title}</td>
           <td>{deadline}</td>
@@ -237,14 +245,14 @@ def generate_html(search_dir: Path, track: str) -> str:
     for pos_id, e in all_pos:
         if e.get("status") not in ("sent", "replied"):
             continue
-        institution = _esc(e.get("institution", pos_id))
+        institution_html = _format_institution(e, pos_id)
         title = _esc(e.get("title", ""))
         flag = _flag(e.get("institution", "") + " " + e.get("location", ""))
         sent_date = _esc(e.get("sent_date") or "—")
         status = _status_badge(e.get("status", "sent"))
         sent_rows.append(f"""
         <tr>
-          <td><strong>{institution}</strong></td><td>{flag}</td>
+          <td>{institution_html}</td><td>{flag}</td>
           <td>{title}</td><td>{sent_date}</td>
           <td>{status}</td>
         </tr>""")
@@ -370,7 +378,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
 
         prio = "✅" if status == "sent" else ("🔴" if dl is not None and dl <= 7 else ("🟠" if dl is not None and dl <= 15 else "🟡"))
         title = _esc(e.get("title", pos_id))
-        institution = _esc(e.get("institution", ""))
+        institution_html = _format_institution(e, "")
         deadline = e.get("deadline", "")
         dl_text = f"⏰ Deadline : {deadline}" + (f" — dans {dl} jours" if dl and dl > 0 else " — AUJOURD'HUI" if dl == 0 else " — PASSÉE" if dl and dl < 0 else "") if deadline else ""
         notes = _esc(e.get("notes", ""))
@@ -378,7 +386,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
     <div class="action-item">
       <div class="action-prio">{prio}</div>
       <div class="action-text">
-        <strong>{institution} — {title}</strong>
+        {institution_html} — <strong>{title}</strong>
         {f'<span class="deadline">{dl_text}</span>' if dl_text else ''}
         {f'<span class="detail">{notes}</span>' if notes else ''}
       </div>
@@ -391,7 +399,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
     for pos_id, e in sorted(all_pos, key=lambda x: (_days_left(x[1].get("deadline")) or 9999)):
         if e.get("status") in ("rejected", "bounced"):
             continue
-        institution = _esc(e.get("institution", pos_id))
+        institution_html = _format_institution(e, pos_id)
         title = _esc(e.get("title", ""))
         location = _esc(e.get("location", ""))
         flag = _flag(e.get("institution", "") + " " + e.get("location", ""))
@@ -400,7 +408,7 @@ def generate_job_html(search_dir: Path, track: str) -> str:
         status = _status_badge(e.get("status", "found"))
         pipeline_rows.append(f"""
         <tr>
-          <td><strong>{institution}</strong></td>
+          <td>{institution_html}</td>
           <td>{flag}</td>
           <td>{title}</td>
           <td>{location}</td>
@@ -413,14 +421,14 @@ def generate_job_html(search_dir: Path, track: str) -> str:
     for pos_id, e in all_pos:
         if e.get("status") not in ("sent", "replied"):
             continue
-        institution = _esc(e.get("institution", pos_id))
+        institution_html = _format_institution(e, pos_id)
         title = _esc(e.get("title", ""))
         flag = _flag(e.get("institution", "") + " " + e.get("location", ""))
         sent_date = _esc(e.get("sent_date") or "—")
         status = _status_badge(e.get("status", "sent"))
         sent_rows.append(f"""
         <tr>
-          <td><strong>{institution}</strong></td><td>{flag}</td>
+          <td>{institution_html}</td><td>{flag}</td>
           <td>{title}</td><td>{sent_date}</td>
           <td>{status}</td>
         </tr>""")

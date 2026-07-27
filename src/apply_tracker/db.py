@@ -81,6 +81,8 @@ CREATE TABLE IF NOT EXISTS positions (
     sent_date    TEXT,
     reply_date   TEXT,
     reply_type   TEXT,
+    employer_type TEXT DEFAULT 'unknown',
+    posting_via  TEXT,
     added_date   TEXT DEFAULT (date('now')),
     updated_date TEXT DEFAULT (date('now')),
     PRIMARY KEY (id, kind)
@@ -102,7 +104,7 @@ def get_db(base_dir: Path) -> sqlite3.Connection:
     conn.executescript(_SCHEMA)
     conn.commit()
     # Column migrations (ALTER TABLE IF NOT EXISTS workaround)
-    for col, definition in [("experience", "TEXT")]:
+    for col, definition in [("experience", "TEXT"), ("employer_type", "TEXT DEFAULT 'unknown'"), ("posting_via", "TEXT")]:
         try:
             conn.execute(f"ALTER TABLE positions ADD COLUMN {col} {definition}")
             conn.commit()
@@ -128,12 +130,13 @@ def upsert(conn: sqlite3.Connection, pos: dict, kind: str) -> None:
         INSERT INTO positions
             (id, kind, track, status, title, institution, country, location,
              deadline, fit, fit_score, experience, link, contact, lang, source,
-             notes, sent_date, reply_date, reply_type, added_date, updated_date)
+             notes, sent_date, reply_date, reply_type, employer_type, posting_via,
+             added_date, updated_date)
         VALUES
             (:id, :kind, :track, :status, :title, :institution, :country,
              :location, :deadline, :fit, :fit_score, :experience, :link,
              :contact, :lang, :source, :notes, :sent_date, :reply_date,
-             :reply_type, date('now'), date('now'))
+             :reply_type, :employer_type, :posting_via, date('now'), date('now'))
         ON CONFLICT(id, kind) DO UPDATE SET
             track        = excluded.track,
             title        = COALESCE(excluded.title,       positions.title),
@@ -155,6 +158,8 @@ def upsert(conn: sqlite3.Connection, pos: dict, kind: str) -> None:
             sent_date    = COALESCE(positions.sent_date,  excluded.sent_date),
             reply_date   = COALESCE(positions.reply_date, excluded.reply_date),
             reply_type   = COALESCE(positions.reply_type, excluded.reply_type),
+            employer_type= COALESCE(excluded.employer_type, positions.employer_type),
+            posting_via  = COALESCE(excluded.posting_via, positions.posting_via),
             updated_date = date('now')
     """, {
         "id":          pos["id"],
@@ -177,6 +182,8 @@ def upsert(conn: sqlite3.Connection, pos: dict, kind: str) -> None:
         "sent_date":   pos.get("sent_date"),
         "reply_date":  pos.get("reply_date"),
         "reply_type":  pos.get("reply_type"),
+        "employer_type": pos.get("employer_type", "unknown"),
+        "posting_via": pos.get("posting_via"),
     })
     conn.commit()
 
@@ -219,15 +226,20 @@ def query(
     params: dict = {}
 
     if kind:
-        clauses.append("kind = :kind");        params["kind"]    = kind
+        clauses.append("kind = :kind")
+        params["kind"]    = kind
     if track:
-        clauses.append("track = :track");      params["track"]   = track
+        clauses.append("track = :track")
+        params["track"]   = track
     if status:
-        clauses.append("status = :status");    params["status"]  = status
+        clauses.append("status = :status")
+        params["status"]  = status
     if min_fit is not None:
-        clauses.append("fit_score >= :min_fit"); params["min_fit"] = min_fit
+        clauses.append("fit_score >= :min_fit")
+        params["min_fit"] = min_fit
     if country:
-        clauses.append("country = :country");  params["country"] = country
+        clauses.append("country = :country")
+        params["country"] = country
     if pending_only:
         clauses.append(
             "status NOT IN ('sent','replied','rejected','bounced')"

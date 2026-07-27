@@ -12,6 +12,15 @@ URGENT_DAYS = 7
 NEW_DAYS    = 2   # high-fit positions added within this many days count as "new"
 
 
+def _format_inst(r: dict) -> str:
+    inst = str(r.get("institution") or r.get("id") or "")
+    emp_type = r.get("employer_type")
+    via = r.get("posting_via")
+    if emp_type and emp_type not in ("direct", "unknown") and via:
+        return f"{inst} (via {via})"
+    return inst
+
+
 def _build_email(urgent: list[dict], high_fit: list[dict]) -> str:
     lines = ["PhD/Job Daily Alert\n" + "=" * 40]
 
@@ -22,14 +31,14 @@ def _build_email(urgent: list[dict], high_fit: list[dict]) -> str:
             left = r.get("days_left")
             left_str = f"{left}d" if left is not None else "--"
             fit  = r.get("fit") or "?"
-            inst = r.get("institution") or r.get("id")
+            inst = _format_inst(r)
             lines.append(f"  [{left_str:>4}]  {inst:<35}  fit:{fit:<5}  deadline:{dl}")
 
     if high_fit:
         lines.append(f"\n🟡 HIGH FIT — pending, no deadline ({len(high_fit)} positions)\n")
         for r in high_fit:
             fit  = r.get("fit") or "?"
-            inst = r.get("institution") or r.get("id")
+            inst = _format_inst(r)
             track = r.get("track") or ""
             lines.append(f"  fit:{fit:<5}  {inst:<35}  [{track}]")
 

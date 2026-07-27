@@ -139,6 +139,9 @@ TODO.md
 !config/roles.yaml
 # Committable example only; the REAL config/candidate.yaml never exists in-repo (rule 035 → vault).
 !config/candidate.example.yaml
+# Recruitment agencies / ESN / staffing firms — public company names only, no personal
+# data. Must be tracked: without it employer_extractor silently degrades to regex-only.
+!config/known_agencies.yaml
 
 # ── Registry contract tests (override the test_*.py ignore above) ──
 !tests/test_roles.py

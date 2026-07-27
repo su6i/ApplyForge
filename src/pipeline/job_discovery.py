@@ -90,11 +90,17 @@ def discover_jobs(urls: List[str], target_roles: List[str], use_ai_scoring: bool
                             job_t = t_tag.text.strip()
                             comp_t = c_tag.text.strip() if c_tag else "Unknown"
                             score = score_job_with_llm(job_t, comp_t, role_name) if use_ai_scoring else f"{random.randint(75, 99)}%"
+                            
+                            from src.pipeline.employer_extractor import extract_employer_info
+                            emp_info = extract_employer_info(job_t + " " + comp_t, comp_t)
+
                             results.append({
                                 "source_url": "LinkedIn",
                                 "target_role": role_name,
                                 "job_title": job_t,
-                                "company": comp_t,
+                                "company": emp_info["real_employer"],
+                                "employer_type": emp_info["employer_type"],
+                                "posting_via": emp_info["posting_via"],
                                 "match_score": score,
                                 "apply_link": l_tag["href"].split("?")[0],
                                 "status": "new",
@@ -118,11 +124,17 @@ def discover_jobs(urls: List[str], target_roles: List[str], use_ai_scoring: bool
                             job_t = t_tag.text.strip()
                             comp_t = c_tag.text.strip() if c_tag else "Unknown"
                             score = score_job_with_llm(job_t, comp_t, role_name) if use_ai_scoring else f"{random.randint(75, 99)}%"
+                            
+                            from src.pipeline.employer_extractor import extract_employer_info
+                            emp_info = extract_employer_info(job_t + " " + comp_t, comp_t)
+
                             results.append({
                                 "source_url": "Jobinja",
                                 "target_role": role_name,
                                 "job_title": job_t,
-                                "company": comp_t,
+                                "company": emp_info["real_employer"],
+                                "employer_type": emp_info["employer_type"],
+                                "posting_via": emp_info["posting_via"],
                                 "match_score": score,
                                 "apply_link": t_tag["href"],
                                 "status": "new",
