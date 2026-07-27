@@ -140,13 +140,15 @@ Selection rules:
   +500% de vitesse). À réserver pour les expériences professionnelles."
   Therefore, `cv_summary` must NOT contain percentages or uplift/reduction metrics.
 - Years of experience rule (STRICT):
-  * DEFAULT: Do not mention years unless the exact figure is present in the CANDIDATE PROFILE,
-    in which case it may be stated — never invent or inflate a number.
-  * EXCEPTION (retained for backward compatibility): IF the job posting explicitly requires
-    N years (e.g. "3 ans d'expérience minimum"), AND the candidate has at least N relevant
-    years in that domain as shown in the CANDIDATE PROFILE, THEN you MAY write exactly
-    N years (not more) in `cl_intro` or `cv_summary`.
-  * Never invent years not requested. Never exceed the number asked.
+  * DEFAULT: never state a total-years-of-experience figure anywhere — not in `cv_summary`,
+    not in `cl_intro`, not in `cl_body`, not in `cl_short`, not in `why_this_company` —
+    even if such a figure appears in the CANDIDATE PROFILE. Naming a number can only
+    self-reject the application against postings that ask for more.
+  * Describe seniority through scale and evidence instead (systems operated, users served,
+    equipment supervised, criticality of the environment), never through a duration.
+  * The ONLY exception is an explicit instruction to the contrary in the rules above; if
+    no such instruction is present, no year figure may appear.
+  * Never invent, round up, or infer a duration.
 - `selected_education`: Always include ALL degrees from the profile's `education` list.
   For `honors`, keep only the 3 most relevant grade items for THIS job — always trim to max 3 items.
   Translate `degree`, `institution`, and `honors` exactly into the requested output language.
@@ -245,6 +247,8 @@ def tailor(
     if pos_cfg.get("allow_stating_years", False):
         bullets.append("- You MAY state the candidate's real total years of professional experience exactly as given in the CANDIDATE PROFILE. Never inflate it and never invent a figure absent from the profile.")
 
+    allowed_years = _years_exception(candidate, job_text, str(preferred_language or ""), bullets)
+
     bullets_str = "\n".join(bullets)
 
     prompt = ChatPromptTemplate.from_messages(
@@ -269,17 +273,17 @@ def tailor(
         position_title=data.get("position_title", "Unknown Position"),
         language=data.get("language", "fr"),        # type: ignore[arg-type]
         variant=data.get("variant", role),
-        why_this_company=_strip_years_and_metrics(data.get("why_this_company", ""), known_metrics),
+        why_this_company=_strip_years_and_metrics(data.get("why_this_company", ""), known_metrics, allowed_years),
         match_score=int(data.get("match_score", 0)),
         tailored_skills=data.get("tailored_skills", []),
-        cv_summary=_strip_years_and_metrics(data.get("cv_summary", ""), known_metrics),
+        cv_summary=_strip_years_and_metrics(data.get("cv_summary", ""), known_metrics, allowed_years),
         selected_experience=data.get("selected_experience", []),
         selected_projects=data.get("selected_projects", []),
         job_location=data.get("job_location", ""),
-        cl_intro=_strip_years_and_metrics(data.get("cl_intro", ""), known_metrics),
-        cl_body=_strip_years_and_metrics(data.get("cl_body", ""), known_metrics),
+        cl_intro=_strip_years_and_metrics(data.get("cl_intro", ""), known_metrics, allowed_years),
+        cl_body=_strip_years_and_metrics(data.get("cl_body", ""), known_metrics, allowed_years),
         cl_short=_enforce_char_limit(
-            _strip_years_and_metrics(data.get("cl_short", ""), known_metrics)
+            _strip_years_and_metrics(data.get("cl_short", ""), known_metrics, allowed_years)
         ),
         extra_education=data.get("extra_education", []),
         selected_education=data.get("selected_education", []),
@@ -319,6 +323,98 @@ def _extract_known_metrics(source_text: str) -> set[str]:
     if not source_text:
         return set()
     return set(re.findall(r"\d+[\.,]?\d*(?=\s*%)", source_text))
+
+
+_YEAR_FIGURE_RE = re.compile(r"\b(\d{1,2})\s*\+?\s*(?:ans?|années?|years?)\b", re.IGNORECASE)
+_EXPERIENCE_WORD_RE = re.compile(r"exp[ée]rience|experience|\bexp\.", re.IGNORECASE)
+
+
+def _posting_required_years(job_text: str) -> int | None:
+    """Return the years-of-experience figure the posting explicitly demands, else None.
+
+    A bare "2 ans" is not a requirement — it is just as likely a contract length
+    ("CDD de 2 ans") or a company age. Only a figure sitting within a short window
+    of the word "expérience"/"experience" is treated as a demand. When a posting
+    names several (e.g. "3 ans minimum, 5 ans idéalement"), the highest is taken:
+    the caller caps it against the candidate's real window, so this can never
+    produce an overclaim, only the best honest answer to what was asked.
+    """
+    if not job_text:
+        return None
+    found: list[int] = []
+    for match in _YEAR_FIGURE_RE.finditer(job_text):
+        window = job_text[max(0, match.start() - 60): match.end() + 60]
+        if _EXPERIENCE_WORD_RE.search(window):
+            found.append(int(match.group(1)))
+    return max(found) if found else None
+
+
+def _scale_phrases(evidence: dict, preferred_language: str) -> list[str]:
+    """Pick the `cv_evidence.scale` phrases for the output language.
+
+    Accepts either a flat list (language-agnostic) or a {lang: [...]} mapping,
+    because the vault is hand-edited and both shapes read naturally there.
+    """
+    scale = evidence.get("scale") or []
+    if isinstance(scale, list):
+        return [str(item) for item in scale]
+    lang = (preferred_language or "").strip().lower()
+    for key in (lang, "fr", "en"):
+        if key and scale.get(key):
+            return [str(item) for item in scale[key]]
+    return []
+
+
+def _years_exception(
+    candidate: dict,
+    job_text: str,
+    preferred_language: str,
+    bullets: list[str],
+) -> int | None:
+    """Decide whether a year figure may appear at all, appending the matching
+    prompt rules to ``bullets``. Returns the one figure allowed to survive
+    post-processing, or None when no duration may be stated.
+
+    The default is silence: naming a total only self-rejects against postings
+    asking for more. A figure is unlocked only when the posting itself demands
+    one, and even then it is capped at the candidate's real countable window —
+    so the answer is always "exactly what you asked for, and I have it", never
+    an inflated career total.
+    """
+    evidence = candidate.get("cv_evidence") or {}
+
+    phrases = _scale_phrases(evidence, preferred_language)
+    if phrases:
+        bullets.append(
+            "- Convey seniority through scale, never through a duration. Reuse these "
+            "real facts from the candidate's record when they fit the posting, and "
+            "invent no others: " + " | ".join(phrases)
+        )
+
+    window = evidence.get("countable_window") or {}
+    window_years = int(window.get("years") or 0)
+    if window_years <= 0:
+        return None
+
+    asked = _posting_required_years(job_text)
+    if not asked:
+        return None
+
+    allowed = min(asked, window_years)
+    span = ""
+    if window.get("from_year") and window.get("to_year"):
+        span = f" ({window['from_year']}–{window['to_year']})"
+    bullets.append(
+        f"- This posting explicitly asks for {asked} year(s) of experience. You MAY — once, "
+        f"in `cl_intro` or `cv_summary`, not in both — write exactly "
+        f"\"{allowed} ans d'expérience{span}\" (French) or \"{allowed} years of experience{span}\" "
+        f"(English). Any other duration anywhere in the output is forbidden."
+    )
+    logger.info(
+        f"Years exception unlocked: posting asks {asked}, countable window {window_years} "
+        f"-> stating {allowed}."
+    )
+    return allowed
 
 
 def _strip_metrics_in_summary(text: str, known_metrics: set[str] | None = None) -> str:
@@ -368,24 +464,38 @@ def _enforce_char_limit(text: str, limit: int = SHORT_LETTER_CHAR_LIMIT) -> str:
 
 
 def _strip_years_and_metrics(
-    text: str | list[str], known_metrics: set[str] | None = None
+    text: str | list[str],
+    known_metrics: set[str] | None = None,
+    allowed_years: int | None = None,
 ) -> str | list[str]:
     """Remove years-of-experience mentions and fabricated numeric metrics.
     Logs a warning when any modification is made.
+
+    ``allowed_years`` is the single figure the posting explicitly asked for and
+    that the candidate genuinely covers (see ``_posting_required_years`` and
+    ``cv_evidence.countable_window``). That exact figure survives; every other
+    duration is still removed, so the model cannot smuggle a different number
+    through by claiming the posting authorised it.
     """
     if isinstance(text, list):
-        return [_strip_years_and_metrics(t, known_metrics) for t in text]  # type: ignore
+        return [_strip_years_and_metrics(t, known_metrics, allowed_years) for t in text]  # type: ignore
     if not text:
         return text
     original = text
+
+    def _drop_unless_allowed(match: re.Match) -> str:
+        if allowed_years is not None and int(match.group("digits")) == allowed_years:
+            return match.group(0)
+        return ""
+
     # French year patterns: remove only the quantified phrase
     # Matches optional leading connector (avec/plus de/environ/près de), then digits, optional +, "an" or "ans", optional rest like " d'expérience"
     # Consume the phrase entirely, including any following space or period boundary.
-    fr_pattern = r"(?:plus de\s+|environ\s+|près de\s+|avec\s+)?\d+\s*\+?\s*ans?(?:\s+d['\u2019](?:expérience|exp\.?))?"
-    cleaned = re.sub(fr_pattern, "", text, flags=re.IGNORECASE)
+    fr_pattern = r"(?:plus de\s+|environ\s+|près de\s+|avec\s+)?(?P<digits>\d+)\s*\+?\s*ans?(?:\s+d['\u2019](?:expérience|exp\.?))?"
+    cleaned = re.sub(fr_pattern, _drop_unless_allowed, text, flags=re.IGNORECASE)
     # English year patterns
-    en_pattern = r"(?:more than\s+|over\s+|about\s+|with\s+)?\d+\s*\+?\s*years?(?:\s+of\s+experience|\s+experience)?"
-    cleaned = re.sub(en_pattern, "", cleaned, flags=re.IGNORECASE)
+    en_pattern = r"(?:more than\s+|over\s+|about\s+|with\s+)?(?P<digits>\d+)\s*\+?\s*years?(?:\s+of\s+experience|\s+experience)?"
+    cleaned = re.sub(en_pattern, _drop_unless_allowed, cleaned, flags=re.IGNORECASE)
     # Remove fabricated % metrics — real, sourced figures survive (handled below).
     cleaned = _strip_metrics_in_summary(cleaned, known_metrics)
     # Clean up whitespace and punctuation

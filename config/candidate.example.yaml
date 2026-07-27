@@ -24,3 +24,18 @@ candidate:
     avoid_labels: []            # e.g. ["jeune diplômé", "junior", "débutant"]
     framing: ""                 # e.g. "profil expérimenté en transition"
     allow_stating_years: false  # If true, allows the LLM to state exact years of experience from the profile
+
+  # Replaces the year count as the way seniority is expressed.
+  # Default behaviour with an empty block: no duration is ever written, anywhere.
+  cv_evidence:
+    # Quantified scale facts the LLM may reuse INSTEAD of "N years of experience".
+    # Flat list, or a per-language mapping ({fr: [...], en: [...]}).
+    scale: []                   # e.g. ["supervision de 40+ sites", "astreinte 24/7"]
+
+    # The ONLY figure that may ever be written, and only when the posting itself
+    # demands N years. It is capped at `years`, so the answer matches the ask
+    # without ever inflating the real record. years: 0 disables the exception.
+    countable_window:
+      years: 0                  # continuous, defensible years in the target domain
+      from_year: null           # e.g. 2021 — quoted alongside the figure as proof
+      to_year: null             # e.g. 2024

@@ -13,7 +13,13 @@ from pathlib import Path
 # Allow running directly (python tests/test_content_tailor.py) from anywhere.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.pipeline.content_tailor import _strip_years_and_metrics, _parse_json, TailoringError
+from src.pipeline.content_tailor import (
+    TailoringError,
+    _parse_json,
+    _posting_required_years,
+    _strip_years_and_metrics,
+    _years_exception,
+)
 from src.core.tex_utils import latex_escape
 
 
@@ -106,6 +112,57 @@ def test_empty_json_like_still_raises():
         assert False, "Expected TailoringError"
     except TailoringError:
         pass
+
+
+def test_posting_years_detected_only_next_to_experience():
+    # "CDD de 2 ans" is a contract length, not a requirement — must not unlock a figure.
+    assert _posting_required_years("Contrat: CDD de 2 ans, temps plein.") is None
+    assert _posting_required_years("Vous justifiez de 3 ans d'expérience en réseaux.") == 3
+    assert _posting_required_years("Minimum 5 years of experience with Python.") == 5
+    assert _posting_required_years("") is None
+
+
+def test_years_survive_only_when_posting_asked_for_them():
+    text = "Ingénieur réseaux avec 3 ans d'expérience sur Cisco."
+    assert "3 ans" in _strip_years_and_metrics(text, None, 3)
+    # Same sentence, no posting requirement -> the figure is still removed.
+    assert "3 ans" not in _strip_years_and_metrics(text)
+
+
+def test_allowed_years_does_not_whitelist_other_figures():
+    # Authorising "3" must not let a fabricated "7" ride along.
+    text = "7 ans d'expérience en réseaux et 3 ans d'expérience en Python."
+    cleaned = _strip_years_and_metrics(text, None, 3)
+    assert "7 ans" not in cleaned
+    assert "3 ans" in cleaned
+
+
+def test_years_exception_caps_at_the_real_window():
+    # Posting asks 5, candidate's defensible window is 3 -> state 3, never 5.
+    candidate = {"cv_evidence": {"countable_window": {"years": 3, "from_year": 2021, "to_year": 2024}}}
+    bullets: list[str] = []
+    allowed = _years_exception(candidate, "Nous demandons 5 ans d'expérience.", "fr", bullets)
+    assert allowed == 3
+    assert any("2021" in b for b in bullets)
+
+
+def test_no_years_exception_without_a_posting_requirement():
+    candidate = {"cv_evidence": {"countable_window": {"years": 3}}}
+    bullets: list[str] = []
+    assert _years_exception(candidate, "Poste de technicien réseau à Lyon.", "fr", bullets) is None
+
+
+def test_scale_phrases_are_injected_per_language():
+    candidate = {"cv_evidence": {"scale": {"fr": ["200+ switches Cisco"], "en": ["200+ Cisco switches"]}}}
+    bullets: list[str] = []
+    _years_exception(candidate, "Poste réseau.", "en", bullets)
+    assert any("200+ Cisco switches" in b for b in bullets)
+
+
+def test_empty_cv_evidence_states_nothing():
+    bullets: list[str] = []
+    assert _years_exception({}, "Nous demandons 3 ans d'expérience.", "fr", bullets) is None
+    assert bullets == []
 
 
 def _run_all() -> int:

@@ -167,11 +167,14 @@ def build_spontaneous(
     output_dir = base_dir / folder_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Copy only .cls/.sty files (not all templates in the folder)
+    # Copy the folder's support files, never the sibling CV templates: classes,
+    # packages, and shared .tex includes such as lato_macros.tex, which every
+    # lato template \input's on line 2. Same rule as _copy_template_assets —
+    # it was missing here, so the whole lato spontaneous track failed to compile.
     from src.core.settings import REPO_ROOT
     tmpl_dir = REPO_ROOT / "templates" / template_folder
     for f in tmpl_dir.iterdir():
-        if f.suffix in (".cls", ".sty"):
+        if f.suffix in (".cls", ".sty") or (f.suffix == ".tex" and not f.name.startswith("CV_")):
             shutil.copy2(f, output_dir / f.name)
     # Copy shared/ (personal_data.tex etc.)
     shared_dest = output_dir.parent / "shared"
