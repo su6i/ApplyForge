@@ -16,7 +16,7 @@ def add_source(src_file: Path, name: str, url: str, desc: str = "",
 
     new_line = f"{name:<14}| {url:<80}| {desc}\n"
 
-    data_indices = [i for i, l in enumerate(lines) if _is_data_line(l)]
+    data_indices = [i for i, line in enumerate(lines) if _is_data_line(line)]
 
     if priority is not None:
         # Insert before the Nth data entry (1-based)
@@ -30,7 +30,7 @@ def add_source(src_file: Path, name: str, url: str, desc: str = "",
     else:
         # Default: insert before GMAIL NEWSLETTERS section
         gmail_idx = next(
-            (i for i, l in enumerate(lines) if "── GMAIL" in l),
+            (i for i, line in enumerate(lines) if "── GMAIL" in line),
             len(lines),
         )
         insert_at = gmail_idx

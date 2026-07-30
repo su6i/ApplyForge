@@ -16,9 +16,8 @@ import uvicorn
 from src.core.settings import OWNER_DISPLAY_NAME
 from src.apply_tracker.service import (
     get_positions, get_stats, get_countries,
-    mark_sent, mark_status,
+    mark_status,
 )
-from src.apply_tracker.tracker import days_left
 import src.apply_tracker.gmail_sync as _gmail
 
 import os as _os
@@ -246,9 +245,13 @@ class _FilterState:
                  country: str, min_fit: str, status: str,
                  track: str, fit: str):
         self.base = base
-        self.sort = sort; self.asc = asc
-        self.country = country; self.min_fit = min_fit
-        self.status = status; self.track = track; self.fit = fit
+        self.sort = sort
+        self.asc = asc
+        self.country = country
+        self.min_fit = min_fit
+        self.status = status
+        self.track = track
+        self.fit = fit
 
     def url(self, **overrides) -> str:
         p = dict(sort=self.sort, asc=self.asc, country=self.country,
@@ -410,7 +413,6 @@ def _stats_cards(st: dict, kind: str) -> str:
     bs = st["by_status"]
     total   = st["total"]
     pending = bs.get("found",0) + bs.get("draft_ready",0) + bs.get("watching",0)
-    urgent  = 0  # can't compute without deadline data here
     return f"""<div class="stats">
       <div class="stat"><div class="num">{total}</div><div class="lbl">Total</div></div>
       <div class="stat"><div class="num">{pending}</div><div class="lbl">Pending</div></div>
@@ -763,7 +765,7 @@ def run_web(base_dir: Path, port: int = 8765, reload: bool = True) -> None:
     print(f"  🌐 Apply Tracker Web UI → http://localhost:{port}")
     print(f"  🌐 API docs             → http://localhost:{port}/api/docs")
     if reload:
-        print(f"  👁 Watchdog active — auto-reload on file change")
+        print("  👁 Watchdog active — auto-reload on file change")
         # reload=True requires app as import string
         import os
         os.environ["APPLY_BASE_DIR"] = str(base_dir)

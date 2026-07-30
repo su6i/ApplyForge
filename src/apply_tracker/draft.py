@@ -12,7 +12,7 @@ try:
 except ImportError:
     HAS_OPENAI = False
 
-from src.apply_tracker.tracker import parse_position_md, load_tracking, update_entry, _find_track_dir
+from src.apply_tracker.tracker import parse_position_md, load_tracking, update_entry
 
 
 # ── API key loader ─────────────────────────────────────────────────────────────

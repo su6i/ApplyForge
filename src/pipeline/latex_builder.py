@@ -35,7 +35,6 @@ from src.core.settings import (
     TEMPLATES_SHARED,
 )
 from src.core.tex_utils import latex_escape, slugify
-from src.pipeline import altacv_renderer
 from src.pipeline.content_tailor import TailoredContent
 from src.pipeline.job_scraper import JobPosting
 from src.pipeline.role_classifier import RoleType

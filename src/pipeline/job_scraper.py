@@ -13,7 +13,6 @@ import io
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
