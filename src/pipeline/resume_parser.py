@@ -19,10 +19,9 @@ from pathlib import Path
 
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
 
 from src.core.logger import logger
-from src.core.settings import CV_OWNER_SLUG, DATA_DIR, LLM_MODEL, OPENAI_API_KEY, REPO_ROOT
+from src.core.settings import CV_OWNER_SLUG, DATA_DIR, REPO_ROOT
 
 PROFILE_PATH = DATA_DIR / f"{CV_OWNER_SLUG}-CV_AI_source.json"
 DEFAULT_CV_TEX = REPO_ROOT / "templates" / "lato" / "CV_AI_en.tex"

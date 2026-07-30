@@ -2,14 +2,10 @@
 """Terminal status table for PhD/Job applications — color-blind friendly."""
 
 import json
-import sys
 from pathlib import Path
 
-from src.apply_tracker.tracker import (
-    load_tracking, parse_position_md, days_left, init_tracking
-)
-from src.apply_tracker.db import get_db, query as db_query
-from src.apply_tracker.service import get_positions, SORT_CHOICES
+from src.apply_tracker.tracker import days_left, init_tracking
+from src.apply_tracker.service import get_positions
 
 _SORT_MAP: dict[str, str] = {
     "fit":         "fit_score DESC NULLS LAST, CASE WHEN deadline IS NULL THEN 1 ELSE 0 END, deadline",

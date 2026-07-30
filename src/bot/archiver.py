@@ -7,7 +7,6 @@ Key change: now sends both cv_pdf AND cl_pdf.
 from __future__ import annotations
 
 import asyncio
-import os
 from pathlib import Path
 
 from telegram import Bot

@@ -108,7 +108,6 @@ def audit_folder(apply_folder: Path | None, pos_id: str) -> list[tuple[str, bool
     results.append(_check("Apply folder exists", True, str(apply_folder)))
 
     files = list(apply_folder.iterdir())
-    names = " ".join(f.name for f in files)
 
     has_cv = any("CV" in f.name and f.suffix == ".pdf" for f in files)
     has_lettre = any("Lettre" in f.name and f.suffix == ".pdf" for f in files)
@@ -174,7 +173,7 @@ def audit_lettre(apply_folder: Path | None, sup: dict | None) -> list[tuple[str,
             import subprocess
             out = subprocess.check_output(["pdfinfo", str(pdf_file)],
                                           stderr=subprocess.DEVNULL, text=True)
-            pages_line = next((l for l in out.splitlines() if "Pages:" in l), "")
+            pages_line = next((line for line in out.splitlines() if "Pages:" in line), "")
             n_pages = int(pages_line.split()[-1]) if pages_line else 0
             results.append(_check(f"Lettre is 1 page (got {n_pages})",
                                    n_pages == 1,
@@ -256,7 +255,6 @@ def audit_tracking(entry: dict, pos_id: str) -> list[tuple[str, bool]]:
         try:
             dl = datetime.strptime(deadline, "%Y-%m-%d").date()
             days = (dl - date.today()).days
-            urgent = days <= 7
             results.append(_check(f"Deadline: {deadline} ({days}d left)",
                                    days > 0,
                                    "OVERDUE" if days <= 0 else ("URGENT — send today" if days <= 3 else ""),
@@ -274,10 +272,7 @@ def audit_tracking(entry: dict, pos_id: str) -> list[tuple[str, bool]]:
 # ── main ───────────────────────────────────────────────────────────────────────
 
 def run_audit(search_dir: Path, pos_id: str, applyforge_dir: Path) -> int:
-    from src.apply_tracker.tracker import load_tracking
-
     found_dir = search_dir / "found"
-    pos_track = None
     for td in found_dir.iterdir():
         if not td.is_dir():
             continue
@@ -286,7 +281,6 @@ def run_audit(search_dir: Path, pos_id: str, applyforge_dir: Path) -> int:
             continue
         data = json.loads(tj.read_text())
         if pos_id in data:
-            pos_track = td.name
             entry = data[pos_id]
             break
     else:
@@ -297,12 +291,12 @@ def run_audit(search_dir: Path, pos_id: str, applyforge_dir: Path) -> int:
     sup = entry.get("supervisor")
 
     print()
-    print(f"  ══════════════════════════════════════════════════════")
+    print("  ══════════════════════════════════════════════════════")
     print(f"  🔍  AUDIT — {pos_id}")
     title = entry.get("title", "")[:60]
     if title:
         print(f"       {title}")
-    print(f"  ══════════════════════════════════════════════════════")
+    print("  ══════════════════════════════════════════════════════")
 
     sections = [
         ("TRACKING", audit_tracking(entry, pos_id)),
@@ -327,7 +321,7 @@ def run_audit(search_dir: Path, pos_id: str, applyforge_dir: Path) -> int:
 
     score = int(passed / total * 100) if total else 0
     print()
-    print(f"  ══════════════════════════════════════════════════════")
+    print("  ══════════════════════════════════════════════════════")
     print(f"  Score: {passed}/{total} checks passed ({score}%)")
 
     if blockers:
@@ -339,7 +333,7 @@ def run_audit(search_dir: Path, pos_id: str, applyforge_dir: Path) -> int:
     else:
         print(f"\n  {WARN}  Minor issues — review warnings above")
 
-    print(f"  ══════════════════════════════════════════════════════")
+    print("  ══════════════════════════════════════════════════════")
     print()
     return 0 if not blockers else 1
 

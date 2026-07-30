@@ -10,7 +10,7 @@ from pathlib import Path
 
 from src.apply_tracker.db import (
     get_db, query as _db_query, update_status as _db_update,
-    find_position, stats as _db_stats, upsert,
+    stats as _db_stats,
 )
 from src.apply_tracker.tracker import days_left, _find_track_dir, update_entry
 

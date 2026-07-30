@@ -26,7 +26,7 @@ def main(base_dir: Path) -> None:
             print(f"  {color}{status:<14}{RESET}  {n:3}  {color}{bar}{RESET}")
 
         if s["by_country"]:
-            print(f"\n  Countries:")
+            print("\n  Countries:")
             for r in s["by_country"]:
                 bar = "▪" * r["n"]
                 print(f"    {r['country']:<16} {r['n']:3}  {bar}")

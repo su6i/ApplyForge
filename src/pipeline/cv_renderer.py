@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.core.tex_utils import latex_escape, itemize
+from src.core.tex_utils import latex_escape
 
 if TYPE_CHECKING:
     from src.pipeline.content_tailor import TailoredContent
