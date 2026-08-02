@@ -32,6 +32,31 @@ _DOC_PREAMBLE = r"""\documentclass[10pt,a4paper,withhyper]{altacv}
 \colorlet{emphasis}{SlateGrey}
 \colorlet{body}{LightGrey}
 
+% ── Header info items ────────────────────────────────────────────────────
+% altacv's \printinfo puts its 2em trailing separator INSIDE the \mbox, so the
+% gap is unbreakable: the last item on a line is measured as "text + 2em" and
+% wraps even when the text alone would fit, leaving dead space on the right
+% (the homepage field jumped to line 2 with ~97pt free next to it). Redefining
+% it with the separator OUTSIDE the box lets TeX discard that glue at a line
+% break, which is what a separator is supposed to do.
+\RenewDocumentCommand{\printinfo}{o m m o}{%
+  \mbox{\textcolor{accent}{\normalfont #2}~%
+    \IfNoValueTF{#4}%
+      {\utffriendlydetokenize{#3}}%
+      {\href{#4}{\utffriendlydetokenize{#3}}}%
+  }\hskip 1.6em plus .4em minus .35em\relax
+}
+
+% ── Tech-stack tags ──────────────────────────────────────────────────────
+% Blue rounded box around each technology (owner's standard, default ON for
+% every render). One tag per technology instead of a comma-separated run.
+\usepackage{tikz}
+\definecolor{StackLightBlue}{HTML}{EBF5FB}
+\definecolor{StackBorderBlue}{HTML}{85C1E9}
+\newcommand{\stacktag}[1]{%
+  \smash{\tikz[baseline]\node[anchor=base,fill=StackLightBlue,draw=StackBorderBlue,rounded corners=2pt,inner xsep=0.8ex,inner ysep=0.5ex]{\textbf{\itshape\footnotesize #1}};}%
+}
+
 \renewcommand{\itemmarker}{{\small\textbullet}}
 \renewcommand{\ratingmarker}{\faCircle}
 \renewcommand{\taglinefont}{\Large\bfseries}
@@ -431,6 +456,18 @@ def _right_col_divider(default_divider: str) -> str:
         return ""
     return default_divider
 
+def _tech_tags(tech: list[str], language: str) -> str:
+    """Render a tech list as boxed tags (owner's standard, always on)."""
+    tags = " ".join(f"\\stacktag{{{latex_escape(t)}}}" for t in tech if t)
+    return (
+        "\\smallskip\\par\\noindent\\raggedright\\textit{"
+        + _label("tech", language)
+        + ": }"
+        + tags
+        + "\\par"
+    )
+
+
 def _section_experience(experience: list[dict], language: str) -> str:
     items: list[str] = [f"\\cvsection{{{_label('experience', language)}}}\n"]
     for job in experience:
@@ -450,13 +487,7 @@ def _section_experience(experience: list[dict], language: str) -> str:
             items.append("\\end{itemize}")
             
         if tech:
-            items.append(
-                "\\smallskip\\noindent\\textit{"
-                + _label("tech", language)
-                + ": }"
-                + latex_escape(", ".join(tech[:6]))
-                + "\\par"
-            )
+            items.append(_tech_tags(tech[:6], language))
         else:
             items.append("\\par")
             
@@ -483,7 +514,20 @@ def _section_projects(projects: list[dict], language: str) -> str:
         # Format: bold title with period on same line, no type shown
         title_with_period = f"\\textbf{{{title}}} {{\\footnotesize\\color{{LightGrey}}{period}}}"
         if url:
-            title_with_period = f"\\href{{{url}}}{{{title_with_period}}}"
+            # The link used to be invisible: \href with no visual cue meant the
+            # reader had no way to know a project was on GitHub. Show the icon
+            # and the repo path in accent colour, so it reads as a link on paper
+            # as well as on screen.
+            icon = "\\faGithub" if "github.com" in url else "\\faLink"
+            label = latex_escape(
+                url.split("github.com/")[-1].strip("/")
+                if "github.com" in url
+                else url.replace("https://", "").replace("http://", "").strip("/")
+            )
+            title_with_period = (
+                f"\\href{{{url}}}{{{title_with_period}"
+                f" {{\\footnotesize\\color{{accent}}{icon}\\," + label + "}}"
+            )
         
         # Use empty strings for type (2nd param) and location (4th param) to hide them
         items.append(f"\\cvevent{{{title_with_period}}}{{}}{{}}{{}}") 
@@ -499,13 +543,7 @@ def _section_projects(projects: list[dict], language: str) -> str:
             items.append("\\end{itemize}")
             
         if tech:
-            items.append(
-                "\\smallskip\\noindent\\textit{"
-                + _label("tech", language)
-                + ": }"
-                + latex_escape(", ".join(tech[:8]))
-                + "\\par"
-            )
+            items.append(_tech_tags(tech[:8], language))
         else:
             if not desc:
                 items.append("\\par")
