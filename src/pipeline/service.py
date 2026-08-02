@@ -123,12 +123,32 @@ class ApplicationService:
                 apply_resp = requests.get(
                     posting.apply_url, headers=_headers, timeout=15, allow_redirects=True
                 )
-                if apply_resp.status_code >= 400:
+                # 401/403/429 mean "this ATS refuses non-browser clients", NOT
+                # "the offer is gone". SmartRecruiters' oneclick-ui (behind many
+                # career sites, e.g. Sopra Steria) 403s every request without a
+                # JS-executing browser session — even with a browser User-Agent.
+                # Treating that as fatal aborted the whole LLM path and silently
+                # emitted a generic offline-dictionary CV for a perfectly live
+                # posting. Only a definitive "gone" status is fatal here.
+                if apply_resp.status_code in (401, 403, 429):
+                    logger.warning(
+                        f"Could not verify apply URL (HTTP {apply_resp.status_code}, "
+                        f"bot protection — not treated as expired): {posting.apply_url}"
+                    )
+                elif apply_resp.status_code in (404, 410):
                     raise RuntimeError(
-                        f"⛔  Application link is unreachable (HTTP {apply_resp.status_code}): "
+                        f"⛔  Application link is gone (HTTP {apply_resp.status_code}): "
                         f"{posting.apply_url}"
                     )
-                apply_body_lower = apply_resp.text.lower()
+                elif apply_resp.status_code >= 400:
+                    logger.warning(
+                        f"Apply URL returned HTTP {apply_resp.status_code}; continuing: "
+                        f"{posting.apply_url}"
+                    )
+                # Only read the body for expiry signals on a successful response —
+                # an error page ("not available") would otherwise be misread as an
+                # expired offer.
+                apply_body_lower = apply_resp.text.lower() if apply_resp.status_code < 400 else ""
                 if any(sig in apply_body_lower for sig in _EXPIRED_SIGNALS):
                     raise RuntimeError(
                         f"⛔  Application link appears expired or closed: {posting.apply_url}"
