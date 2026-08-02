@@ -228,7 +228,7 @@ def tailor(
     
     max_exp = pos_cfg.get("max_experience_entries", 0)
     if max_exp > 0:
-        bullets.append(f"- selected_experience: include ONLY the candidate's {max_exp} most recent professional position(s). Do NOT list older jobs. (EXCEPTION: for a PhD application include the full history — see the PhD note above.)\n  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.\n  * Adjust highlights to focus heavily on aspects relevant to this specific job.")
+        bullets.append(f"- selected_experience: ALWAYS include the internship / stage entry (an internship is NOT a professional position and does NOT count towards the limit below) PLUS the candidate's {max_exp} most recent professional position(s). Do NOT list older jobs. (EXCEPTION: for a PhD application include the full history — see the PhD note above.)\n  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.\n  * Adjust highlights to focus heavily on aspects relevant to this specific job.")
     else:
         bullets.append("- selected_experience: include the relevant positions from the profile.\n  Rewrite/translate `role` and `highlights` accurately to the target language, maintaining professional terminology.\n  * Adjust highlights to focus heavily on aspects relevant to this specific job.")
 
