@@ -57,6 +57,8 @@ class DossierArtifacts:
     cl_pdf: Path | None = None
     cl_full_txt: Path | None = None
     cl_short_txt: Path | None = None
+    enclosed_docs: list[tuple[Path, str]] = field(default_factory=list)
+
 
 
 # ─── Artifact Discovery & Helper Functions ────────────────────────────────────
@@ -246,6 +248,78 @@ def _check_r1_stale_artifact(artifacts: DossierArtifacts, findings: list[Finding
             logger.warning(f"Could not read sidecar .coherence.json: {exc}")
 
 
+def _discover_enclosed_docs(artifacts: DossierArtifacts, findings: list[Finding]) -> None:
+    """
+    Find and extract text from enclosed supporting documents (e.g. reference letters,
+    files in context/ subfolder) to extend the evidence corpus.
+    Emits an INFO-level finding if an enclosed PDF cannot be text-extracted.
+    """
+    primary_paths = {
+        p.resolve()
+        for p in [
+            artifacts.cv_tex,
+            artifacts.cv_pdf,
+            artifacts.cl_tex,
+            artifacts.cl_pdf,
+            artifacts.cl_full_txt,
+            artifacts.cl_short_txt,
+        ]
+        if p and p.exists()
+    }
+
+    candidates: list[Path] = []
+    for p in artifacts.dir_path.rglob("*"):
+        if not p.is_file():
+            continue
+        if p.resolve() in primary_paths:
+            continue
+        if p.name in ("COHERENCE.md", ".coherence.json", ".DS_Store"):
+            continue
+        if p.name.startswith("."):
+            continue
+        if p.name.startswith("JobPosting"):
+            continue
+        candidates.append(p)
+
+    for p in candidates:
+        suf = p.suffix.lower()
+        if suf in (".txt", ".md", ".tex"):
+            try:
+                text = p.read_text(encoding="utf-8", errors="ignore")
+                if text.strip():
+                    artifacts.enclosed_docs.append((p, text))
+            except Exception:
+                pass
+        elif suf == ".pdf":
+            try:
+                from pdfminer.high_level import extract_text as pdf_extract_text
+                pdf_text = pdf_extract_text(str(p))
+                if pdf_text and pdf_text.strip():
+                    artifacts.enclosed_docs.append((p, pdf_text))
+                else:
+                    findings.append(Finding(
+                        rule="R0",
+                        rule_name="unextractable-pdf",
+                        severity="info",
+                        source_a=p.name,
+                        source_b="",
+                        quote_a="",
+                        quote_b="",
+                        message=f"Could not extract text from enclosed PDF {p.name}",
+                    ))
+            except Exception as exc:
+                findings.append(Finding(
+                    rule="R0",
+                    rule_name="unextractable-pdf",
+                    severity="info",
+                    source_a=p.name,
+                    source_b="",
+                    quote_a="",
+                    quote_b="",
+                    message=f"Could not extract text from enclosed PDF {p.name}: {exc}",
+                ))
+
+
 def _is_kw_in_text(kw: str, text: str) -> bool:
     if kw == "DU":
         return bool(re.search(r"(?<!\w)DU(?!\w)", text))
@@ -253,10 +327,65 @@ def _is_kw_in_text(kw: str, text: str) -> bool:
     return bool(re.search(pattern, text, flags=re.IGNORECASE))
 
 
+def _is_applied_for_position(text: str, start_idx: int, end_idx: int) -> bool:
+    """
+    Determine if a diploma match at (start_idx, end_idx) in text refers to an
+    applied-for position (future/conditional/candidature) rather than a claimed credential.
+    """
+    line_start = text.rfind("\n", 0, start_idx)
+    line_start = 0 if line_start == -1 else line_start + 1
+    line_end = text.find("\n", end_idx)
+    line_end = len(text) if line_end == -1 else line_end
+    line = text[line_start:line_end].strip()
+
+    if re.search(r"^\s*(?:Objet|Subject)\s*:", line, re.IGNORECASE):
+        return True
+
+    claim_window = text[max(0, start_idx - 150):end_idx].lower()
+    if re.search(r"\b(?:titulaire|obtenu|obtained|graduated|diplômé|diplome|holding|completed)\b", claim_window):
+        return False
+
+    win_start = max(0, start_idx - 70)
+    win_end = min(len(text), end_idx + 70)
+    window = text[win_start:win_end].lower()
+
+    applied_patterns = [
+        r"\bcandidat\w*",
+        r"\bpostul\w*",
+        r"\bapply\w*",
+        r"\bapplication\b",
+        r"\bposte\s+de\b",
+        r"\bposition\b",
+        r"\bsujet\s+de\b",
+        r"\boffre\s+de\b",
+        r"\bprojet\s+de\b",
+        r"\bcontrat\s+doctoral\b",
+        r"\bthèse\s+de\b",
+        r"\bpoursuivre\b",
+        r"\bentreprendre\b",
+        r"\bpréparer\b|\bpreparer\b",
+        r"\bréaliser\b|\brealiser\b",
+        r"\benvisage\b",
+        r"\bsouhaite\b",
+        r"\bseeking\b",
+        r"\bpursue\b",
+        r"\bprospective\b",
+        r"\bfellowship\b",
+        r"\bvacancy\b",
+        r"\bopening\b",
+    ]
+
+    for pat in applied_patterns:
+        if re.search(pat, window):
+            return True
+
+    return False
+
+
 def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Finding]) -> None:
     """
     R2 diploma-support: Every diploma named in the letter (either .txt or .tex)
-    must appear in the CV's FORMATION section.
+    must appear in the CV's FORMATION section or enclosed supporting documents.
     """
     if not artifacts.cv_tex or not artifacts.cv_tex.exists():
         return
@@ -293,6 +422,9 @@ def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Findin
             flags = 0 if is_case_sensitive else re.IGNORECASE
             matches = re.finditer(pattern, text, flags=flags)
             for m in matches:
+                if _is_applied_for_position(text, m.start(), m.end()):
+                    continue
+
                 start = max(0, m.start() - 10)
                 end = min(len(text), m.end() + 30)
                 context_phrase = text[start:end].replace("\n", " ").strip()
@@ -303,7 +435,12 @@ def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Findin
                 checked_diplomas.add(diploma_key)
 
                 kw_list = label_keywords.get(label, [label.lower()])
-                if not any(_is_kw_in_text(kw, edu_text) for kw in kw_list):
+                in_edu = any(_is_kw_in_text(kw, edu_text) for kw in kw_list)
+                in_enclosed = any(
+                    any(_is_kw_in_text(kw, doc_text) for kw in kw_list)
+                    for _, doc_text in artifacts.enclosed_docs
+                )
+                if not (in_edu or in_enclosed):
                     findings.append(Finding(
                         rule="R2",
                         rule_name="diploma-support",
@@ -312,7 +449,7 @@ def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Findin
                         source_b=artifacts.cv_tex.name,
                         quote_a=context_phrase,
                         quote_b=edu_text[:200],
-                        message=f"Diploma '{label}' mentioned in letter ({path.name}) does not appear in CV FORMATION section",
+                        message=f"Diploma '{label}' mentioned in letter ({path.name}) does not appear in CV FORMATION section or enclosed supporting documents",
                     ))
 
 
@@ -346,22 +483,53 @@ def _check_r3_diploma_contradiction(artifacts: DossierArtifacts, findings: list[
                 ))
 
 
+def _strip_identifiers(text: str) -> str:
+    """Strip ORCIDs and phone numbers structurally from text so they are not extracted as metrics."""
+    # Mask ORCID: 0000-0002-1825-0097 or https://orcid.org/...
+    text = re.sub(r"\b\d{4}-\d{4}-\d{4}-\d{3}[\dX]\b", lambda m: " " * len(m.group(0)), text)
+    # Mask \cvphone{...}
+    text = re.sub(r"\\cvphone\{[^}]*\}", lambda m: " " * len(m.group(0)), text)
+
+    # Mask standalone phone numbers (starting with + or 0, containing 9-15 digits total)
+    def _replace_phone(m: re.Match) -> str:
+        raw = m.group(0)
+        digits = re.sub(r"\D", "", raw)
+        if 9 <= len(digits) <= 15:
+            return " " * len(raw)
+        return raw
+
+    phone_pattern = r"(?:\+\d{1,4}|\b0\d)(?:[\s\.\-\(\)]*\d){7,13}\b"
+    text = re.sub(phone_pattern, _replace_phone, text)
+    return text
+
+
+def _normalize_latex_numbers(text: str) -> str:
+    r"""Normalize LaTeX numeric decorations ({,}, \, ~, \%) before metric comparison."""
+    text = text.replace("{,}", ",")
+    text = text.replace(r"\,", " ")
+    text = text.replace(r"\~", " ").replace("~", " ")
+    text = text.replace(r"\%", "%")
+    return text
+
+
 def _check_r4_metric_support(artifacts: DossierArtifacts, findings: list[Finding]) -> None:
     """
     R4 metric-support: Every metric in the letter or .txt must occur in the CV
-    with the same subject noun within a short context window.
+    or enclosed supporting documents with the same subject noun within a short context window.
     """
     if not artifacts.cv_tex or not artifacts.cv_tex.exists():
         return
 
-    cv_text = _read_artifact_text(artifacts.cv_tex)
+    cv_text = _normalize_latex_numbers(_strip_identifiers(_read_artifact_text(artifacts.cv_tex)))
 
     letter_paths = [p for p in [artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt] if p and p.exists()]
 
     for path in letter_paths:
-        text = _read_artifact_text(path)
-        # Find explicit numeric figures (> 10, skipping years like 2024, 2026)
-        for m in re.finditer(r"\b(\d{1,3}(?:[\s\.,]\d{3})+|\d{2,4}\+?)\b", text):
+        raw_text = _read_artifact_text(path)
+        text = _normalize_latex_numbers(_strip_identifiers(raw_text))
+
+        # Find explicit numeric figures (> 10, skipping years like 2020..2030)
+        for m in re.finditer(r"\b(\d{1,3}(?:[\s\.,]\d{1,3})+|\d{2,4}\+?)\b", text):
             val_raw = m.group(0).strip()
             val_clean = re.sub(r"[\s\.,\+]", "", val_raw)
             if not val_clean.isdigit():
@@ -375,11 +543,12 @@ def _check_r4_metric_support(artifacts: DossierArtifacts, findings: list[Finding
             end = min(len(text), m.end() + 40)
             letter_window = text[start:end].replace("\n", " ").strip()
 
-            # Check if this metric exists in CV
-            # Normalize digits for matching
+            # Check if this metric exists in CV or in enclosed supporting documents
             cv_has_metric = False
             cv_window = ""
-            for cv_m in re.finditer(r"\b(\d{1,3}(?:[\s\.,]\d{3})+|\d{2,4}\+?)\b", cv_text):
+
+            # 1. Search CV
+            for cv_m in re.finditer(r"\b(\d{1,3}(?:[\s\.,]\d{1,3})+|\d{2,4}\+?)\b", cv_text):
                 cv_raw = cv_m.group(0).strip()
                 cv_clean = re.sub(r"[\s\.,\+]", "", cv_raw)
                 if cv_clean == val_clean:
@@ -389,6 +558,22 @@ def _check_r4_metric_support(artifacts: DossierArtifacts, findings: list[Finding
                     cv_window = cv_text[cv_start:cv_end].replace("\n", " ").strip()
                     break
 
+            # 2. Search enclosed documents if not found in CV
+            if not cv_has_metric:
+                for _, doc_raw in artifacts.enclosed_docs:
+                    doc_text = _normalize_latex_numbers(_strip_identifiers(doc_raw))
+                    for doc_m in re.finditer(r"\b(\d{1,3}(?:[\s\.,]\d{1,3})+|\d{2,4}\+?)\b", doc_text):
+                        doc_raw_val = doc_m.group(0).strip()
+                        doc_clean = re.sub(r"[\s\.,\+]", "", doc_raw_val)
+                        if doc_clean == val_clean:
+                            cv_has_metric = True
+                            doc_start = max(0, doc_m.start() - 50)
+                            doc_end = min(len(doc_text), doc_m.end() + 50)
+                            cv_window = doc_text[doc_start:doc_end].replace("\n", " ").strip()
+                            break
+                    if cv_has_metric:
+                        break
+
             if not cv_has_metric:
                 findings.append(Finding(
                     rule="R4",
@@ -397,8 +582,8 @@ def _check_r4_metric_support(artifacts: DossierArtifacts, findings: list[Finding
                     source_a=path.name,
                     source_b=artifacts.cv_tex.name,
                     quote_a=letter_window,
-                    quote_b="Not found in CV",
-                    message=f"Metric '{val_raw}' in {path.name} is not present in CV",
+                    quote_b="Not found in CV or enclosed supporting documents",
+                    message=f"Metric '{val_raw}' in {path.name} is not present in CV or enclosed supporting documents",
                 ))
             else:
                 # Check subject noun alignment: e.g. Power BI dashboards vs Support N2/N3
@@ -959,6 +1144,9 @@ def check_dossier(
     dir_path = Path(application_dir).resolve()
     artifacts = discover_artifacts(dir_path)
     result = CoherenceResult(application_dir=dir_path)
+
+    # Discover enclosed supporting documents to extend evidence corpus
+    _discover_enclosed_docs(artifacts, result.findings)
 
     # Run Layer 1 rules
     _check_r1_stale_artifact(artifacts, result.findings)

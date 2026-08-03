@@ -410,3 +410,173 @@ def test_r5_subject_parsing_separators() -> None:
     assert pos == "Senior DevOps Engineer"
     assert comp == "ACME Corp"
 
+
+# ─── T-024 False Positive & True Positive Regression Tests ────────────────────
+
+def test_r4_phone_and_orcid_not_flagged_as_metrics(tmp_path: Path) -> None:
+    """Fix 1 (FP): Phone numbers (+33 6 00 00 00 00, 06.00.00.00.00) and ORCIDs (0000-0002-1825-0097) are not flagged as metrics."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_txt = cl_txt_path.read_text(encoding="utf-8")
+    cl_txt += "\nPhone: +33 6 00 00 00 00 / 06.00.00.00.00\nORCID: 0000-0002-1825-0097\n"
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r4_findings = [f for f in result.findings if f.rule == "R4"]
+    assert len(r4_findings) == 0, f"Unexpected R4 findings for phone/ORCID: {r4_findings}"
+
+
+def test_r4_unsupported_numeric_claim_still_flagged(tmp_path: Path) -> None:
+    """Fix 1 (TP): An unsupported numeric claim (e.g. 45 000) in letter is still flagged by R4."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_txt = cl_txt_path.read_text(encoding="utf-8")
+    cl_txt += "\nJ'ai géré un budget de 45 000 € en autonomie.\n"
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r4_findings = [f for f in result.findings if f.rule == "R4"]
+    assert len(r4_findings) > 0
+    assert any("45" in f.message for f in r4_findings)
+
+
+def test_r4_latex_number_formatting_not_flagged(tmp_path: Path) -> None:
+    r"""Fix 2 (FP): LaTeX number decorations ({,}, \, ~, \%) match normalized numbers in CV."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_tex_path = dossier / "cv-owner-LettreMotivation_Support_fr.tex"
+    cl_full_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_short_path = dossier / "cv-owner-LettreMotivation_Courte_Support_fr.txt"
+    cv_tex_path = dossier / "cv-owner-CV_Support_fr.tex"
+
+    cl_tex_path.write_text(cl_tex_path.read_text("utf-8").replace("1 500 utilisateurs", r"18{,}000 utilisateurs et 18\,000 requêtes"), "utf-8")
+    cl_full_path.write_text(cl_full_path.read_text("utf-8").replace("1 500", "18 000"), "utf-8")
+    cl_short_path.write_text(cl_short_path.read_text("utf-8").replace("1 500", "18 000"), "utf-8")
+    cv_tex_path.write_text(cv_tex_path.read_text("utf-8").replace("1 500 utilisateurs", "18 000 utilisateurs et 18 000 requêtes"), "utf-8")
+
+    result = check_dossier(dossier)
+    r4_findings = [f for f in result.findings if f.rule == "R4"]
+    assert len(r4_findings) == 0, f"Unexpected R4 findings for LaTeX formatted numbers: {r4_findings}"
+
+
+def test_r4_mismatched_latex_number_still_flagged(tmp_path: Path) -> None:
+    """Fix 2 (TP): Mismatched LaTeX number (e.g. 18{,}000 attached to Power BI) is still flagged by R4."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_txt = cl_txt_path.read_text(encoding="utf-8")
+    cl_txt += "\nTableaux de bord Power BI pour 18{,}000 utilisateurs.\n"
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r4_findings = [f for f in result.findings if f.rule == "R4"]
+    assert len(r4_findings) > 0
+    assert any("18" in f.message for f in r4_findings)
+
+
+def test_r2_applied_for_phd_position_not_flagged(tmp_path: Path) -> None:
+    """Fix 3 (FP): Applied-for PhD position ('candidature au poste de doctorat') is not flagged by R2 as missing degree."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_txt = """Alex Smith
+Montpellier
+
+Objet : Candidature au poste de doctorat en informatique — LITIS
+
+Madame, Monsieur,
+
+I am applying for the PhD position at LITIS. Je souhaite candidater au poste de doctorat.
+
+Cordialement,
+Alex Smith
+"""
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r2_findings = [f for f in result.findings if f.rule == "R2"]
+    assert len(r2_findings) == 0, f"Unexpected R2 findings for applied PhD position: {r2_findings}"
+
+
+def test_r2_unsupported_claimed_phd_still_flagged(tmp_path: Path) -> None:
+    """Fix 3 (TP): Claimed PhD degree ('Titulaire d'un Doctorat') missing from CV FORMATION is still flagged by R2."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_txt = cl_txt_path.read_text(encoding="utf-8")
+    cl_txt = cl_txt.replace("Titulaire du Master", "Titulaire d'un Doctorat")
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r2_findings = [f for f in result.findings if f.rule == "R2"]
+    assert len(r2_findings) > 0
+    assert any("Doctorat" in f.message for f in r2_findings)
+
+
+def test_r2_r4_enclosed_supporting_documents_support_claims(tmp_path: Path) -> None:
+    """Fix 4 (FP): Claims (diploma DU Big Data, metric 50 000 €) backed by enclosed context file are not reported unsupported."""
+    dossier = _create_clean_dossier(tmp_path)
+    cv_tex_path = dossier / "cv-owner-CV_Support_fr.tex"
+    cl_tex_path = dossier / "cv-owner-LettreMotivation_Support_fr.tex"
+    cl_full_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_short_path = dossier / "cv-owner-LettreMotivation_Courte_Support_fr.txt"
+
+    # Remove DU Big Data and 1 500 metric from CV
+    cv_tex = cv_tex_path.read_text(encoding="utf-8")
+    cv_tex = cv_tex.replace(r"\cvevent{DU Big Data, Data Science}{Université de Montpellier}{2021-2022}{}", "")
+    cv_tex = cv_tex.replace("1 500", "50")
+    cv_tex_path.write_text(cv_tex, encoding="utf-8")
+
+    # Add enclosed supporting document under context/
+    ctx_dir = dossier / "context"
+    ctx_dir.mkdir(exist_ok=True)
+    rec_letter = ctx_dir / "recommendation.txt"
+    rec_letter.write_text("M. Smith est titulaire du DU Big Data et a géré un budget de 50 000 €.", encoding="utf-8")
+
+    # Letter files assert DU Big Data and 50 000 €
+    cl_tex_path.write_text(cl_tex_path.read_text("utf-8").replace("1 500", "50 000"), "utf-8")
+    cl_full_path.write_text(cl_full_path.read_text("utf-8").replace("1 500", "50 000"), "utf-8")
+    cl_short_path.write_text(cl_short_path.read_text("utf-8").replace("1 500", "50 000"), "utf-8")
+
+    result = check_dossier(dossier)
+    r2_findings = [f for f in result.findings if f.rule == "R2"]
+    r4_findings = [f for f in result.findings if f.rule == "R4"]
+    assert len(r2_findings) == 0, f"Unexpected R2 findings: {r2_findings}"
+    assert len(r4_findings) == 0, f"Unexpected R4 findings: {r4_findings}"
+
+
+def test_r2_r4_unsupported_claims_not_in_enclosed_docs_still_flagged(tmp_path: Path) -> None:
+    """Fix 4 (TP): Claims absent from both CV and enclosed documents are still flagged."""
+    dossier = _create_clean_dossier(tmp_path)
+    ctx_dir = dossier / "context"
+    ctx_dir.mkdir(exist_ok=True)
+    (ctx_dir / "letter.txt").write_text("Context document without relevant claims.", encoding="utf-8")
+
+    # Remove DU Big Data from CV
+    cv_tex_path = dossier / "cv-owner-CV_Support_fr.tex"
+    cv_tex = cv_tex_path.read_text(encoding="utf-8")
+    cv_tex = cv_tex.replace(r"\cvevent{DU Big Data, Data Science}{Université de Montpellier}{2021-2022}{}", "")
+    cv_tex_path.write_text(cv_tex, encoding="utf-8")
+
+    # Add unsupported metric 99 000 to letter
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_txt = cl_txt_path.read_text(encoding="utf-8") + "\nGéré 99 000 requêtes."
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r2_findings = [f for f in result.findings if f.rule == "R2"]
+    r4_findings = [f for f in result.findings if f.rule == "R4"]
+    assert len(r2_findings) > 0
+    assert len(r4_findings) > 0
+
+
+def test_enclosed_unextractable_pdf_emits_info_finding(tmp_path: Path) -> None:
+    """Fix 4 (unextractable PDF): A corrupted enclosed PDF emits an INFO-level finding and does not fail the gate."""
+    dossier = _create_clean_dossier(tmp_path)
+    ctx_dir = dossier / "context"
+    ctx_dir.mkdir(exist_ok=True)
+    (ctx_dir / "scanned_corrupted.pdf").write_bytes(b"%PDF-1.4 INVALID CORRUPTED CONTENT")
+
+    result = check_dossier(dossier)
+    info_findings = [f for f in result.findings if f.severity == "info"]
+    assert len(info_findings) > 0
+    assert any("scanned_corrupted.pdf" in f.source_a for f in info_findings)
+    assert result.passed
+
+
