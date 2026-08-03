@@ -11,7 +11,17 @@ Tests include:
 import time
 from pathlib import Path
 
+import pytest
+
+from src.pipeline import coherence as coherence_mod
 from src.pipeline.coherence import check_dossier
+
+
+@pytest.fixture(autouse=True)
+def _no_semantic_pass(monkeypatch):
+    """Layer 2 is on by default in production; keep the suite offline and
+    deterministic by stubbing it out for every test in this module."""
+    monkeypatch.setattr(coherence_mod, "_run_semantic_pass", lambda *a, **k: None)
 
 
 def _create_clean_dossier(tmp_path: Path) -> Path:

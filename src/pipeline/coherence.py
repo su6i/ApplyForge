@@ -7,7 +7,8 @@ Edits to one file trigger detection if sibling artifacts are out-of-date,
 contradictory, unsupported, or incomplete.
 
 Layer 1: Deterministic rules R1..R8 (fast, blocking).
-Layer 2: Semantic review via agy/Gemini (opt-in --semantic, non-blocking).
+Layer 2: Semantic review via agy/Gemini (on by default, --no-semantic to skip;
+non-blocking, and skipped automatically when the agy binary is absent).
 """
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ import json
 import re
 import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -749,13 +751,33 @@ def _check_r8_no_placeholder(artifacts: DossierArtifacts, findings: list[Finding
 
 # ─── Layer 2 Semantic Review ──────────────────────────────────────────────────
 
+def _semantic_unavailable(findings: list[Finding], why: str) -> None:
+    """
+    Record that Layer 2 could not run. Layer 2 is on by default, so a silent
+    skip would read exactly like a clean semantic review — the gate would
+    hand back false confidence on the one layer that catches wording drift.
+    """
+    logger.warning(f"Layer 2 semantic review unavailable: {why}")
+    findings.append(Finding(
+        rule="L2-semantic",
+        rule_name="semantic-unavailable",
+        severity="low",
+        source_a="",
+        source_b="",
+        quote_a=why,
+        quote_b="",
+        message="Layer 2 semantic review did not run — Layer 1 rules only",
+    ))
+
+
 def _run_semantic_pass(artifacts: DossierArtifacts, findings: list[Finding]) -> None:
     """
     Layer 2: LLM semantic review using agy CLI with gemini-3.6-flash-low model.
-    Opt-in, skipped silently if agy binary is absent.
+    On by default; records a LOW finding rather than passing silently when it
+    cannot run.
     """
     if not shutil.which("agy"):
-        logger.debug("agy binary not found in PATH — skipping Layer 2 semantic pass")
+        _semantic_unavailable(findings, "agy binary not found in PATH")
         return
 
     corpus: list[str] = []
@@ -817,11 +839,36 @@ def _run_semantic_pass(artifacts: DossierArtifacts, findings: list[Finding]) -> 
         + full_text
     )
 
+    # agy contract (verified against the CLI, 2026-08-03): the prompt goes behind
+    # -p, --json-schema takes a FILE PATH and is rejected unless --output-format
+    # is json, and the parsed payload comes back under "structured_output" — not
+    # at the top level, which is where this used to look.
     try:
-        cmd = ["agy", "--model", "gemini-3.6-flash-low", "--json-schema", json.dumps(schema), prompt]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        if res.returncode == 0 and res.stdout:
-            data = json.loads(res.stdout)
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as fh:
+            json.dump(schema, fh)
+            schema_path = fh.name
+        try:
+            cmd = [
+                "agy", "-p", prompt,
+                "--model", "gemini-3.6-flash-low",
+                "--output-format", "json",
+                "--json-schema", schema_path,
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        finally:
+            Path(schema_path).unlink(missing_ok=True)
+
+        if res.returncode != 0 or not res.stdout.strip():
+            _semantic_unavailable(
+                findings,
+                f"agy exited {res.returncode}: {(res.stderr or res.stdout).strip()[:200]}",
+            )
+        else:
+            envelope = json.loads(res.stdout)
+            if envelope.get("status") != "SUCCESS":
+                _semantic_unavailable(findings, f"agy status={envelope.get('status')}")
+                return
+            data = envelope.get("structured_output") or {}
             for c in data.get("contradictions", []):
                 findings.append(Finding(
                     rule="L2-semantic",
@@ -833,8 +880,30 @@ def _run_semantic_pass(artifacts: DossierArtifacts, findings: list[Finding]) -> 
                     quote_b=c.get("claim_b", ""),
                     message="Semantic contradiction detected by LLM",
                 ))
+            for u in data.get("unsupported_claims", []):
+                findings.append(Finding(
+                    rule="L2-semantic",
+                    rule_name="semantic-unsupported-claim",
+                    severity="medium",
+                    source_a=u.get("source", ""),
+                    source_b="",
+                    quote_a=u.get("claim", ""),
+                    quote_b=u.get("why", ""),
+                    message="Claim not supported by the other artifacts",
+                ))
+            for d in data.get("narrative_drift", []):
+                findings.append(Finding(
+                    rule="L2-semantic",
+                    rule_name="semantic-narrative-drift",
+                    severity="low",
+                    source_a=", ".join(d.get("sources", [])),
+                    source_b="",
+                    quote_a=d.get("issue", ""),
+                    quote_b="",
+                    message="Narrative drift between artifacts",
+                ))
     except Exception as exc:
-        logger.warning(f"Layer 2 semantic review failed: {exc}")
+        _semantic_unavailable(findings, f"{type(exc).__name__}: {exc}")
 
 
 # ─── Report Generator & Public API ────────────────────────────────────────────
@@ -876,12 +945,12 @@ def format_report(result: CoherenceResult) -> str:
 
 def check_dossier(
     application_dir: Path | str,
-    semantic: bool = False,
+    semantic: bool = True,
     report_path: Path | str | None = None,
     write_report: bool = True,
 ) -> CoherenceResult:
     """
-    Run Layer 1 deterministic coherence gate (R1..R8) and optional Layer 2
+    Run Layer 1 deterministic coherence gate (R1..R8) and the Layer 2
     semantic review on an application folder.
 
     Writes COHERENCE.md report in application_dir (or report_path if specified)
@@ -901,7 +970,7 @@ def check_dossier(
     _check_r7_language(artifacts, result.findings)
     _check_r8_no_placeholder(artifacts, result.findings)
 
-    # Optional Layer 2 semantic pass
+    # Layer 2 semantic pass (default on; no-ops when agy is unavailable)
     if semantic:
         _run_semantic_pass(artifacts, result.findings)
 

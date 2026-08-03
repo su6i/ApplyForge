@@ -6,7 +6,7 @@ Modes:
     uv run main.py apply <url> [--template] [--lang auto|<language>] [--licence]   → Generate application from terminal
     uv run main.py spontaneous <role> [--city <city>] [--lang <language>] → Candidature spontanée (no LLM)
     uv run main.py preview [--template] [--lang <language>] [--no-localize-preview] → Preview CV with full profile data
-    uv run main.py check <dir> [--semantic]   → Coherence gate audit on application folder
+    uv run main.py check <dir> [--no-semantic] → Coherence gate audit on application folder
     uv run main.py init-profile [--cv path]   → Parse LaTeX CV into resume_profile.json
     uv run main.py test                       → Sanity-check settings
 
@@ -160,7 +160,7 @@ def cmd_init_profile(cv_path: str | None = None) -> None:
     print(f"   Proj  : {len(profile.get('projects', []))} projects\n")
 
 
-def cmd_check(app_dir: str, semantic: bool = False, report_path: str | None = None) -> None:
+def cmd_check(app_dir: str, semantic: bool = True, report_path: str | None = None) -> None:
     """Run coherence gate checks on an application folder."""
     from pathlib import Path
     from src.pipeline.coherence import check_dossier, format_report
@@ -380,10 +380,12 @@ def main() -> None:
 
     elif command == "check":
         if len(args) < 2:
-            print("Usage: uv run main.py check <application_dir> [--semantic] [--report <path>]")
+            print("Usage: uv run main.py check <application_dir> [--no-semantic] [--report <path>]")
             sys.exit(1)
         app_dir = args[1]
-        semantic = "--semantic" in args
+        # Layer 2 runs by default (owner decision 2026-08-03): it costs $0 via agy
+        # flash and catches the wording contradictions R1..R8 cannot see.
+        semantic = "--no-semantic" not in args
         report_path = None
         if "--report" in args:
             idx = args.index("--report")

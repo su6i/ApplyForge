@@ -351,6 +351,36 @@ found/applied position files) lives outside this repo, in the personal-data vaul
 
 ---
 
+## Coherence Gate (`main.py check`)
+
+A generated application is a set of documents that must tell **one** story: the CV,
+the letter PDF and the two `.txt` letters all restate the same degrees, the same
+figures and the same identity. Editing one of them by hand — which is the normal
+workflow — silently desynchronises the rest. The gate audits a finished folder for
+exactly that:
+
+```bash
+uv run main.py check "$APPLY_BASE_DIR/Job-Search/applied/2026-08-03_Acme_Technicien_fr"
+```
+
+It reads whatever is **on disk right now** (not the pipeline's in-memory bundle), so
+hand-edits are covered. Layer 1 is eight deterministic rules — R1 stale artifact
+(mtime + SHA sidecar), R2/R3 degree support and contradiction, R4 figures backed by
+the CV *on the same subject*, R5 identity, R6 completeness and letter format, R7 one
+language per document, R8 leftover placeholders. Layer 2 is a single free `agy`
+flash call that catches wording contradictions the rules cannot see; it **runs by
+default**, is non-blocking, and no-ops when `agy` is not installed.
+
+```bash
+uv run main.py check <dir> --no-semantic          # Layer 1 only, fully offline
+uv run main.py check <dir> --report /tmp/out.md   # write the report elsewhere
+```
+
+`COHERENCE.md` is written into the folder only when the target sits inside this repo;
+for folders in the personal vault the report goes to stdout unless `--report` is given.
+
+---
+
 ## Technical Documentation
 
 For developers, AI agents, or anyone who wants to understand the internals:
