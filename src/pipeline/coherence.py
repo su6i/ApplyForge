@@ -101,11 +101,28 @@ def _sha256_text(path: Path) -> str:
         return ""
 
 
+def _strip_latex_comments(text: str) -> str:
+    """Strip LaTeX comments (unescaped % to end of line)."""
+    lines = []
+    for line in text.splitlines():
+        cleaned = re.sub(r"(?<!\\)(?:\\\\)*%.*", "", line)
+        lines.append(cleaned)
+    return "\n".join(lines)
+
+
+def _read_artifact_text(path: Path) -> str:
+    """Read artifact text, stripping LaTeX comments if path is a .tex file."""
+    text = path.read_text(encoding="utf-8")
+    if path.suffix.lower() == ".tex":
+        return _strip_latex_comments(text)
+    return text
+
+
 def _extract_education_text(cv_tex: Path) -> str:
     """Extract text inside the CV's Education / Formation section."""
     if not cv_tex or not cv_tex.exists():
         return ""
-    text = cv_tex.read_text(encoding="utf-8")
+    text = _read_artifact_text(cv_tex)
 
     # Locate Education / Formation section
     pattern = r"\\(?:cv)?section\{[^}]*(?:Education|Formation)[^}]*\}(.*?)(?=\\(?:cv)?section|\Z)"
@@ -119,7 +136,7 @@ def _extract_profile_text(cv_tex: Path) -> str:
     """Extract text inside the CV's Profile / Summary section."""
     if not cv_tex or not cv_tex.exists():
         return ""
-    text = cv_tex.read_text(encoding="utf-8")
+    text = _read_artifact_text(cv_tex)
 
     pattern = r"\\(?:cv)?section\{[^}]*(?:Profile|Profil|Summary|Résumé)[^}]*\}(.*?)(?=\\(?:cv)?section|\Z)"
     match = re.search(pattern, text, flags=re.IGNORECASE | re.DOTALL)
@@ -227,6 +244,13 @@ def _check_r1_stale_artifact(artifacts: DossierArtifacts, findings: list[Finding
             logger.warning(f"Could not read sidecar .coherence.json: {exc}")
 
 
+def _is_kw_in_text(kw: str, text: str) -> bool:
+    if kw == "DU":
+        return bool(re.search(r"(?<!\w)DU(?!\w)", text))
+    pattern = r"(?<!\w)" + re.escape(kw) + r"(?!\w)"
+    return bool(re.search(pattern, text, flags=re.IGNORECASE))
+
+
 def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Finding]) -> None:
     """
     R2 diploma-support: Every diploma named in the letter (either .txt or .tex)
@@ -236,10 +260,9 @@ def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Findin
         return
 
     edu_text = _extract_education_text(artifacts.cv_tex)
-    edu_text_lc = edu_text.lower()
 
     label_keywords = {
-        "DU": ["du", "d.u.", "diplôme universitaire"],
+        "DU": ["DU", "D.U.", "d.u.", "diplôme universitaire", "diplome universitaire", "diplôme d'université", "diplome d'universite"],
         "Master": ["master", "msc", "bac+5"],
         "Licence": ["licence", "bachelor", "bsc", "bac+3"],
         "Doctorat/PhD": ["doctorat", "phd", "ph.d."],
@@ -248,23 +271,25 @@ def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Findin
         "DUT": ["dut"],
     }
 
-    diploma_patterns = [
-        (r"\bDU\b|\bD\.U\.\b|\bDiplôme Universitaire\b", "DU"),
-        (r"\bMaster\b|\bMSc\b|\bBac\+5\b", "Master"),
-        (r"\bLicence\b|\bBachelor\b|\bBSc\b|\bBac\+3\b", "Licence"),
-        (r"\bDoctorat\b|\bPhD\b|\bPh\.D\.\b", "Doctorat/PhD"),
-        (r"\bIngénieur\b", "Ingénieur"),
-        (r"\bBTS\b", "BTS"),
-        (r"\bDUT\b", "DUT"),
+    diploma_patterns: list[tuple[str, str, bool]] = [
+        (r"(?<!\w)DU(?!\w)", "DU", True),
+        (r"\bD\.U\.\b|\bDipl[ôo]me\s+Universitaire\b|\bDipl[ôo]me\s+d['’]Universit[ée]\b", "DU", False),
+        (r"\bMaster\b|\bMSc\b|\bBac\+5\b", "Master", False),
+        (r"\bLicence\b|\bBachelor\b|\bBSc\b|\bBac\+3\b", "Licence", False),
+        (r"\bDoctorat\b|\bPhD\b|\bPh\.D\.\b", "Doctorat/PhD", False),
+        (r"\bIngénieur\b|\bIngenieur\b", "Ingénieur", False),
+        (r"\bBTS\b", "BTS", False),
+        (r"\bDUT\b", "DUT", False),
     ]
 
     letter_paths = [p for p in [artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt] if p and p.exists()]
     checked_diplomas: set[str] = set()
 
     for path in letter_paths:
-        text = path.read_text(encoding="utf-8")
-        for pattern, label in diploma_patterns:
-            matches = re.finditer(pattern, text, flags=re.IGNORECASE)
+        text = _read_artifact_text(path)
+        for pattern, label, is_case_sensitive in diploma_patterns:
+            flags = 0 if is_case_sensitive else re.IGNORECASE
+            matches = re.finditer(pattern, text, flags=flags)
             for m in matches:
                 start = max(0, m.start() - 10)
                 end = min(len(text), m.end() + 30)
@@ -276,7 +301,7 @@ def _check_r2_diploma_support(artifacts: DossierArtifacts, findings: list[Findin
                 checked_diplomas.add(diploma_key)
 
                 kw_list = label_keywords.get(label, [label.lower()])
-                if not any(kw in edu_text_lc for kw in kw_list):
+                if not any(_is_kw_in_text(kw, edu_text) for kw in kw_list):
                     findings.append(Finding(
                         rule="R2",
                         rule_name="diploma-support",
@@ -304,7 +329,7 @@ def _check_r3_diploma_contradiction(artifacts: DossierArtifacts, findings: list[
     # If CV profile presents DU Big Data as central, letter must not omit it or claim contradicting primary degree
     if ("du big data" in profile_lc or "diplôme universitaire" in profile_lc) and "master" not in profile_lc:
         for path in letter_paths:
-            text = path.read_text(encoding="utf-8")
+            text = _read_artifact_text(path)
             text_lc = text.lower()
             if "master" in text_lc and "du" not in text_lc and "diplôme universitaire" not in text_lc:
                 findings.append(Finding(
@@ -327,12 +352,12 @@ def _check_r4_metric_support(artifacts: DossierArtifacts, findings: list[Finding
     if not artifacts.cv_tex or not artifacts.cv_tex.exists():
         return
 
-    cv_text = artifacts.cv_tex.read_text(encoding="utf-8")
+    cv_text = _read_artifact_text(artifacts.cv_tex)
 
     letter_paths = [p for p in [artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt] if p and p.exists()]
 
     for path in letter_paths:
-        text = path.read_text(encoding="utf-8")
+        text = _read_artifact_text(path)
         # Find explicit numeric figures (> 10, skipping years like 2024, 2026)
         for m in re.finditer(r"\b(\d{1,3}(?:[\s\.,]\d{3})+|\d{2,4}\+?)\b", text):
             val_raw = m.group(0).strip()
@@ -400,7 +425,7 @@ def _check_r5_identity(artifacts: DossierArtifacts, findings: list[Finding]) -> 
     for path in [artifacts.cv_tex, artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt]:
         if not path or not path.exists():
             continue
-        text = path.read_text(encoding="utf-8")
+        text = _read_artifact_text(path)
         id_data: dict[str, str] = {}
 
         if path.suffix == ".tex":
@@ -533,7 +558,7 @@ def _check_r7_language(artifacts: DossierArtifacts, findings: list[Finding]) -> 
         if not path or not path.exists():
             continue
 
-        text = path.read_text(encoding="utf-8")
+        text = _read_artifact_text(path)
         is_fr = "_fr" in path.name.lower() or "madame, monsieur" in text.lower() or "objet :" in text.lower()
         is_en = "_en" in path.name.lower() or "dear hiring manager" in text.lower() or "subject:" in text.lower()
 
@@ -598,7 +623,7 @@ def _check_r8_no_placeholder(artifacts: DossierArtifacts, findings: list[Finding
     for path in [artifacts.cv_tex, artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt]:
         if not path or not path.exists():
             continue
-        text = path.read_text(encoding="utf-8")
+        text = _read_artifact_text(path)
         for pat, label in patterns:
             match = re.search(pat, text, flags=re.IGNORECASE)
             if match:
@@ -628,7 +653,7 @@ def _run_semantic_pass(artifacts: DossierArtifacts, findings: list[Finding]) -> 
     corpus: list[str] = []
     for p in [artifacts.cv_tex, artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt]:
         if p and p.exists():
-            corpus.append(f"--- ARTIFACT: {p.name} ---\n" + p.read_text(encoding="utf-8"))
+            corpus.append(f"--- ARTIFACT: {p.name} ---\n" + _read_artifact_text(p))
 
     if not corpus:
         return

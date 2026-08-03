@@ -191,3 +191,11 @@ uv run main.py apply <url> --lang fr --licence
 ```
 
 This sets `include_licence=True` in `ApplicationService.generate()`, which appends the `conditional_education` entries directly to `content.extra_education` after the LLM step.  The LLM itself never sees or generates `extra_education` entries.
+
+---
+
+## Coherence Gate
+
+Evaluates consistency across CV and cover letter artifacts via deterministic rules (R1..R8) and optional semantic LLM review.
+R2 validates diploma support using word-boundary anchored matching for degrees including DU variants ("Diplôme d'Université").
+R8 strips LaTeX comments (`%` to end-of-line) before checking for unfilled placeholders (`[...]`).

@@ -271,3 +271,53 @@ def test_rule_r8_no_placeholder(tmp_path: Path) -> None:
     result = check_dossier(dossier)
     assert not result.passed
     assert any(f.rule == "R8" and "[Company Name]" in f.quote_a for f in result.findings)
+
+
+def test_r2_diplome_d_universite_support(tmp_path: Path) -> None:
+    """
+    R2 fires when letter names 'Diplôme d'Université' but CV FORMATION contains only Licence
+    at an institution with preposition 'du' (e.g. Institut Jahade Daneshgahi du Khouzestan).
+    """
+    dossier = _create_clean_dossier(tmp_path)
+    cv_tex_path = dossier / "cv-owner-CV_Support_fr.tex"
+    cl_tex_path = dossier / "cv-owner-LettreMotivation_Support_fr.tex"
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_short_path = dossier / "cv-owner-LettreMotivation_Courte_Support_fr.txt"
+
+    # CV FORMATION section has Licence at "Institut Jahade Daneshgahi du Khouzestan" but NO DU
+    cv_tex = cv_tex_path.read_text(encoding="utf-8")
+    cv_tex_no_du = cv_tex.replace(
+        r"\cvevent{DU Big Data, Data Science}{Université de Montpellier}{2021-2022}{}",
+        r"\cvevent{Licence}{Institut Jahade Daneshgahi du Khouzestan}{2019-2021}{}",
+    )
+    cv_tex_path.write_text(cv_tex_no_du, encoding="utf-8")
+
+    # Letter names "Diplôme d'Université"
+    cl_tex = cl_tex_path.read_text(encoding="utf-8").replace("du DU Big Data", "du Diplôme d'Université en Big Data")
+    cl_tex_path.write_text(cl_tex, encoding="utf-8")
+    cl_txt = cl_txt_path.read_text(encoding="utf-8").replace("du DU Big Data", "du Diplôme d'Université en Big Data")
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+    cl_short = cl_short_path.read_text(encoding="utf-8").replace("du DU Big Data", "du Diplôme d'Université en Big Data")
+    cl_short_path.write_text(cl_short, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    assert not result.passed
+    r2_findings = [f for f in result.findings if f.rule == "R2"]
+    assert len(r2_findings) > 0
+    assert any("DU" in f.message for f in r2_findings)
+
+
+def test_r8_ignores_placeholder_in_latex_comment(tmp_path: Path) -> None:
+    """R8 passes when [...] placeholder is contained entirely within a LaTeX %-comment line."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_tex_path = dossier / "cv-owner-LettreMotivation_Support_fr.tex"
+
+    # Insert comment line containing [...] into letter .tex
+    cl_tex = cl_tex_path.read_text(encoding="utf-8")
+    cl_tex_with_comment = "% ⚠️ DO NOT leave any placeholder brackets [...] in the final version.\n" + cl_tex
+    cl_tex_path.write_text(cl_tex_with_comment, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r8_findings = [f for f in result.findings if f.rule == "R8"]
+    assert len(r8_findings) == 0
+
