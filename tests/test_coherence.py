@@ -321,3 +321,82 @@ def test_r8_ignores_placeholder_in_latex_comment(tmp_path: Path) -> None:
     r8_findings = [f for f in result.findings if f.rule == "R8"]
     assert len(r8_findings) == 0
 
+
+def test_r5_position_title_with_dash(tmp_path: Path) -> None:
+    """R5 does not report false positive position/company mismatch when position title contains a dash."""
+    dossier = _create_clean_dossier(tmp_path)
+    cv_tex_path = dossier / "cv-owner-CV_Support_fr.tex"
+    cl_tex_path = dossier / "cv-owner-LettreMotivation_Support_fr.tex"
+    cl_txt_path = dossier / "cv-owner-LettreMotivation_Support_fr.txt"
+    cl_short_path = dossier / "cv-owner-LettreMotivation_Courte_Support_fr.txt"
+
+    pos_title = "Reconversion Consultant(e) SAP - Roanne"
+    company = "Sopra Steria"
+
+    # Update CV .tex
+    cv_tex = cv_tex_path.read_text(encoding="utf-8")
+    cv_tex = cv_tex.replace(r"\newcommand{\PositionTitle}{Technicien Support}", f"\\newcommand{{\\PositionTitle}}{{{pos_title}}}")
+    cv_tex = cv_tex.replace(r"\newcommand{\CompanyName}{Acme Corp}", f"\\newcommand{{\\CompanyName}}{{{company}}}")
+    cv_tex_path.write_text(cv_tex, encoding="utf-8")
+
+    # Update Letter .tex
+    cl_tex = cl_tex_path.read_text(encoding="utf-8")
+    cl_tex = cl_tex.replace(r"\newcommand{\PositionTitle}{Technicien Support}", f"\\newcommand{{\\PositionTitle}}{{{pos_title}}}")
+    cl_tex = cl_tex.replace(r"\newcommand{\CompanyName}{Acme Corp}", f"\\newcommand{{\\CompanyName}}{{{company}}}")
+    cl_tex_path.write_text(cl_tex, encoding="utf-8")
+
+    # Update .txt full
+    cl_txt = cl_txt_path.read_text(encoding="utf-8")
+    cl_txt = cl_txt.replace("Objet : Candidature au poste de Technicien Support — Acme Corp", f"Objet : Candidature au poste de {pos_title} — {company}")
+    cl_txt_path.write_text(cl_txt, encoding="utf-8")
+
+    # Update .txt short
+    cl_short = cl_short_path.read_text(encoding="utf-8")
+    cl_short = cl_short.replace("Objet : Candidature au poste de Technicien Support — Acme Corp", f"Objet : Candidature au poste de {pos_title}")
+    cl_short_path.write_text(cl_short, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r5_findings = [f for f in result.findings if f.rule == "R5"]
+    assert len(r5_findings) == 0, f"Unexpected R5 findings: {r5_findings}"
+
+
+def test_r5_short_letter_signature_name_only(tmp_path: Path) -> None:
+    """R5 extracts candidate name from signature block when short letter has no contact header."""
+    dossier = _create_clean_dossier(tmp_path)
+    cl_short_path = dossier / "cv-owner-LettreMotivation_Courte_Support_fr.txt"
+
+    # Rewrite short letter without top header lines (starts directly with Objet line)
+    short_content = """Objet : Candidature au poste de Technicien Support — Acme Corp
+
+Madame, Monsieur,
+
+Titulaire du Master et du DU Big Data, je candidate pour le poste de Technicien Support chez Acme Corp.
+Support pour 1 500 utilisateurs.
+
+Cordialement,
+Alex Smith
++00-00000000 — alex@example.com
+"""
+    cl_short_path.write_text(short_content, encoding="utf-8")
+
+    result = check_dossier(dossier)
+    r5_findings = [f for f in result.findings if f.rule == "R5"]
+    assert len(r5_findings) == 0, f"Unexpected R5 findings: {r5_findings}"
+
+
+def test_r5_subject_parsing_separators() -> None:
+    """Unit tests for _parse_subject_line handling of dashes and English/French templates."""
+    from src.pipeline.coherence import _parse_subject_line
+
+    pos, comp = _parse_subject_line("Objet : Candidature au poste de Reconversion Consultant(e) SAP - Roanne — Sopra Steria")
+    assert pos == "Reconversion Consultant(e) SAP - Roanne"
+    assert comp == "Sopra Steria"
+
+    pos, comp = _parse_subject_line("Objet : Candidature au poste de Reconversion Consultant(e) SAP - Roanne")
+    assert pos == "Reconversion Consultant(e) SAP - Roanne"
+    assert comp is None
+
+    pos, comp = _parse_subject_line("Subject: Application for the Senior DevOps Engineer position — ACME Corp")
+    assert pos == "Senior DevOps Engineer"
+    assert comp == "ACME Corp"
+

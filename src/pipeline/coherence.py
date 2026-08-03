@@ -415,6 +415,98 @@ def _check_r4_metric_support(artifacts: DossierArtifacts, findings: list[Finding
                         ))
 
 
+def _norm_id_val(s: str | None) -> str:
+    """Normalize identity value by collapsing whitespace and stripping trailing punctuation."""
+    if not s:
+        return ""
+    s = re.sub(r"\s+", " ", s).strip()
+    s = s.rstrip(".,;:")
+    return s
+
+
+def _parse_subject_line(text: str) -> tuple[str | None, str | None]:
+    """
+    Extract (position_title, company_name) from letter subject line.
+    Handles French and English templates:
+      FR: "Objet : Candidature au poste de X — Y" or "Objet : Candidature au poste de X"
+      EN: "Subject: Application for the X position — Y" or "Subject: Application for X position — Y"
+    Splits on the LAST separator ('—', '--', ' - ') between position and company.
+    """
+    match = re.search(
+        r"^\s*(?:Objet|Subject)\s*:\s*(.*)$", text, flags=re.IGNORECASE | re.MULTILINE
+    )
+    if not match:
+        return None, None
+
+    subj_body = match.group(1).strip()
+
+    raw_pos_comp = None
+    if re.match(r"^Candidature au poste de\s+", subj_body, re.IGNORECASE):
+        raw_pos_comp = re.sub(r"^Candidature au poste de\s+", "", subj_body, flags=re.IGNORECASE).strip()
+    elif re.match(r"^Application for(?: the)?\s+", subj_body, re.IGNORECASE):
+        raw_pos_comp = re.sub(r"^Application for(?: the)?\s+", "", subj_body, flags=re.IGNORECASE).strip()
+    else:
+        raw_pos_comp = subj_body
+
+    if not raw_pos_comp:
+        return None, None
+
+    pos: str | None = None
+    comp: str | None = None
+
+    if "—" in raw_pos_comp:
+        parts = raw_pos_comp.rsplit("—", 1)
+        pos, comp = parts[0].strip(), parts[1].strip()
+    elif " -- " in raw_pos_comp:
+        parts = raw_pos_comp.rsplit(" -- ", 1)
+        pos, comp = parts[0].strip(), parts[1].strip()
+
+    if pos is None:
+        pos = raw_pos_comp
+        comp = None
+
+    if pos:
+        pos = re.sub(r"\s+position$", "", pos, flags=re.IGNORECASE).strip()
+
+    return pos if pos else None, comp if comp else None
+
+
+def _extract_name_from_txt(text: str) -> str | None:
+    """
+    Extract candidate name from a .txt artifact.
+    Checks header lines (first 5 non-empty lines) and signature block lines (last 5 non-empty lines).
+    Returns name string if found, otherwise None.
+    """
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        return None
+
+    def _is_valid_name(line: str) -> bool:
+        if not (3 <= len(line) <= 60):
+            return False
+        if any(c in line for c in "@+0123456789=<>{}[]/\\"):
+            return False
+        if re.search(r"^(?:Objet|Subject|Madame|Monsieur|Dear|Cordialement|Sincerely|Dans l|Veuillez|Best|Regards|Bien|http|www)", line, re.IGNORECASE):
+            return False
+        if "," in line or "mobile" in line.lower() or "france" in line.lower():
+            return False
+        if len(re.findall(r"[a-zA-ZÀ-ÿ]", line)) < 2:
+            return False
+        return True
+
+    # 1. Check header lines (before subject/salutation)
+    for line in lines[:5]:
+        if _is_valid_name(line):
+            return line
+
+    # 2. Check signature block lines (last 5 non-empty lines)
+    for line in reversed(lines[-5:]):
+        if _is_valid_name(line):
+            return line
+
+    return None
+
+
 def _check_r5_identity(artifacts: DossierArtifacts, findings: list[Finding]) -> None:
     """
     R5 identity: Company name, position title, candidate name, phone, e-mail,
@@ -429,44 +521,57 @@ def _check_r5_identity(artifacts: DossierArtifacts, findings: list[Finding]) -> 
         id_data: dict[str, str] = {}
 
         if path.suffix == ".tex":
-            m_comp = re.search(r"\\newcommand\{\\CompanyName\}\{([^}]*)\}", text)
+            m_comp = re.search(r"\\(?:newcommand|providecommand)\{\\CompanyName\}\{([^}]*)\}", text)
             if m_comp:
-                id_data["company"] = m_comp.group(1).strip()
+                id_data["company"] = _norm_id_val(m_comp.group(1))
 
-            m_title = re.search(r"\\newcommand\{\\PositionTitle\}\{([^}]*)\}", text)
+            m_title = re.search(r"\\(?:newcommand|providecommand)\{\\PositionTitle\}\{([^}]*)\}", text)
             if m_title:
-                id_data["position"] = m_title.group(1).strip()
+                id_data["position"] = _norm_id_val(m_title.group(1))
 
             m_name = re.search(r"\\(?:newcommand\{)?\\cvname\}?\{([^}]*)\}", text)
             if m_name:
-                id_data["name"] = m_name.group(1).strip()
+                id_data["name"] = _norm_id_val(m_name.group(1))
 
             m_phone = re.search(r"\\(?:newcommand\{)?\\cvphone\}?\{([^}]*)\}", text)
             if m_phone:
-                id_data["phone"] = m_phone.group(1).strip()
+                id_data["phone"] = _norm_id_val(m_phone.group(1))
 
             m_email = re.search(r"\\(?:newcommand\{)?\\cvemail\}?\{([^}]*)\}", text)
             if m_email:
-                id_data["email"] = m_email.group(1).strip()
+                id_data["email"] = _norm_id_val(m_email.group(1))
 
             m_city = re.search(r"\\(?:re)?new-?command\{\\cvlocation\}\{([^}]*)\}", text)
             if m_city:
-                id_data["city"] = m_city.group(1).strip().split(",")[0].strip()
+                id_data["city"] = _norm_id_val(m_city.group(1).split(",")[0])
+
+            # If position or company not set by macro in .tex, check subject line in .tex
+            if "position" not in id_data or "company" not in id_data:
+                pos_subj, comp_subj = _parse_subject_line(text)
+                if "position" not in id_data and pos_subj:
+                    id_data["position"] = _norm_id_val(pos_subj)
+                if "company" not in id_data and comp_subj:
+                    id_data["company"] = _norm_id_val(comp_subj)
         else:  # .txt
-            # Subject line extraction
-            m_subj = re.search(r"(?:Objet|Subject)\s*:\s*Candidature au poste de ([^—\-]+)[—\-]\s*(.*)", text, re.IGNORECASE)
-            if m_subj:
-                id_data["position"] = m_subj.group(1).strip()
-                id_data["company"] = m_subj.group(2).strip()
+            pos_subj, comp_subj = _parse_subject_line(text)
+            if pos_subj:
+                id_data["position"] = _norm_id_val(pos_subj)
+            if comp_subj:
+                id_data["company"] = _norm_id_val(comp_subj)
+
+            name = _extract_name_from_txt(text)
+            if name:
+                id_data["name"] = _norm_id_val(name)
 
             lines = [line.strip() for line in text.splitlines() if line.strip()]
-            if lines:
-                id_data["name"] = lines[0]
-            for line in lines[:5]:
-                if "@" in line:
-                    id_data["email"] = line
-                elif re.search(r"[\+\d\s\.\-]{8,}", line) and not line.startswith("Objet"):
-                    id_data["phone"] = line
+            for line in lines:
+                m_em = re.search(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b", line)
+                if m_em and "email" not in id_data:
+                    id_data["email"] = _norm_id_val(m_em.group(0))
+
+                m_ph = re.search(r"\+?\d[\d\s\.\-]{7,}\d", line)
+                if m_ph and "phone" not in id_data and not line.startswith("Objet") and not line.startswith("Subject"):
+                    id_data["phone"] = _norm_id_val(m_ph.group(0))
 
         identities[path.name] = id_data
 
@@ -474,17 +579,20 @@ def _check_r5_identity(artifacts: DossierArtifacts, findings: list[Finding]) -> 
     field_labels = ["company", "position", "name", "phone", "email"]
     for f_key in field_labels:
         values = {name: data[f_key] for name, data in identities.items() if f_key in data and data[f_key]}
-        if len(set(values.values())) > 1:
-            sources = list(values.keys())
+        unique_vals = set(values.values())
+        if len(unique_vals) > 1:
+            items = list(values.items())
+            src_a, val_a = items[0]
+            src_b, val_b = next((s, v) for s, v in items if v != val_a)
             findings.append(Finding(
                 rule="R5",
                 rule_name="identity",
                 severity="high",
-                source_a=sources[0],
-                source_b=sources[1],
-                quote_a=f"{f_key}='{values[sources[0]]}'",
-                quote_b=f"{f_key}='{values[sources[1]]}'",
-                message=f"Identity mismatch for '{f_key}' between {sources[0]} and {sources[1]}",
+                source_a=src_a,
+                source_b=src_b,
+                quote_a=f"{f_key}='{val_a}'",
+                quote_b=f"{f_key}='{val_b}'",
+                message=f"Identity mismatch for '{f_key}' between {src_a} and {src_b}",
             ))
 
 
@@ -766,13 +874,18 @@ def format_report(result: CoherenceResult) -> str:
     return "\n".join(lines) + "\n"
 
 
-def check_dossier(application_dir: Path | str, semantic: bool = False) -> CoherenceResult:
+def check_dossier(
+    application_dir: Path | str,
+    semantic: bool = False,
+    report_path: Path | str | None = None,
+    write_report: bool = True,
+) -> CoherenceResult:
     """
     Run Layer 1 deterministic coherence gate (R1..R8) and optional Layer 2
     semantic review on an application folder.
 
-    Writes COHERENCE.md report in application_dir and updates .coherence.json
-    when green.
+    Writes COHERENCE.md report in application_dir (or report_path if specified)
+    and updates .coherence.json when green (if write_report is True).
     """
     dir_path = Path(application_dir).resolve()
     artifacts = discover_artifacts(dir_path)
@@ -792,12 +905,16 @@ def check_dossier(application_dir: Path | str, semantic: bool = False) -> Cohere
     if semantic:
         _run_semantic_pass(artifacts, result.findings)
 
-    # Write COHERENCE.md
+    # Write report if report_path explicitly specified or write_report is True
     report_md = format_report(result)
-    (dir_path / "COHERENCE.md").write_text(report_md, encoding="utf-8")
 
-    # Update .coherence.json sidecar hashes when clean
-    if result.passed:
+    if report_path:
+        Path(report_path).write_text(report_md, encoding="utf-8")
+    elif write_report:
+        (dir_path / "COHERENCE.md").write_text(report_md, encoding="utf-8")
+
+    # Update .coherence.json sidecar hashes when clean and write_report is True
+    if result.passed and write_report:
         hashes: dict[str, str] = {}
         for path in [artifacts.cv_tex, artifacts.cl_tex, artifacts.cl_full_txt, artifacts.cl_short_txt]:
             if path and path.exists():
@@ -805,3 +922,5 @@ def check_dossier(application_dir: Path | str, semantic: bool = False) -> Cohere
         (dir_path / ".coherence.json").write_text(json.dumps(hashes, indent=2), encoding="utf-8")
 
     return result
+
+

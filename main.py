@@ -160,17 +160,34 @@ def cmd_init_profile(cv_path: str | None = None) -> None:
     print(f"   Proj  : {len(profile.get('projects', []))} projects\n")
 
 
-def cmd_check(app_dir: str, semantic: bool = False) -> None:
+def cmd_check(app_dir: str, semantic: bool = False, report_path: str | None = None) -> None:
     """Run coherence gate checks on an application folder."""
     from pathlib import Path
     from src.pipeline.coherence import check_dossier, format_report
 
-    target_dir = Path(app_dir)
+    target_dir = Path(app_dir).resolve()
     if not target_dir.exists():
         print(f"❌ Application directory not found: {app_dir}")
         sys.exit(1)
 
-    result = check_dossier(target_dir, semantic=semantic)
+    repo_root = Path.cwd().resolve()
+    try:
+        is_inside_repo = target_dir.is_relative_to(repo_root)
+    except AttributeError:
+        try:
+            target_dir.relative_to(repo_root)
+            is_inside_repo = True
+        except ValueError:
+            is_inside_repo = False
+
+    write_report = is_inside_repo or (report_path is not None)
+
+    result = check_dossier(
+        target_dir,
+        semantic=semantic,
+        report_path=report_path,
+        write_report=write_report,
+    )
     report = format_report(result)
     print(report)
 
@@ -363,11 +380,16 @@ def main() -> None:
 
     elif command == "check":
         if len(args) < 2:
-            print("Usage: uv run main.py check <application_dir> [--semantic]")
+            print("Usage: uv run main.py check <application_dir> [--semantic] [--report <path>]")
             sys.exit(1)
         app_dir = args[1]
         semantic = "--semantic" in args
-        cmd_check(app_dir, semantic)
+        report_path = None
+        if "--report" in args:
+            idx = args.index("--report")
+            if idx + 1 < len(args):
+                report_path = args[idx + 1]
+        cmd_check(app_dir, semantic, report_path)
 
     elif command == "test":
         cmd_test()
