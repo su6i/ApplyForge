@@ -246,6 +246,14 @@ class ApplicationService:
             job_url=job_url,
         )
 
+        from src.pipeline.coherence import check_dossier
+        coh_res = check_dossier(bundle.output_dir)
+        if not coh_res.passed:
+            raise RuntimeError(
+                f"Coherence gate failed ({len(coh_res.findings)} issue(s)). "
+                f"See {bundle.output_dir / 'COHERENCE.md'}"
+            )
+
         logger.info(
             f"Application generated:\n"
             f"  CV                : {bundle.cv_pdf}\n"
@@ -256,6 +264,7 @@ class ApplicationService:
             f"  Top skills        : {', '.join(content.tailored_skills[:5])}"
         )
         return bundle
+
 
     def preview(
         self,

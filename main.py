@@ -6,6 +6,7 @@ Modes:
     uv run main.py apply <url> [--template] [--lang auto|<language>] [--licence]   → Generate application from terminal
     uv run main.py spontaneous <role> [--city <city>] [--lang <language>] → Candidature spontanée (no LLM)
     uv run main.py preview [--template] [--lang <language>] [--no-localize-preview] → Preview CV with full profile data
+    uv run main.py check <dir> [--semantic]   → Coherence gate audit on application folder
     uv run main.py init-profile [--cv path]   → Parse LaTeX CV into resume_profile.json
     uv run main.py test                       → Sanity-check settings
 
@@ -157,6 +158,24 @@ def cmd_init_profile(cv_path: str | None = None) -> None:
     print(f"   Skills: {sum(len(v) for v in profile.get('skills', {}).values())} entries")
     print(f"   Exp   : {len(profile.get('experience', []))} positions")
     print(f"   Proj  : {len(profile.get('projects', []))} projects\n")
+
+
+def cmd_check(app_dir: str, semantic: bool = False) -> None:
+    """Run coherence gate checks on an application folder."""
+    from pathlib import Path
+    from src.pipeline.coherence import check_dossier, format_report
+
+    target_dir = Path(app_dir)
+    if not target_dir.exists():
+        print(f"❌ Application directory not found: {app_dir}")
+        sys.exit(1)
+
+    result = check_dossier(target_dir, semantic=semantic)
+    report = format_report(result)
+    print(report)
+
+    if not result.passed:
+        sys.exit(1)
 
 
 def _llm_status(model: str, deepseek_key: str, openai_key: str, gemini_key: str) -> dict:
@@ -342,12 +361,20 @@ def main() -> None:
                 
         cmd_preview(template, role, color, output_language, localize_preview)
 
+    elif command == "check":
+        if len(args) < 2:
+            print("Usage: uv run main.py check <application_dir> [--semantic]")
+            sys.exit(1)
+        app_dir = args[1]
+        semantic = "--semantic" in args
+        cmd_check(app_dir, semantic)
+
     elif command == "test":
         cmd_test()
 
     else:
         print(f"Unknown command: {command!r}")
-        print("Available commands: bot, apply <url>, spontaneous <role>, preview, test")
+        print("Available commands: bot, apply <url>, spontaneous <role>, preview, check <dir>, test")
         sys.exit(1)
 
 

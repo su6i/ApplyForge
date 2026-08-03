@@ -38,6 +38,7 @@ LLM extracts four cover-letter variables:
   Note: personal_data.tex provides \cvlinkedin and \cvgithub as full paths
   (e.g. "linkedin.com/in/su6i") — templates must NOT prepend the base URL.
 • Generate standardized filenames: {CV_OWNER_SLUG}-{DocumentType}_{Role}_{Language}.tex
+• Coherence Gate (src/pipeline/coherence.py): Run Layer 1 (R1..R8) deterministic validation and optional Layer 2 semantic review to ensure all dossier artifacts (CV, cover letter, full & short text) are consistent, fully supported, and up to date. Saves COHERENCE.md report.
 • pdflatex ×2  →  CV.pdf
 • xelatex  ×1  →  CoverLetter.pdf
   │

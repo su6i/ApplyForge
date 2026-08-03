@@ -197,7 +197,7 @@ def test_add_source_priority_insert(tmp_path):
     src = tmp_path / "sources.md"
     src.write_text("first | http://a.com | \nsecond | http://b.com | \n")
     sources.add_source(src, "Inserted", "http://c.com", "", priority=2)
-    lines = [l for l in src.read_text().splitlines() if l.strip()]
+    lines = [line for line in src.read_text().splitlines() if line.strip()]
     assert lines[1].startswith("Inserted")
 
 

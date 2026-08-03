@@ -109,10 +109,20 @@ def build(
             role=role,
         )
 
+    # Run coherence gate after writing all artifacts — log loud warning if red (never raise here)
+    from src.pipeline.coherence import check_dossier
+    coh_res = check_dossier(output_dir)
+    if not coh_res.passed:
+        logger.warning(
+            f"⚠️  COHERENCE GATE FAILED for {output_dir.name} ({len(coh_res.findings)} issue(s)). "
+            f"See {output_dir / 'COHERENCE.md'} for full audit table."
+        )
+
     return ApplicationBundle(
         output_dir=output_dir, cv_pdf=cv_pdf, cl_pdf=cl_pdf,
         cl_full_txt=cl_full_txt, cl_short_txt=cl_short_txt
     )
+
 
 
 # ─── Spontaneous application ──────────────────────────────────────────────────
