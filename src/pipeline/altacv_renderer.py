@@ -433,7 +433,9 @@ def _section_contact(
 def _section_profile(summary: str, language: str) -> str:
     return (
         f"\\cvsection{{{_label('profile', language)}}}\n"
-        f"{{\\small {latex_escape(summary)}\\par}}\n"
+        # \justifying — every hand-written altacv template justifies the profile
+        # block; the renderer used to drop it, so generated CVs came out ragged.
+        f"{{\\small\\justifying {latex_escape(summary)}\\par}}\n"
     )
 
 

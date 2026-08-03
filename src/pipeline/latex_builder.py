@@ -61,6 +61,7 @@ class ApplicationBundle:
     output_dir: Path
     cv_pdf: Path
     cl_pdf: Path | None = None
+    cl_full_txt: Path | None = None
     cl_short_txt: Path | None = None
 
 
@@ -94,6 +95,9 @@ def build(
 
     cv_pdf = _build_cv(role, content, output_dir, profile, template, job_url)
     cl_pdf = _build_cover_letter(role, content, output_dir, job_url)
+    cl_full_txt = _write_full_cover_letter_txt(
+        role, content, output_dir, letter_tex=cl_pdf.with_suffix(".tex") if cl_pdf else None
+    )
     cl_short_txt = _write_short_cover_letter(role, content, output_dir)
 
     if job_posting and job_url:
@@ -106,7 +110,8 @@ def build(
         )
 
     return ApplicationBundle(
-        output_dir=output_dir, cv_pdf=cv_pdf, cl_pdf=cl_pdf, cl_short_txt=cl_short_txt
+        output_dir=output_dir, cv_pdf=cv_pdf, cl_pdf=cl_pdf,
+        cl_full_txt=cl_full_txt, cl_short_txt=cl_short_txt
     )
 
 
@@ -410,6 +415,70 @@ def _build_cover_letter(role: RoleType, content: TailoredContent, output_dir: Pa
 
     logger.info(f"Cover letter compiled: {cl_pdf}")
     return cl_pdf
+
+
+def _personal_data() -> dict[str, str]:
+    """Identity values from templates/shared/personal_data.tex, as a plain dict."""
+    pd_tex = TEMPLATES_SHARED / "personal_data.tex"
+    if not pd_tex.exists():
+        return {}
+    text = pd_tex.read_text(encoding="utf-8")
+    return {m.group(1): m.group(2) for m in re.finditer(r"\\newcommand\{\\(\w+)\}\{([^}]*)\}", text)}
+
+
+def _write_full_cover_letter_txt(
+    role: RoleType, content: TailoredContent, output_dir: Path, letter_tex: Path | None = None
+) -> Path | None:
+    """
+    Write the full cover letter as plain text, next to the PDF. Portals that
+    reject PDFs (or truncate them) need the same letter as pasteable text — and
+    it must be the *same* letter, so it is rendered from the same content fields
+    the .tex is filled from, never re-written by hand.
+    """
+    if not content.cl_intro and not content.cl_body:
+        logger.warning("No cl_intro/cl_body — skipping full cover-letter .txt")
+        return None
+
+    lang = (content.language or "en").lower()
+    fr = lang == "fr"
+    pd = _personal_data()
+    body = content.cl_body if isinstance(content.cl_body, list) else [content.cl_body]
+
+    # The city is decided per application and injected into the .tex, so read it
+    # back from there — the text file must state the same address as the PDF.
+    location = pd.get("cvlocation", "")
+    if letter_tex and letter_tex.exists():
+        m = re.search(r"\\renewcommand\{\\cvlocation\}\{([^}]*)\}", letter_tex.read_text(encoding="utf-8"))
+        if m:
+            location = m.group(1)
+
+    # Contact block: one line each, mirroring the letter header in the .tex.
+    header = "\n".join(
+        v for v in (pd.get("cvname"), location, pd.get("cvphone"), pd.get("cvemail")) if v
+    )
+    subject = (
+        f"Objet : Candidature au poste de {content.position_title} — {content.company_name}"
+        if fr else
+        f"Subject: Application for the {content.position_title} position — {content.company_name}"
+    )
+    salutation = "Madame, Monsieur," if fr else "Dear Hiring Manager,"
+    closing = (
+        "Dans l'attente de votre retour, je vous prie d'agréer, Madame, Monsieur, "
+        "l'expression de mes salutations distinguées."
+        if fr else
+        "Thank you for your time and consideration. I look forward to hearing from you."
+    )
+    paragraphs = [p.strip() for p in (content.cl_intro, *body, content.why_this_company) if p and p.strip()]
+
+    letter = "\n\n".join(
+        [header, subject, salutation, *paragraphs, closing, pd.get("cvname", "")]
+    ) + "\n"
+
+    label = "LettreMotivation" if fr else "CoverLetter"
+    txt_path = output_dir / f"{CV_OWNER_SLUG}-{label}_{_canonical_role_label(str(role))}_{lang}.txt"
+    txt_path.write_text(letter, encoding="utf-8")
+    logger.info(f"Full cover letter written as text: {txt_path}")
+    return txt_path
 
 
 def _write_short_cover_letter(role: RoleType, content: TailoredContent, output_dir: Path) -> Path | None:
