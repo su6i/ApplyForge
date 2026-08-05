@@ -183,8 +183,15 @@ def test_technicien_track_is_downlevelled_for_interim():
     assert "Technicien" in tex
     assert "Ingénieur" not in tex.split("\\cvsection{Compétences}")[0], \
         "the header/profil block must not call the candidate Ingénieur"
-    assert "DU Big Data" not in tex, "the DU is a liability in the intérim channel"
-    assert "sans permis B" in tex, "sédentaire-only must be stated explicitly"
+    # The down-levelled track must not carry the DU under ANY spelling. The
+    # old single-substring check ("DU Big Data") only ever passed on a
+    # technicality: the template shipped "(DU) Big Data", which does not
+    # contain that substring, so the assertion never tested anything.
+    for marker in ("DU Big Data", "(DU)", "Diplôme d'Université", "Big Data"):
+        assert marker not in tex, f"the DU leaked into the intérim CV as {marker!r}"
+    # No template volunteers a driving-licence status: it answers a question
+    # the posting did not ask and can only ever narrow the match.
+    assert "permis" not in tex.lower(), "the CV must not mention the permis at all"
 
 
 def test_no_template_states_a_year_count():
