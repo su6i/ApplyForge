@@ -17,7 +17,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.core import roles as r
 
 CANONICAL = ["python", "polyvalent",
-    "technicien", "ai", "devops", "devops_alternance", "phd", "support"]
+    "technicien", "ai", "devops", "devops_alternance", "phd", "ingenieur_etude",
+    "support"]
 
 
 def test_canonical_keys():

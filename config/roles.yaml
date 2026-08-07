@@ -118,6 +118,32 @@ roles:
     spontaneous: {folder: lato, file: CV_PhD_en.tex, lang: en}
     variant:     {fr: it, en: python}
 
+  ingenieur_etude:
+    label: IngenieurEtude
+    # Placeholder: shares the AI layout until a dedicated CV_IngenieurEtude
+    # baseline is written. The stub CV_IngenieurEtude_fr.tex is a copy of CV_AI_fr.
+    #
+    # Deliberately NOT merged into `ai` or `phd`: an IGE posting is scored on
+    # delivered technical platforms and support-to-research, not on
+    # publications, so the CV must lead with engineering deliverables. And it is
+    # a permanent corps post, so the alternance/interim framings are wrong too.
+    description: >-
+      Ingénieur d'études (IGE) — research-support and study/design engineer
+      posts, typically in French public research (CNRS, INRAE, INSERM, IRD,
+      universités; BAP E "informatique, statistiques et calcul scientifique")
+      and in engineering firms. Covers building and operating research
+      software, data platforms, instrumentation and scientific computing in
+      support of research programmes. Match "ingénieur d'études",
+      "ingénieur d'étude", "IGE", "ingénieur études et développement". Do NOT
+      match "ingénieur de recherche" / "IR" — a distinct, higher corps — nor
+      generic "ingénieur" titles that fit a more specialised track.
+    lang: fr
+    skill_order: [ai_ml, mlops_devops, data, networks_support]
+    cv:          {folder: altacv, file: CV_IngenieurEtude_fr.tex}
+    lato:        {file: CV_AI_en.tex, stem: AI}
+    spontaneous: {folder: altacv, file: CV_IngenieurEtude_fr.tex, lang: fr}
+    variant:     {fr: ai, en: ai}
+
   support:
     label: Support
     description: >-
