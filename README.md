@@ -194,6 +194,7 @@ Filenames follow `CV_<Label>_<lang>.tex`, matching the role labels in
 | File | Role | Use for |
 |---|---|---|
 | `CV_AI_fr.tex` / `CV_AI_en.tex` | `ai` | AI / MLOps roles |
+| `CV_IngenieurEtude_fr.tex` | `ingenieur_etude` | Ingénieur d'études / IGE (placeholder copy of AI) |
 | `CV_DevOpsAlternance_fr.tex` | `devops`, `devops_alternance` | DevOps (alternance layout) |
 | `CV_Polyvalent_fr.tex` | `polyvalent` | Polyvalent / interim agency (French) |
 | `CV_Python_fr.tex` | `python` | Generalist Python (placeholder copy of Polyvalent) |
@@ -232,6 +233,7 @@ uv run main.py spontaneous devops                # DevOps (French)
 uv run main.py spontaneous devops_alternance     # DevOps alternance / work-study (French)
 uv run main.py spontaneous support               # Network / support technicien (French)
 uv run main.py spontaneous phd                   # PhD / Research (English)
+uv run main.py spontaneous ingenieur_etude       # Ingénieur d'études / IGE (French)
 uv run main.py spontaneous polyvalent            # Polyvalent / interim (French)
 uv run main.py spontaneous technicien            # Intérim technicien-tier, no DU/honours (French)
 
